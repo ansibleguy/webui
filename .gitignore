@@ -2,3 +2,4 @@
 dist/
 venv/
 ansible_webui.egg-info/
+__pychache__.py
