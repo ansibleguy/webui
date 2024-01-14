@@ -4,10 +4,26 @@ This project was inspired by [ansible-semaphore](https://github.com/ansible-sema
 
 The goal is to allow users to quickly install a WebUI for using Ansible locally.
 
+This is achived by [distributing it using pip](https://pypi.org/project/ansible-webui/).
+
 Keep it simple.
 
-**This project is still in active development! DO NOT USE IN PRODUCTION!**
+**This project is still in early development! DO NOT USE IN PRODUCTION!**
 
+----
+
+## Setup
+
+```
+# requirements
+python3 -m pip install -r requirements.txt
+
+# webui
+python3 -m pip install ansible-webui
+
+# run
+python3 -m ansible-webui
+```
 
 ----
 

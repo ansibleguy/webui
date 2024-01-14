@@ -1,0 +1,21 @@
+# webui
+gunicorn
+django
+django-bootstrap-v5
+django-bootstrap-datepicker-plus
+
+pycryptodome
+pytz
+
+pyyaml
+ua-parser
+user-agents
+django-user-agents
+
+# ansible
+ansible-core
+## ansible runtime
+jmespath
+netaddr
+passlib
+winrm
