@@ -5,7 +5,7 @@ from datetime import datetime
 project = 'Ansible WebUI'
 copyright = f'{datetime.now().year}, AnsibleGuy'
 author = 'AnsibleGuy'
-extensions = ['sphinx_rtd_theme', 'myst_parser']
+extensions = ['sphinx_rtd_theme']
 templates_path = ['_templates']
 exclude_patterns = []
 html_theme = 'sphinx_rtd_theme'

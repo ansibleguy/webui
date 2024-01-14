@@ -1,5 +1,9 @@
 # Ansible WebUI
 
+[![Documentation](https://readthedocs.org/projects/ansible-webui/badge/?version=latest)](https://ansible-webui.readthedocs.io/en/latest/?badge=latest)
+[![Lint](https://github.com/ansibleguy/ansible-webui/actions/workflows/lint.yml/badge.svg)](https://github.com/ansibleguy/ansible-webui/actions/workflows/lint.yml)
+[![Test](https://github.com/ansibleguy/ansible-webui/actions/workflows/test.yml/badge.svg)](https://github.com/ansibleguy/ansible-webui/actions/workflows/test.yml)
+
 This project was inspired by [ansible-semaphore](https://github.com/ansible-semaphore/semaphore).
 
 The goal is to allow users to quickly install a WebUI for using Ansible locally.
@@ -24,6 +28,12 @@ python3 -m pip install ansible-webui
 # run
 python3 -m ansible-webui
 ```
+
+----
+
+## Usage
+
+[Documentation](http://ansible-webui.readthedocs.io/)
 
 ----
 

@@ -7,3 +7,6 @@ rules:
     allowed-values: ['true', 'false', 'yes', 'no']
   line-length:
     max: 160
+
+ignore: |
+  venv/*

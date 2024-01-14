@@ -21,10 +21,7 @@
             {% endfor %}
         {% endif %}
         <div class="alert alert-info">
-            {% if user.is_authenticated %}
-                Your account doesn't have access to this page. To proceed,
-                please login with an account that has access.
-            {% else %}
+            {% if not user.is_authenticated %}
                 Please login to see this page.
             {% endif %}
         </div>
@@ -43,11 +40,5 @@
             <br>
             <button type="submit" value="login" class="btn btn-secondary">Login</button>
         </form>
-        <div class="alert alert-info aw-info-special-mode">
-            <strong>This is the GrowAutomation Beta-System</strong><br>
-            You can get access to this preview by supporting our cause:<br>
-            <a href="https://github.com/sponsors/ansibleguy">Sponsor</a>
-        </div>
-        {% endif %}
     </div>
 {% endblock %}

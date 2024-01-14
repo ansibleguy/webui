@@ -12,5 +12,3 @@ class BareModel(models.Model):
 
     class Meta:
         abstract = True
-
-

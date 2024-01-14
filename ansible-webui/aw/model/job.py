@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from django.contrib.auth.models import Group
 
 from crontab import CronTab
 
@@ -13,14 +14,45 @@ class JobError(BareModel):
     logfile = models.FilePathField()
 
 
-class Job(BareModel):
-    field_list = ['inventory', 'playbook', 'schedule', 'name', 'job_id']
+class JobPermission(BareModel):
+    field_list = ['name', 'permission', 'users', 'groups']
 
+    name = models.CharField(max_length=100)
+    permission = models.CharField(
+        max_length=50,
+        choices=[('all', 'Full'), ('read', 'Read'), ('write', 'Write'), ('execute', 'Execute')],
+    )
+    users = models.ManyToManyField(
+        settings.AUTH_USER_MODEL,
+        through='JobPermissionMemberUser',
+        through_fields=('permission', 'user'),
+    )
+    groups = models.ManyToManyField(
+        Group,
+        through='JobPermissionMemberGroup',
+        through_fields=('permission', 'group'),
+    )
+
+
+class JobPermissionMemberUser(BareModel):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    permission = models.ForeignKey(JobPermission, on_delete=models.CASCADE)
+
+
+class JobPermissionMemberGroup(BareModel):
+    group = models.ForeignKey(Group, on_delete=models.CASCADE)
+    permission = models.ForeignKey(JobPermission, on_delete=models.CASCADE)
+
+
+class Job(BareModel):
+    field_list = ['job_id', 'inventory', 'playbook', 'schedule', 'name', 'permission']
+
+    job_id = models.PositiveIntegerField(primary_key=True)
     inventory = models.CharField(max_length=150)
     playbook = models.CharField(max_length=150)
     schedule = models.CharField(max_length=50, validators=[CronTab])
     name = models.CharField(max_length=100)
-    job_id = models.PositiveIntegerField(max_length=50)
+    permission = models.ForeignKey(JobPermission, on_delete=models.SET_NULL, null=True)
 
 
 class JobExecution(BareModel):
@@ -31,7 +63,7 @@ class JobExecution(BareModel):
     ]
 
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING, blank=True, null=True,
+        settings.AUTH_USER_MODEL, on_delete=models.PROTECT, blank=True, null=True,
         related_name=f"jobexec_fk_user"
     )
     job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name=f"jobexec_fk_job")

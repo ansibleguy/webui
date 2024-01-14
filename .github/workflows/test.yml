@@ -38,6 +38,22 @@ jobs:
           pip install -r requirements.txt
         shell: bash
 
+      - name: Testing DB migrations for errors
+        run: |
+          python3 manage.py makemigrations
+          python3 manage.py migrate
+        shell: bash
+        working-directory: ansible-webui/
+
+      - name: Testing DB migrations for warnings
+        run: |
+          m1=$(python3 manage.py makemigrations 2>&1)
+          if echo "$m1" | grep -q 'WARNING'; then exit 1;fi
+          m2=$(python3 manage.py migrate 2>&1)
+          if echo "$m2" | grep -q 'WARNING'; then exit 1;fi
+        shell: bash
+        working-directory: ansible-webui/
+
       - name: Running Tests
         run: python3 -m pytest
         shell: bash

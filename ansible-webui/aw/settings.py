@@ -3,12 +3,15 @@ from os import path as os_path
 from os import environ
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve()
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 from aw.config.main import config
+from aw.config.hardcoded import ENV_KEY_DEV, LOGIN_PATH
 
 
+DEBUG = ENV_KEY_DEV in environ
 ALLOWED_HOSTS = ['*']
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 # Application definition
 INSTALLED_APPS = [
@@ -83,9 +86,9 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [os_path.join(BASE_DIR, 'static/')]
+STATICFILES_DIRS = [BASE_DIR / 'aw' / 'static']
 LOGIN_REDIRECT_URL = '/ui/'
-LOGOUT_REDIRECT_URL = '/accounts/login/'
+LOGOUT_REDIRECT_URL = LOGIN_PATH
 handler403 = 'aw.utils.handlers.handler403'
 handler500 = 'aw.utils.handlers.handler500'
 
