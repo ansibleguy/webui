@@ -32,6 +32,7 @@ jobs:
       - name: Update version in setup.py
         run: >-
           sed -i 's/version=.*/version="${{ steps.version.outputs.TAG_NAME }}",/g' setup.py
+          sed -i 's/VERSION =.*/VERSION = "${{ steps.version.outputs.TAG_NAME }}"/g' ansible-webui/aw/config/hardcoded.py
 
       - name: Building
         run: python3 -m build

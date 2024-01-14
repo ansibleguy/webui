@@ -1,0 +1,53 @@
+{% extends "../body.html" %}
+{% load util %}
+{% load static %}
+{% block content %}
+    <div align="center" style="display: block;">
+        <img src="{% static 'img/ansible.svg' %}" alt="" onerror="this.style.display='none'" class="aw-img-float"/>
+    </div>
+    <div class="aw-login">
+        {% if form.errors %}
+            {% for field in form %}
+                {% for error in field.errors %}
+                    <div class="alert alert-danger">
+                        <strong>{{ error|escape }}</strong>
+                    </div>
+                {% endfor %}
+            {% endfor %}
+            {% for error in form.non_field_errors %}
+                <div class="alert alert-danger">
+                    <strong>{{ error|escape }}</strong>
+                </div>
+            {% endfor %}
+        {% endif %}
+        <div class="alert alert-info">
+            {% if user.is_authenticated %}
+                Your account doesn't have access to this page. To proceed,
+                please login with an account that has access.
+            {% else %}
+                Please login to see this page.
+            {% endif %}
+        </div>
+        <br>
+        <form method="post" action="{% url 'login' %}">
+            {% csrf_token %}
+            <label for="id_username" class="aw-login-fields">
+                Username:
+                <input class="aw-login-fields form-control" type="text" name="username" autofocus="" autocapitalize="none" autocomplete="username" maxlength="150" required="" id="id_username">
+            </label>
+            <br>
+            <label for="id_password" class="aw-login-fields">
+                Password:
+                <input class="form-control" type="password" name="password" autocomplete="current-password" required="" id="id_password">
+            </label>
+            <br>
+            <button type="submit" value="login" class="btn btn-secondary">Login</button>
+        </form>
+        <div class="alert alert-info aw-info-special-mode">
+            <strong>This is the GrowAutomation Beta-System</strong><br>
+            You can get access to this preview by supporting our cause:<br>
+            <a href="https://github.com/sponsors/ansibleguy">Sponsor</a>
+        </div>
+        {% endif %}
+    </div>
+{% endblock %}

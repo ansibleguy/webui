@@ -10,8 +10,8 @@ templates_path = ['_templates']
 exclude_patterns = []
 html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
-html_logo = 'https://avatars.githubusercontent.com/u/44586252?s=280&v=4'
-html_favicon = '_static/img/favicon.ico'
+html_logo = 'https://raw.githubusercontent.com/ansible/logos/main/vscode-ansible-logo/vscode-ansible.svg'
+html_favicon = 'https://raw.githubusercontent.com/ansible/logos/main/vscode-ansible-logo/vscode-ansible.svg'
 html_css_files = ['css/main.css']
 master_doc = 'index'
 display_version = True

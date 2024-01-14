@@ -2,35 +2,45 @@
 
 
 if __name__ == '__main__':
-    from multiprocessing import cpu_count
+    import signal
     from platform import uname
+    from threading import Thread
+    from os import getpid, environ
+    from os import kill as os_kill
+    from time import sleep
 
-    from gunicorn.app.wsgiapp import WSGIApplication
+    from gunicorn.arbiter import Arbiter
+
+    from aw.config.main import init_globals
+    init_globals()
+
+    from base.webserver import create_webserver
+    from base.scheduler import Scheduler
 
     if uname().system.lower() != 'linux':
         raise SystemError('Currently only linux systems are supported!')
 
+    scheduler = Scheduler()
+    schedulerThread = Thread(target=scheduler.start)
+    webserver = create_webserver()
 
-    class StandaloneApplication(WSGIApplication):
-        def __init__(self, app_uri, options=None):
-            self.options = options or {}
-            self.app_uri = app_uri
-            super().__init__()
+    # override gunicorn signal handling to allow for graceful shutdown
+    def signal_exit(signum=None, stack=None):
+        scheduler.stop(signum)
+        os_kill(getpid(), signal.SIGQUIT)  # trigger 'Arbiter.stop'
+        sleep(5)
+        exit(0)
 
-        def load_config(self):
-            config = {
-                key: value
-                for key, value in self.options.items()
-                if key in self.cfg.settings and value is not None
-            }
-            for key, value in config.items():
-                self.cfg.set(key.lower(), value)
+    def signal_reload(signum=None, stack=None):
+        scheduler.reload(signum)
 
-    # https://docs.gunicorn.org/en/stable/settings.html
-    options = {
-        'bind': '127.0.0.1:8000',
-        'workers': (cpu_count() * 2) + 1,
-        'reload': False,
-        'loglevel': 'warning',
-    }
-    StandaloneApplication("aw.main:app", options).run()
+    Arbiter.SIGNALS.remove(signal.SIGHUP)
+    Arbiter.SIGNALS.remove(signal.SIGINT)
+    Arbiter.SIGNALS.remove(signal.SIGTERM)
+
+    signal.signal(signal.SIGHUP, signal_reload)
+    signal.signal(signal.SIGINT, signal_exit)
+    signal.signal(signal.SIGTERM, signal_exit)
+
+    schedulerThread.start()
+    webserver.run()

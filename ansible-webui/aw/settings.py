@@ -1,12 +1,14 @@
 from pathlib import Path
 from os import path as os_path
 from os import environ
-from secrets import choice as random_choice
-from string import digits, ascii_letters, punctuation
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve()
 
+from aw.config.main import config
+
+
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 INSTALLED_APPS = [
@@ -31,7 +33,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django_user_agents.middleware.UserAgentMiddleware',
 ]
-ROOT_URLCONF = 'urls'
+ROOT_URLCONF = 'route'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -82,18 +84,10 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [os_path.join(BASE_DIR, 'static/')]
-LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = '/ui/'
+LOGOUT_REDIRECT_URL = '/accounts/login/'
 handler403 = 'aw.utils.handlers.handler403'
 handler500 = 'aw.utils.handlers.handler500'
 
-ENVIRON_FALLBACK = {
-    'AW_TIMEZONE': 'GMT',
-    'AW_SECRET': ''.join(random_choice(ascii_letters + digits + punctuation) for i in range(50)),
-}
-
-if 'AW_TIMEZONE' not in environ:
-    AW_TIMEZONE = ENVIRON_FALLBACK['AW_TIMEZONE']
-
-if 'AW_SECRET' not in environ:
-    AW_SECRET = ENVIRON_FALLBACK['AW_SECRET']
+SECRET_KEY = config['_secret']
+TIMEZONE = config['timezone']

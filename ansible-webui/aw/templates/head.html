@@ -1,0 +1,24 @@
+{% load util %}
+{% load static %}
+{% if title %}
+    <title>{{ title }}</title>
+{% else %}
+    <title>Ansible WebUI</title>
+{% endif %}
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="color-scheme" content="light dark" />
+{% if request.user_agent.is_mobile %}
+    <meta name="viewport" content="width=640"/>
+{% endif %}
+<link rel="icon" type="image/jpg" href="{% static 'img/ansible.svg' %}">
+
+{% load bootstrap5 %}
+{% bootstrap_javascript %}
+{% bootstrap_css %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/aw.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'css/aw_mobile.css' %}">
+

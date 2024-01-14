@@ -1,21 +1,17 @@
 # webui
 gunicorn
-django
+Django==4.*
 django-bootstrap-v5
 django-bootstrap-datepicker-plus
-
 pycryptodome
 pytz
-
 pyyaml
 ua-parser
 user-agents
 django-user-agents
 
+# scheduling
+crontab
+
 # ansible
 ansible-core
-## ansible runtime
-jmespath
-netaddr
-passlib
-winrm

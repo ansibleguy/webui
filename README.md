@@ -31,6 +31,8 @@ python3 -m ansible-webui
 
 Feel free to contribute to this project using [pull-requests](https://github.com/ansibleguy/ansible-webui/pulls), [issues](https://github.com/ansibleguy/ansible-webui/issues) and [discussions](https://github.com/ansibleguy/ansible-webui/discussions)!
 
+See also: [Contributing](https://github.com/ansibleguy/ansible-webui/blob/latest/CONTRIBUTE.md)
+
 
 ----
 
@@ -56,7 +58,7 @@ Feel free to contribute to this project using [pull-requests](https://github.com
 
   - [ ] Ad-Hoc execution
 
-  - [ ] Scheduled execution
+  - [ ] Scheduled execution (Cron-Format)
 
   - [ ] Job Logging
 

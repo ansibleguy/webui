@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 {% load util %}
+{% load static %}
 <html lang="en">
     <head>
         {% include "./head.html" %}
@@ -11,9 +12,6 @@
     <body>
         {% include "./nav.html" %}
         {% include "./error/js_disabled.html" %}
-        {% if hide_warning == False %}
-            {% include "./warn/connection_public.html" %}
-        {% endif %}
         <main class="aw-main">
             {% if title %}
             <h1 class="aw-header">{{ title }}</h1>
@@ -26,7 +24,7 @@
             <footer class="aw-footer">
                 <div class="aw-footer-text">
                     <div>
-                        © {% now 'Y' %} AnsibleGuy | Version {% get_version %}
+                        © {% now 'Y' %} AnsibleGuy | Version {% get_version %} | <a href="https://github.com/sponsors/ansibleguy">Sponsor</a>
                     </div>
                 </div>
             </footer>

@@ -1,6 +1,0 @@
-{% load util %}
-{% if request|client_is_public %}
-    <div class="alert alert-warning">
-        {{ 'public' | warning | safe }}
-    </div>
-{% endif %}

@@ -1,0 +1,76 @@
+@media only screen and (max-width: 1300px) {  /* tablets */
+    .aw-text-responsive, .aw-text-responsive .btn {
+        font-size: 0.9rem;
+    }
+
+    .aw-form-inline-right {
+        float: none;
+    }
+}
+
+@media only screen and (max-width: 991px) {
+    .aw-nav-main {
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+
+    .aw-nav-left, .aw-nav-dd1, .aw-nav-dd2, .aw-nav-main-a1, .aw-nav-main-a2, .aw-nav-main-a3 {
+        align-items: center !important;
+        text-align: center !important;
+    }
+
+    .aw-nav-right {
+        flex-direction: row !important;
+        align-items: center;
+        justify-content: center;
+        border-top: 2px solid rgba(255, 255, 255, 0.6);
+        margin-top: 10px;
+    }
+
+    .aw-nav-right-li {
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+
+}
+
+@media only screen and (max-width: 801px) {  /* tablets */
+    .aw-text-responsive, .aw-text-responsive .btn {
+        font-size: 0.9rem;
+    }
+
+}
+
+@media only screen and (max-width: 500px) {  /* mobile devices */
+    .aw-text-responsive, .aw-text-responsive .btn {
+        font-size: 0.8rem;
+    }
+
+    .aw-file-content-line {
+        text-indent: -5vw;
+        padding-left: 5vw;
+    }
+
+    .aw-login {
+        width: 70vw;
+    }
+
+    .aw-login-fields {
+        width: 70vw;
+    }
+
+    .aw-btn-action-icon {
+        font-size: 20px !important;
+    }
+
+    .aw-btn-action {
+        padding: 1px 1px !important;
+    }
+
+}
+
+@include media-breakpoint-between(xs,sm){
+  .btn {
+      @include button-size($btn-padding-y-sm, $btn-padding-x-sm, $font-size-sm, $btn-border-radius-sm);
+  }
+}
