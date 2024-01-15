@@ -1,17 +1,23 @@
 # Contribute
 
+## Testing
+
 You can run the service in its development mode:
 
 ```bash
-python3 -m pip install -r ${REPO}/requirements.txt
-
-export AW_DEV=1
-
-python3 -m ansible-webui
-# OR
-cd ${REPO}/ansible-webui/
-python3 __init__.py
+bash ${REPO}/scripts/run_dev.sh
 ```
+
+Run in staging mode: (*close to production behavior*)
+
+```bash
+bash ${REPO}/scripts/run_staging.sh
+```
+
+Admin user for testing:
+
+* User: `ansible`
+* Pwd: `automateMe`
 
 Run tests and lint:
 
@@ -23,3 +29,9 @@ python3 -m pip install -r ${REPO}/requirements_test.txt
 bash ${REPO}/scripts/lint.sh
 bash ${REPO}/scripts/test.sh
 ```
+
+## Migrations
+
+Migrations should not be committed to `latest`.
+
+They will be generated & distributed cumulated for each release.
