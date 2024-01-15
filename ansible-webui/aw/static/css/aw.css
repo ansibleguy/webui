@@ -36,8 +36,10 @@ hr {
 
 
 .aw-img-float {
-    width: 85%;
-    max-width: 500px;
+    width: 55%;
+    max-width: 250px;
+    padding-top: 1vh;
+    padding-bottom: 1vh;
 }
 .aw-login {
     margin-left: auto;

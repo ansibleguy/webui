@@ -1,17 +1,19 @@
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import HttpResponse, redirect
+from django.conf import settings
 
 from aw.config.hardcoded import LOGIN_PATH
-from aw.permission import authorized_to_access, authorized_to_exec, authorized_to_write
+from aw.permission import authorized_to_exec, authorized_to_write
 
 
 def _deny(request) -> (bool, HttpResponse):
     if request.method not in ['GET', 'POST', 'PUT']:
-        return HttpResponse(status=405)
+        return True, HttpResponse(status=405)
+
+    return False, None
 
 
 @login_required
-@user_passes_test(authorized_to_access, login_url=LOGIN_PATH)
 def ui(request, **kwargs):
     bad, deny = _deny(request)
     if bad:
@@ -39,4 +41,7 @@ def ui_exec(request, **kwargs):
 
 
 def catchall(request, **kwargs):
+    if request.user.is_authenticated:
+        return redirect(settings.LOGIN_REDIRECT_URL)
+
     return redirect(LOGIN_PATH)

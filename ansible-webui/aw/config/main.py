@@ -8,7 +8,7 @@ from pytz import all_timezones
 ENVIRON_FALLBACK = {
     'timezone': {'keys': ['AW_TIMEZONE', 'TZ'], 'fallback': datetime.now().astimezone().tzname()},
     '_secret': {
-        'keys': ['AW_TIMEZONE'],
+        'keys': ['AW_SECRET'],
         'fallback': ''.join(random_choice(ascii_letters + digits + punctuation) for i in range(50))
     },
 }

@@ -1,20 +1,21 @@
 from pathlib import Path
-from os import path as os_path
 from os import environ
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 from aw.config.main import config
-from aw.config.hardcoded import ENV_KEY_DEV, LOGIN_PATH
+from aw.config.hardcoded import LOGIN_PATH, ENV_KEY_DB
+from aw.utils.deployment import deployment_dev, deployment_prod
 
 
-DEBUG = ENV_KEY_DEV in environ
+DEBUG = deployment_dev()
 ALLOWED_HOSTS = ['*']
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 # Application definition
 INSTALLED_APPS = [
+    'aw.apps.AwConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -24,7 +25,6 @@ INSTALLED_APPS = [
     'bootstrap5',
     'bootstrap_datepicker_plus',
     'django_user_agents',
-    'aw',
 ]
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -55,10 +55,33 @@ TEMPLATES = [
 WSGI_APPLICATION = 'aw.main.app'
 
 # Database
+DB_FILE = None
+if deployment_prod():
+    if ENV_KEY_DB in environ:
+        DB_FILE = Path(environ[ENV_KEY_DB])
+        if not DB_FILE.parent.exists():
+            raise ValueError(f"Provided database directory does not exist: '{DB_FILE.parent}'")
+
+    if DB_FILE is None:
+        home_config = Path(environ['HOME']) / '.config'
+        if home_config.is_dir():
+            DB_FILE = home_config
+
+    if DB_FILE is None:
+        DB_FILE = Path(environ['HOME'])
+        if not DB_FILE.is_dir():
+            raise ValueError(f"Home directory does not exist: '{DB_FILE}'")
+
+    DB_FILE = DB_FILE / 'aw.db'
+
+else:
+    DB_FILE = 'aw.dev.db' if deployment_dev() else 'aw.staging.db'
+    DB_FILE = BASE_DIR / DB_FILE
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'aw.db',
+        'NAME': DB_FILE,
         'OPTIONS': {
             'timeout': 10,
         }

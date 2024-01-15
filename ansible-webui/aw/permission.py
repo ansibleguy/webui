@@ -8,8 +8,8 @@ def _group_check(user, permission: str) -> bool:
     return False
 
 
-def authorized_to_access(user) -> bool:
-    return _group_check(user, 'access')
+# def authorized_to_access(user) -> bool:
+#     return _group_check(user, 'access')
 
 
 def authorized_to_exec(user) -> bool:

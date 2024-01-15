@@ -30,7 +30,7 @@ def main():
         del stack
         scheduler.stop(signum)
         os_kill(getpid(), signal.SIGQUIT)  # trigger 'Arbiter.stop'
-        sleep(5)
+        sleep(3)
         sys_exit(0)
 
     def signal_reload(signum=None, stack=None):

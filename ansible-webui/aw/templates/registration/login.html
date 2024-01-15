@@ -20,11 +20,11 @@
                 </div>
             {% endfor %}
         {% endif %}
-        <div class="alert alert-info">
-            {% if not user.is_authenticated %}
+        {% if not user.is_authenticated %}
+            <div class="alert alert-info">
                 Please login to see this page.
-            {% endif %}
-        </div>
+            </div>
+        {% endif %}
         <br>
         <form method="post" action="{% url 'login' %}">
             {% csrf_token %}
