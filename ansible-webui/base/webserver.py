@@ -1,6 +1,8 @@
-from os import environ
 from multiprocessing import cpu_count
+from string import ascii_letters
+from random import choice as random_choice
 
+import gunicorn
 from gunicorn.app.wsgiapp import WSGIApplication
 
 from aw.config.hardcoded import PORT_WEB
@@ -36,6 +38,7 @@ class StandaloneApplication(WSGIApplication):
 
 
 def create_webserver() -> WSGIApplication:
+    gunicorn.SERVER = ''.join(random_choice(ascii_letters) for i in range(10))
     run_options = {
         'workers': (cpu_count() * 2) + 1,
         **OPTIONS_PROD

@@ -1,8 +1,12 @@
+.. _usage_config:
+
+.. include:: ../_include/head.rst
+
 ==========
 2 - Config
 ==========
 
-Most configuration can be managed using the WebUI: :code:`https://<WEBUI>/a/`
+Most configuration can be managed using the WebUI: :code:`https://<WEBUI>/m/` (*Django Admin interface*)
 
 Environmental variables
 ***********************

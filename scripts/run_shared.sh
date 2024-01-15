@@ -12,7 +12,7 @@ cd "$(pwd)/../ansible-webui"
 TEST_DB="$(pwd)/aw.${AW_ENV}.db"
 TEST_MIGRATE=''
 
-if [ -f "$TEST_DB" ]
+if [ -f "$TEST_DB" ] && [[ "$TEST_QUIET" != "1" ]]
 then
   # shellcheck disable=SC2162
   read -p "Delete existing ${AW_ENV} DB? (yes/NO) " del_dev_db
@@ -31,8 +31,11 @@ export DJANGO_SUPERUSER_USERNAME='ansible'
 export DJANGO_SUPERUSER_PASSWORD='automateMe'
 export DJANGO_SUPERUSER_EMAIL='ansible@localhost'
 
-log 'INSTALLING REQUIREMENTS'
-python3 -m pip install --upgrade -r ../requirements.txt >/dev/null
+if [[ "$TEST_QUIET" != "1" ]]
+then
+  log 'INSTALLING REQUIREMENTS'
+  python3 -m pip install --upgrade -r ../requirements.txt >/dev/null
+fi
 
 log 'INITIALIZING DATABASE SCHEMA'
 bash ../scripts/migrate_db.sh "$TEST_MIGRATE"

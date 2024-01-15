@@ -12,6 +12,7 @@ from aw.utils.deployment import deployment_dev, deployment_prod
 DEBUG = deployment_dev()
 ALLOWED_HOSTS = ['*']
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+X_FRAME_OPTIONS = 'SAMEORIGIN'
 
 # Application definition
 INSTALLED_APPS = [
@@ -22,9 +23,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'bootstrap5',
-    'bootstrap_datepicker_plus',
     'django_user_agents',
+    # styles
+    'bootstrap5',
+    'fontawesomefree',
 ]
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

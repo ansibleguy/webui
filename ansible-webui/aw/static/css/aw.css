@@ -1,3 +1,6 @@
+body {
+    height: 100vh;
+}
 body.light {
 }
 
@@ -34,6 +37,13 @@ hr {
     padding-bottom: 3vh;
 }
 
+iframe {
+ display: block;
+ width: 100%;
+ border: none;
+ overflow-y: auto;
+ overflow-x: hidden;
+}
 
 .aw-img-float {
     width: 55%;

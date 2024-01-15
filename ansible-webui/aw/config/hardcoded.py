@@ -8,6 +8,7 @@ PORT_WEB = 8000
 THREAD_JOIN_TIMEOUT = 3
 RELOAD_INTERVAL = 10
 LOGIN_PATH = '/a/login/'
+LOGOUT_PATH = '/o/'
 
 PERMISSIONS = dict(
     access='AW_ACCESS',

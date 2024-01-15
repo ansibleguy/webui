@@ -1,6 +1,7 @@
 from django import template
 
 from aw.config.hardcoded import VERSION
+from aw.config.navigation import NAVIGATION
 
 
 register = template.Library()
@@ -21,11 +22,12 @@ def get_full_uri(request):
     return request.build_absolute_uri()
 
 
-# @register.filter
-# def format_ts(datetime_obj):
-#     return datetime.strftime(datetime_obj, config.DATETIME_TS_FORMAT)
+@register.filter
+def get_nav(key: str) -> dict:
+    # serves navigation config to template
+    return NAVIGATION[key]
 
 
-# @register.simple_tag
-# def random_gif() -> str:
-#     return f"img/500/{randint(1, 20)}.gif"
+@register.filter
+def get_type(value):
+    return str(type(value)).replace("<class '", '').replace("'>", '')

@@ -1,0 +1,146 @@
+{% load util %}
+{% load static %}
+<div class="aw-nav">
+    <nav class="aw-nav-container navbar navbar-expand-lg">  <!-- navbar-dark bg-dark -->
+        <a class="navbar-brand" href="/">
+            <img src="{% static 'img/ansible.svg' %}" alt="HOME" width="40" height="40" class="aw-nav-icon">
+        </a>
+        <button class="navbar-toggler aw-nav-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="navbar-toggler-icon fas fa-bars"></i>
+        </button>
+        <div class="collapse navbar-collapse mr-auto" id="navbarSupportedContent">
+        {% if user.is_authenticated %}
+            <!-- START left navbar -->
+            {% set_var 'left'|get_nav as nav_left %}
+                <ul class="navbar-nav aw-nav-left">
+                    {% for nav_key, nav_config in nav_left.items %}
+                        {% if nav_config|get_type == 'str' %}
+                            <!-- START basic link -->
+                            <li class="nav-item aw-nav-main">
+                                <a class="nav-link aw-nav-main-a1" href="{{ nav_config }}">
+                                    {{ nav_key | safe }}
+                                </a>
+                            </li>
+                            <!-- END basic link -->
+                        {% elif nav_config|get_type == 'dict' %}
+                            <!-- START dropdown link -->
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle aw-nav-main-a1" href="#" id="navbarDropdown{{ nav_key }}" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                  {{ nav_key }}
+                                </a>
+                                <ul class="dropdown-menu aw-nav-dd1" aria-labelledby="navbarDropdown{{ nav_key }}">
+                                    {% for dd_key, dd_config in nav_config.items %}
+                                        {% if dd_config|get_type == 'dict' %}
+                                            <!-- START nested dropdown link -->
+                                            <li class="dropdown-submenu">
+                                                <a class="dropdown-toggle dropdown-item aw-nav-main-a2" onClick="display_submenu('{{ nav_key }}{{ dd_key }}')" href="#" id="navbarDropdown{{ nav_key }}{{ dd_key }}" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                    {{ dd_key }}
+                                                </a>
+                                                <ul class="dropdown-menu aw-nav-dd2" aria-labelledby="navbarDropdown{{ nav_key }}{{ dd_key }}">
+                                                    {% for key, value in dd_config.items %}
+                                                    <li>
+                                                        <a class="dropdown-item aw-nav-main-a3" href="{{ value }}">
+                                                            {{ key | safe }}
+                                                        </a>
+                                                    </li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </li>
+                                            <!-- END nested dropdown link -->
+                                        {% else %}
+                                            <li>
+                                                <a class="dropdown-item aw-nav-main-a2" href="{{ dd_config }}">
+                                                    {{ dd_key | safe }}
+                                                </a>
+                                            </li>
+                                        {% endif %}
+                                    {% endfor %}
+                                </ul>
+                            </li>
+                            <!-- END dropdown link -->
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            <!-- END left navbar -->
+            {% endif %}
+            <!-- START right navbar -->
+            <ul class="navbar-nav ml-auto aw-nav-right">
+                <li class="nav-item aw-nav-right-li">
+                    <a type="button" class="nav-link" id="aw-switch-colorScheme">
+                        <i class="fas fa-adjust fa-2x aw-nav-right-icon" title="Switch Dark/Light Mode"></i>
+                    </a>
+                </li>
+                {% set_var 'right'|get_nav as nav_right %}
+                {% for nav_item in nav_right.values %}
+                    {% if not nav_item.login or user.is_authenticated %}
+                        <li class="nav-item aw-nav-right-li">
+                            <a class="nav-link" href="{{ nav_item.url }}">{{ nav_item.element | safe }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+            <!-- END right navbar -->
+        </div>
+    </nav>
+</div>
+<!-- START submenu script -->
+<script type="text/javascript">
+    $('.dropdown-menu a.dropdown-toggle').on('click', function(e) {
+        if (!$(this).next().hasClass('show')) {
+            $(this).parents('.dropdown-menu').first().find('.show').removeClass("show");
+        }
+        var $subMenu = $(this).next(".dropdown-menu");
+        $subMenu.toggleClass('show');
+
+        $(this).parents('li.nav-item.dropdown.show').on('hidden.bs.dropdown', function(e) {
+            $('.dropdown-submenu .show').removeClass("show");
+        });
+
+        return false;
+    });
+</script>
+<!-- STOP submenu script -->
+<!-- START light/dark scheme toggle script -->
+<script type="text/javascript">
+    const colorSchemeButton = document.getElementById('aw-switch-colorScheme');
+    const colorScheme = document.querySelector('meta[name="color-scheme"]');
+    const colorSchemeVar = 'color-scheme';
+    const colorSchemeLight = 'light';
+    const colorSchemeDark = 'dark';
+    const colorSchemeDefault = 'none';
+
+    function getColorSchema(preference) {
+        if (preference !== colorSchemeDefault) {
+            return preference;
+        } else if (matchMedia('(prefers-color-scheme: light)').matches) {
+            return colorSchemeLight;
+        } else {
+            return colorSchemeDark;
+        }
+    }
+
+    function setColorSchema(mode) {
+        document.body.className = mode;
+        colorScheme.content = mode;
+        localStorage.setItem(colorSchemeVar, mode);
+    }
+
+    function switchColorScheme(mode) {
+        if (mode === colorSchemeLight) {
+            return colorSchemeDark;
+        } else {
+            return colorSchemeLight;
+        }
+    }
+
+    let userPreference = localStorage.getItem(colorSchemeVar) || colorSchemeDefault;
+    setColorSchema(getColorSchema(userPreference));
+
+    if (colorSchemeButton != null) {
+        colorSchemeButton.onclick = function() {
+            userPreference = switchColorScheme(userPreference);
+            setColorSchema(userPreference);
+        };
+    }
+</script>
+<!-- STOP light/dark scheme toggle script -->
