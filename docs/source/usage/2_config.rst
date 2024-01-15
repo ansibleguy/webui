@@ -10,7 +10,6 @@ Environmental variables
 * **AW_STATIC**
 
    If defined - the built-in static-file serving is disabled.
-
    Use this if in production and a `proxy like nginx <https://docs.nginx.com/nginx/admin-guide/web-server/serving-static-content/>`_ is in front of the Ansible-WebUI webservice.
 
 
@@ -22,21 +21,17 @@ Environmental variables
 * **AW_SECRET**
 
    Define a secret key to use for cookie encryption.
-
    By default it will be re-generated at service restart.
 
 
 * **AW_TIMEZONE**
 
    Override the timezone used.
-
    Default is the system timezone.
 
 
-* **ENV_KEY_DEPLOYMENT**
+* **AW_ENV**
 
    Used in development.
-
    If unset or value is neither 'dev' nor 'staging' the webservice will be in production mode.
-
    'staging' mode is close to production behavior.
