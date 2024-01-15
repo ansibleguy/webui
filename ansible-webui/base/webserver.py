@@ -3,7 +3,8 @@ from multiprocessing import cpu_count
 
 from gunicorn.app.wsgiapp import WSGIApplication
 
-from aw.config.hardcoded import ENV_KEY_DEV
+from aw.config.hardcoded import PORT_WEB
+from aw.utils.deployment import deployment_dev, warn_if_development
 
 # https://docs.gunicorn.org/en/stable/settings.html
 OPTIONS_DEV = {
@@ -12,7 +13,7 @@ OPTIONS_DEV = {
     'workers': 2,
 }
 OPTIONS_PROD = {
-    'bind': '127.0.0.1:8000',
+    'bind': f'127.0.0.1:{PORT_WEB}',
     'reload': False,
     'loglevel': 'warning',
 }
@@ -39,8 +40,8 @@ def create_webserver() -> WSGIApplication:
         'workers': (cpu_count() * 2) + 1,
         **OPTIONS_PROD
     }
-    if ENV_KEY_DEV in environ:
-        print('WARNING: Development mode!')
+    if deployment_dev():
+        warn_if_development()
         run_options = {**run_options, **OPTIONS_DEV}
 
     return StandaloneApplication(

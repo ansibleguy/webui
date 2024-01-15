@@ -10,6 +10,8 @@ def main():
     # pylint: disable=E0401,C0415
     from aw.config.main import init_globals
     init_globals()
+    from aw.utils.deployment import warn_if_development
+    warn_if_development()
 
     try:
         # pylint: disable=C0415

@@ -1,7 +1,7 @@
 from os import environ, getpid
 
 from aw.utils.util import datetime_w_tz
-from aw.config.hardcoded import ENV_KEY_DEV
+from aw.utils.deployment import deployment_dev
 
 PID = getpid()
 
@@ -19,7 +19,7 @@ LOG_TIME_FORMAT = '%Y-%m-%d %H:%M:%S %z'
 
 
 def log(msg: str, level: int = 3):
-    if level > 5 and ENV_KEY_DEV not in environ:
+    if level > 5 and not deployment_dev():
         return
 
     # time format adapted to the one used by gunicorn
