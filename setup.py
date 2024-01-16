@@ -3,6 +3,9 @@ import setuptools
 with open('README.md', 'r', encoding='utf-8') as info:
     long_description = info.read()
 
+with open('requirements.txt', 'r', encoding='utf-8') as reqs:
+    requirements = [req for req in reqs.readlines() if not req.startswith('#') or req.strip() == '']
+
 setuptools.setup(
     name='ansible-webui',
     version='0.0.1',
@@ -21,5 +24,6 @@ setuptools.setup(
         'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
         'Operating System :: OS Independent',
     ],
-    python_requires='>=3.5'
+    python_requires='>=3.5',
+    install_requires=requirements,
 )

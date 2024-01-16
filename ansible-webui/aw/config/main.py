@@ -1,17 +1,8 @@
 from os import environ
-from secrets import choice as random_choice
-from string import digits, ascii_letters, punctuation
-from datetime import datetime
+
 from pytz import all_timezones
 
-
-ENVIRON_FALLBACK = {
-    'timezone': {'keys': ['AW_TIMEZONE', 'TZ'], 'fallback': datetime.now().astimezone().tzname()},
-    '_secret': {
-        'keys': ['AW_SECRET'],
-        'fallback': ''.join(random_choice(ascii_letters + digits + punctuation) for i in range(50))
-    },
-}
+from aw.config.environment import ENVIRON_FALLBACK
 
 
 def init_globals():

@@ -3,6 +3,10 @@ from django.shortcuts import render
 from utils.debug import log
 
 
+class AnsibleConfigError(Exception):
+    pass
+
+
 def handler_log(request, msg: str, status: int):
     log(f"{request.build_absolute_uri()} - Got error {status} - {msg}")
 

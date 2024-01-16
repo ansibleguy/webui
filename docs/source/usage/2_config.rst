@@ -6,7 +6,7 @@
 2 - Config
 ==========
 
-Most configuration can be managed using the WebUI: :code:`https://<WEBUI>/m/` (*Django Admin interface*)
+Most configuration can be managed using the WebUI.
 
 Environmental variables
 ***********************

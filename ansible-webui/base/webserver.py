@@ -38,7 +38,7 @@ class StandaloneApplication(WSGIApplication):
 
 
 def create_webserver() -> WSGIApplication:
-    gunicorn.SERVER = ''.join(random_choice(ascii_letters) for i in range(10))
+    gunicorn.SERVER = ''.join(random_choice(ascii_letters) for _ in range(10))
     run_options = {
         'workers': (cpu_count() * 2) + 1,
         **OPTIONS_PROD

@@ -4,12 +4,10 @@ from django.contrib.auth.models import Group
 
 from crontab import CronTab
 
-from aw.model.base import BareModel, BaseModel
+from aw.model.base import BareModel, BaseModel, CHOICES_BOOL
 
 
 class JobError(BareModel):
-    field_list = ['short', 'med', 'logfile']
-
     short = models.CharField(max_length=100)
     med = models.TextField(max_length=1024, null=True)
     logfile = models.FilePathField()
@@ -18,14 +16,7 @@ class JobError(BareModel):
         return f"Job error {self.created}: '{self.short}'"
 
 
-class JobWarning(JobError):
-    def __str__(self) -> str:
-        return f"Job warning {self.created}: '{self.short}'"
-
-
 class JobPermission(BaseModel):
-    field_list = ['name', 'permission', 'users', 'groups']
-
     name = models.CharField(max_length=100)
     permission = models.CharField(
         max_length=50,
@@ -56,13 +47,33 @@ class JobPermissionMemberGroup(BareModel):
     permission = models.ForeignKey(JobPermission, on_delete=models.CASCADE)
 
 
-class Job(BaseModel):
-    field_list = ['job_id', 'name', 'inventory', 'playbook', 'schedule', 'permission']
+CHOICES_JOB_VERBOSITY = (
+    (0, 'None'),
+    (1, 'v'),
+    (2, 'vv'),
+    (3, 'vvv'),
+    (4, 'vvvv'),
+    (5, 'vvvv'),
+    (6, 'vvvvvv'),
+)
 
+
+class MetaJob(BaseModel):
+    limit = models.CharField(max_length=500, null=True, default=None)
+    verbosity = models.PositiveSmallIntegerField(choices=CHOICES_JOB_VERBOSITY, default=0)
+
+    # NOTE: one or multiple comma-separated vars
+    environment_vars = models.CharField(max_length=1000, null=True, default=None)
+
+    class Meta:
+        abstract = True
+
+
+class Job(MetaJob):
     job_id = models.PositiveIntegerField(primary_key=True)
     name = models.CharField(max_length=150)
-    inventory = models.CharField(max_length=150)
-    playbook = models.CharField(max_length=150)
+    inventory = models.CharField(max_length=300)  # NOTE: one or multiple comma-separated inventories
+    playbook = models.CharField(max_length=300)  # NOTE: one or multiple comma-separated playbooks
     schedule = models.CharField(max_length=50, validators=[CronTab])
     permission = models.ForeignKey(JobPermission, on_delete=models.SET_NULL, null=True)
 
@@ -70,33 +81,59 @@ class Job(BaseModel):
         return f"Job '{self.name}' ('{self.playbook}')"
 
 
-class JobExecution(BareModel):
-    field_list = [
-        'user', 'start', 'fin', 'error',
-        'result_ok', 'result_changed', 'result_unreachable', 'result_failed', 'result_skipped',
-        'result_rescued', 'result_ignored',
-    ]
+class JobExecutionResult(BareModel):
+    # ansible_runner.runner.Runner
+    time_start = models.DateTimeField(auto_now_add=True)
+    time_fin = models.DateTimeField(blank=True, null=True, default=None)
 
+    failed = models.BooleanField(choices=CHOICES_BOOL, default=False)
+
+
+class JobExecutionResultHost(BareModel):
+    # ansible_runner.runner.Runner.stats
+    hostname = models.CharField(max_length=300)
+    unreachable = models.BooleanField(choices=CHOICES_BOOL, default=False)
+
+    tasks_skipped = models.PositiveSmallIntegerField(default=0)
+    tasks_ok = models.PositiveSmallIntegerField(default=0)
+    tasks_failed = models.PositiveSmallIntegerField(default=0)
+    tasks_rescued = models.PositiveSmallIntegerField(default=0)
+    tasks_ignored = models.PositiveSmallIntegerField(default=0)
+    tasks_changed = models.PositiveSmallIntegerField(default=0)
+
+    error = models.ForeignKey(JobError, on_delete=models.CASCADE, related_name=f"jobresulthost_fk_error")
+    result = models.ForeignKey(JobExecutionResult, on_delete=models.CASCADE, related_name=f"jobresulthost_fk_result")
+
+    def __str__(self) -> str:
+        if int(self.tasks_failed) > 0:
+            result = 'failed'
+        else:
+            result = 'success' if self.warning is None else 'warning'
+
+        return f"Job execution {self.created} of host {self.hostname}: {result}"
+
+
+CHOICES_JOB_EXEC_STATUS = [
+    (0, 'Waiting'),
+    (1, 'Starting'),
+    (2, 'Running'),
+    (3, 'Failed'),
+    (4, 'Finished'),
+]
+
+
+class JobExecution(MetaJob):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.PROTECT, blank=True, null=True,
         related_name=f"jobexec_fk_user"
     )
     job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name=f"jobexec_fk_job")
-    start = models.DateTimeField(auto_now_add=True)
-    fin = models.DateTimeField(blank=True, null=True, default=None)
-    error = models.ForeignKey(JobError, on_delete=models.CASCADE, related_name=f"jobexec_fk_error")
-    warning = models.ForeignKey(JobWarning, on_delete=models.CASCADE, related_name=f"jobexec_fk_warning")
-    result_ok = models.PositiveSmallIntegerField(default=0)
-    result_changed = models.PositiveSmallIntegerField(default=0)
-    result_unreachable = models.PositiveSmallIntegerField(default=0)
-    result_failed = models.PositiveSmallIntegerField(default=0)
-    result_skipped = models.PositiveSmallIntegerField(default=0)
-    result_rescued = models.PositiveSmallIntegerField(default=0)
-    result_ignored = models.PositiveSmallIntegerField(default=0)
+    result = models.ForeignKey(
+        JobExecutionResult, on_delete=models.CASCADE, related_name=f"jobexec_fk_result",
+        null=True, default=None,  # execution is created before result is available
+    )
+    status = models.PositiveSmallIntegerField(default=0, choices=CHOICES_JOB_EXEC_STATUS)
 
     def __str__(self) -> str:
-        result = 'success' if self.warning is None else 'warning'
-        if self.error is not None:
-            result = 'failed'
-
-        return f"Job '{self.job.name}' execution {self.created}: {result}"
+        status_name = CHOICES_JOB_EXEC_STATUS[int(self.status)][1]
+        return f"Job '{self.job.name}' execution {self.created}: {status_name}"

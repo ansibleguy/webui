@@ -1,6 +1,6 @@
 from django.db import models
 
-BOOLEAN_CHOICES = (
+CHOICES_BOOL = (
     (True, 'Yes'),
     (False, 'No')
 )

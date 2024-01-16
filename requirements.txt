@@ -16,4 +16,4 @@ fontawesomefree
 crontab
 
 # ansible
-ansible-core
+ansible-runner

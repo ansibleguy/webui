@@ -1,12 +1,20 @@
-# https://docs.ansible.com/ansible/latest/dev_guide/developing_api.html
-# https://github.com/ansible/ansible/blob/devel/lib/ansible/cli/playbook.py
-# https://github.com/ansible/ansible/blob/devel/lib/ansible/cli/__init__.py
-# https://github.com/ansible/ansible/blob/devel/lib/ansible/executor/playbook_executor.py
+from datetime import datetime
+from ansible_runner import run as ansible_run
 
-# from ansible.executor.playbook_executor import PlaybookExecutor
-
-from aw.config.main import config
+from aw.model.job import Job, JobExecution
+from aw.execute.util import runner_cleanup, runner_prep, parse_run_result
 
 
-def ansible_playbook(job):
-    pass
+def ansible_playbook(job: Job, execution: JobExecution):
+    time_start = datetime.now()
+    opts = runner_prep(job=job, execution=execution)
+
+    result = ansible_run(**opts)
+
+    parse_run_result(
+        time_start=time_start,
+        execution=execution,
+        result=result,
+    )
+
+    runner_cleanup(opts)

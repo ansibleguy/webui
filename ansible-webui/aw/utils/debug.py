@@ -1,7 +1,8 @@
-from os import environ, getpid
+from os import getpid
 
 from aw.utils.util import datetime_w_tz
 from aw.utils.deployment import deployment_dev
+from aw.config.hardcoded import LOG_TIME_FORMAT
 
 PID = getpid()
 
@@ -14,8 +15,6 @@ LEVEL_NAME_MAPPING = {
     6: 'DEBUG',
     7: 'DEBUG',
 }
-
-LOG_TIME_FORMAT = '%Y-%m-%d %H:%M:%S %z'
 
 
 def log(msg: str, level: int = 3):

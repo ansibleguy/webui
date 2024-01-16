@@ -9,6 +9,8 @@ THREAD_JOIN_TIMEOUT = 3
 RELOAD_INTERVAL = 10
 LOGIN_PATH = '/a/login/'
 LOGOUT_PATH = '/o/'
+LOG_TIME_FORMAT = '%Y-%m-%d %H:%M:%S %z'
+RUNNER_TMP_DIR_TIME_FORMAT = '%Y-%m-%d_%H-%M-%S'
 
 PERMISSIONS = dict(
     access='AW_ACCESS',
