@@ -13,17 +13,8 @@ See `the documentation <https://docs.ansible.com/ansible/latest/installation_gui
 
 **Make sure to read** the `Ansible best-practices <https://docs.ansible.com/ansible/2.8/user_guide/playbooks_best_practices.html#directory-layout>`_ on how to use Ansible!
 
-Dependencies
-************
-
-.. code-block:: bash
-
-    wget -O /tmp/aw_requirements.txt https://raw.githubusercontent.com/ansibleguy/ansible-webui/latest/requirements.txt
-
-    python3 -m pip install -r /tmp/aw_requirements.txt
-
-WebUI
-*****
+Install
+*******
 
 .. code-block:: bash
 

@@ -19,10 +19,7 @@ Keep it simple.
 ## Setup
 
 ```
-# requirements
-python3 -m pip install -r requirements.txt
-
-# webui
+# install
 python3 -m pip install ansible-webui
 
 # run
