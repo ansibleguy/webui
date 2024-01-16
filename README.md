@@ -74,11 +74,11 @@ There are multiple Ansible WebUI products - how do they compare to this product?
 
    As Ansible already requires Python3 - I chose it as primary language.
 
-   The backend stack is built of [gunicorn](https://gunicorn.org/)/[Django](https://www.djangoproject.com/) and the frontend consists of Django templates and vanilla JS.
+   The backend stack is built of [gunicorn](https://gunicorn.org/)/[Django](https://www.djangoproject.com/) and the frontend consists of Django templates and JS.
 
    Ansible job execution is done using the native [Python API](https://ansible.readthedocs.io/projects/runner/en/latest/python_interface/)!
 
-   Target users are small to medium businesses and Ansible users that just want a UI to run their playbooks.
+   Target users are small to medium businesses and Ansible users which just want a UI to run their playbooks.
 
 ----
 
