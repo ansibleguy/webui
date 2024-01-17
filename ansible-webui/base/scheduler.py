@@ -1,18 +1,16 @@
 from time import sleep, time
 
-from base.threader import Loop as Threader
+from base.threader import ThreadManager
 from aw.utils.debug import log
 from aw.config.hardcoded import RELOAD_INTERVAL
-
-# NOTE: not able to use models here because of dependency on django-init
-# from aw.model.job import Job
+from aw.model.job import Job, JobExecution
 
 
 class Scheduler:
     WAIT_TIME = 1
 
     def __init__(self):
-        self.threader = Threader()
+        self.thread_manager = ThreadManager()
         self.stopping = False
         self.reloading = False
 
@@ -23,7 +21,7 @@ class Scheduler:
             self.stopping = True
 
             log('Stopping job-threads', level=6)
-            self.threader.stop()
+            self.thread_manager.stop()
 
             sleep(self.WAIT_TIME)
             log('Finished!')
@@ -45,9 +43,10 @@ class Scheduler:
     def _signum_log(signum):
         log(f'Scheduler got signal {signum}')
 
-    def _thread(self, job):
-        self.threader.add_thread(job)
-        self.threader.start_thread(job)
+    def _thread(self, job: Job, execution: JobExecution = None):
+        # todo: creation of execution object for ad-hoc execution (with user-provided values)
+        self.thread_manager.add_thread(job)
+        self.thread_manager.start_thread(job)
 
     def start(self):
         log('Starting..', level=3)

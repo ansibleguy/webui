@@ -19,6 +19,11 @@ Admin user for testing:
 * User: `ansible`
 * Pwd: `automateMe`
 
+Test to build the app using PIP:
+```bash
+bash ${REPO}/scripts/run_pip_build.sh
+```
+
 Run tests and lint:
 
 ```bash

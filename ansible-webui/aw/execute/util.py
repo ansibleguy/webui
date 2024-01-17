@@ -74,7 +74,10 @@ def _runner_options(job: Job, execution: JobExecution) -> dict:
     }
 
 
-def runner_prep(job: Job, execution: JobExecution):
+def runner_prep(job: Job, execution: (JobExecution, None)):
+    if execution is None:
+        execution = JobExecution(user=None, job=job, comment='Scheduled')
+
     _update_execution_status(execution, status='Starting')
 
     opts = _runner_options(job=job, execution=execution)

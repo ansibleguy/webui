@@ -9,6 +9,10 @@ def init_globals():
     global config
     config = {}
 
+    environ.setdefault('DJANGO_SETTINGS_MODULE', 'aw.settings')
+    environ['PYTHONIOENCODING'] = 'utf8'
+    environ['PYTHONUNBUFFERED'] = '1'
+
     for cnf_key, values in ENVIRON_FALLBACK.items():
         for env_key in values['keys']:
             if env_key in environ:

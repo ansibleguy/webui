@@ -58,14 +58,8 @@ Without a virtual environment:
 
     [Service]
     Type=simple
-    Environment=AW_REPO="https://raw.githubusercontent.com/ansibleguy/ansible-webui"
     Environment=LANG="en_US.UTF-8"
     Environment=LC_ALL="en_US.UTF-8"
-
-    # making sure the current requirements are installed
-    ExecStartPre=/bin/bash -c 'rm -f /tmp/aw_requirements.txt \
-                               && wget -O /tmp/aw_requirements.txt "${AW_REPO}/$(python3 -m ansible-webui version)/requirements.txt" \
-                               && python3 -m pip install --upgrade -r /tmp/aw_requirements.txt'
 
     ExecStart=/usr/bin/python3 -m ansible-webui
 
@@ -95,15 +89,8 @@ When using a virtual environment: (recommended)
 
     [Service]
     Type=simple
-    Environment=AW_REPO="https://raw.githubusercontent.com/ansibleguy/ansible-webui"
     Environment=LANG="en_US.UTF-8"
     Environment=LC_ALL="en_US.UTF-8"
-
-    # making sure the current requirements are installed
-    ExecStartPre=/bin/bash -c 'source /home/ansible-webui/venv/bin/activate \
-                               && rm -f /tmp/aw_requirements.txt \
-                               && wget -O /tmp/aw_requirements.txt "${AW_REPO}/$(python3 -m ansible-webui version)/requirements.txt" \
-                               && python3 -m pip install --upgrade -r /tmp/aw_requirements.txt'
 
     ExecStart=/bin/bash -c 'source /home/ansible-webui/venv/bin/activate \
                             && /usr/bin/python3 -m ansible-webui'

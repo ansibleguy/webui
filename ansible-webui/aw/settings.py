@@ -14,7 +14,6 @@ ALLOWED_HOSTS = ['*']
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 X_FRAME_OPTIONS = 'SAMEORIGIN'
 
-# Application definition
 INSTALLED_APPS = [
     'aw.apps.AwConfig',
     'django.contrib.admin',

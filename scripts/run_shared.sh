@@ -8,8 +8,8 @@ function log() {
   echo ''
 }
 
-cd "$(pwd)/../ansible-webui"
-TEST_DB="$(pwd)/aw.${AW_ENV}.db"
+cd "$(pwd)/.."
+TEST_DB="$(pwd)/ansible-webui/aw.${AW_ENV}.db"
 TEST_MIGRATE=''
 
 if [ -f "$TEST_DB" ] && [[ "$TEST_QUIET" != "1" ]]
@@ -23,7 +23,8 @@ then
     rm "$TEST_DB"
     TEST_MIGRATE='clean'
   fi
-else
+elif ! [ -f "$TEST_DB" ]
+then
   echo "Creating DB ${TEST_DB}"
 fi
 
@@ -38,10 +39,10 @@ then
 fi
 
 log 'INITIALIZING DATABASE SCHEMA'
-bash ../scripts/migrate_db.sh "$TEST_MIGRATE"
+bash ./scripts/migrate_db.sh "$TEST_MIGRATE"
 
 log 'CREATING USERS'
-python3 manage.py createsuperuser --noinput || true
+python3 ansible-webui/manage.py createsuperuser --noinput || true
 
 log 'STARTING APP'
-python3 __init__.py
+python3 ansible-webui

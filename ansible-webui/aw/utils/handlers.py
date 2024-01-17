@@ -1,6 +1,6 @@
 from django.shortcuts import render
 
-from utils.debug import log
+from aw.utils.debug import log
 
 
 class AnsibleConfigError(Exception):

@@ -123,8 +123,9 @@ CHOICES_JOB_EXEC_STATUS = [
 
 
 class JobExecution(MetaJob):
+    # NOTE: scheduled execution will have no user
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.PROTECT, blank=True, null=True,
+        settings.AUTH_USER_MODEL, on_delete=models.PROTECT, null=True,
         related_name=f"jobexec_fk_user"
     )
     job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name=f"jobexec_fk_job")
@@ -133,6 +134,7 @@ class JobExecution(MetaJob):
         null=True, default=None,  # execution is created before result is available
     )
     status = models.PositiveSmallIntegerField(default=0, choices=CHOICES_JOB_EXEC_STATUS)
+    comment = models.CharField(max_length=300, null=True, default=None)
 
     def __str__(self) -> str:
         status_name = CHOICES_JOB_EXEC_STATUS[int(self.status)][1]

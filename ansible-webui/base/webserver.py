@@ -37,7 +37,7 @@ class StandaloneApplication(WSGIApplication):
             self.cfg.set(key.lower(), value)
 
 
-def create_webserver() -> WSGIApplication:
+def init_webserver():
     gunicorn.SERVER = ''.join(random_choice(ascii_letters) for _ in range(10))
     run_options = {
         'workers': (cpu_count() * 2) + 1,
@@ -47,7 +47,7 @@ def create_webserver() -> WSGIApplication:
         warn_if_development()
         run_options = {**run_options, **OPTIONS_DEV}
 
-    return StandaloneApplication(
+    StandaloneApplication(
         app_uri="aw.main:app",
         options=run_options
-    )
+    ).run()

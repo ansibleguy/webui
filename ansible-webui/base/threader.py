@@ -7,17 +7,16 @@ from crontab import CronTab
 
 from aw.utils.debug import log
 from aw.config import hardcoded
+from aw.model.job import Job, JobExecution
 from aw.execute.play import ansible_playbook
-
-# NOTE: not able to use models here because of dependency on django-init
-# from aw.model.job import Job
 
 
 class Workload(Thread):
-    def __init__(self, job, loop_instance, name: str, once: bool = False, daemon: bool = True):
+    def __init__(self, job: Job, manager, name: str, execution: JobExecution, once: bool = False, daemon: bool = True):
         Thread.__init__(self, daemon=daemon, name=name)
         self.job = job
-        self.loop_instance = loop_instance
+        self.execution = execution
+        self.manager = manager
         self.once = once
         self.started = False
         self.state_stop = Event()
@@ -40,13 +39,17 @@ class Workload(Thread):
         self.started = False
         return True
 
+    def run_playbook(self):
+        ansible_playbook(job=self.job, execution=self.execution)
+
     def run(self) -> None:
         self.started = True
         log(f"Entering runtime of thread {self.log_name}", level=7)
         try:
             if self.once:
-                ansible_playbook(self.job)
-                Loop.stop_thread(self.loop_instance, self.job)
+                self.run_playbook()
+                self.stop()
+                self.manager.threads.remove(self.job)
                 return
 
             else:
@@ -59,14 +62,14 @@ class Workload(Thread):
 
                     else:
                         log(f"Starting job {self.log_name}", level=5)
-                        ansible_playbook(self.job)
+                        self.run_playbook()
 
         except ValueError as err:
             log(f"Got unexpected error while executing job {self.log_name}: '{err}'")
             self.run()
 
 
-class Loop:
+class ThreadManager:
     def __init__(self):
         self.threads = set()
         self.thread_nr = 0
@@ -79,13 +82,14 @@ class Loop:
             if not thread.started:
                 thread.start()
 
-    def add_thread(self, job, once: bool = False):
+    def add_thread(self, job: Job, execution: JobExecution = None, once: bool = False):
         log(f"Adding thread for \"{job.name}\" with schedule \"{job.schedule}\"", level=7)
         self.thread_nr += 1
         self.threads.add(
             Workload(
                 job=job,
-                loop_instance=self,
+                execution=execution,
+                manager=self,
                 once=once,
                 name=f"Thread #{self.thread_nr}",
             )
@@ -108,7 +112,7 @@ class Loop:
         log('All threads stopped', level=3)
         return True
 
-    def stop_thread(self, job):
+    def stop_thread(self, job: Job):
         log(f"Stopping thread for \"{job.name}\"", level=6)
         for thread in self.threads:
             if thread.job.job_id == job.job_id:
@@ -119,7 +123,7 @@ class Loop:
                     del job
                     break
 
-    def start_thread(self, job) -> None:
+    def start_thread(self, job: Job) -> None:
         for thread in self.threads:
             if thread.job.job_id == job.job_id:
                 if not thread.started:
@@ -127,7 +131,7 @@ class Loop:
                     log(f"Thread {job.name} started.", level=5)
                     break
 
-    def replace_thread(self, job) -> None:
+    def replace_thread(self, job: Job) -> None:
         log(f"Reloading thread for \"{job.name}\"", level=6)
         self.stop_thread(job)
         self.add_thread(job)

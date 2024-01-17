@@ -5,7 +5,7 @@ from aw.model.job import Job, JobExecution
 from aw.execute.util import runner_cleanup, runner_prep, parse_run_result
 
 
-def ansible_playbook(job: Job, execution: JobExecution):
+def ansible_playbook(job: Job, execution: (JobExecution, None)):
     time_start = datetime.now()
     opts = runner_prep(job=job, execution=execution)
 
