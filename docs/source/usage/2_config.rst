@@ -39,3 +39,30 @@ Environmental variables
    Used in development.
    If unset or value is neither 'dev' nor 'staging' the webservice will be in production mode.
    'staging' mode is close to production behavior.
+
+* **AW_DB_MIGRATE**
+
+   Define to disable automatic database schema-upgrades.
+   After upgrading the module you might have to run the upgrade manually:
+
+   .. code-block:: bash
+
+       python3 -m ansible-webui.manage makemigrations
+       python3 -m ansible-webui.manage makemigrations aw
+       python3 -m ansible-webui.manage migrate
+
+* **AW_ADMIN**
+
+   Define the user-name for the initial admin user.
+
+* **AW_ADMIN_PWD**
+
+   Define the password for the initial admin user.
+
+* **AW_PATH_RUN**
+
+   Base directory for Ansible-Runner runtime files. Default: :code:`/tmp/ansible-webui`
+
+* **AW_PATH_PLAY**
+
+   Path to the [Ansible base/playbook directory](https://docs.ansible.com/ansible/2.8/user_guide/playbooks_best_practices.html#directory-layout). Default: current working directory (*when executing ansible-webui*)

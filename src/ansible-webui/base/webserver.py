@@ -6,7 +6,8 @@ import gunicorn
 from gunicorn.app.wsgiapp import WSGIApplication
 
 from aw.config.hardcoded import PORT_WEB
-from aw.utils.deployment import deployment_dev, warn_if_development
+from aw.utils.deployment import deployment_dev
+from aw.utils.debug import log, warn_if_development
 
 # https://docs.gunicorn.org/en/stable/settings.html
 OPTIONS_DEV = {
@@ -47,7 +48,7 @@ def init_webserver():
         warn_if_development()
         opts = {**opts, **OPTIONS_DEV}
 
-    print(f"Listening on http://{opts['bind']}")
+    log(msg=f"Listening on http://{opts['bind']}", level=5)
 
     StandaloneApplication(
         app_uri="aw.main:app",

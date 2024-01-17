@@ -25,7 +25,7 @@ ENVIRON_FALLBACK = {
         'keys': ['AW_SECRET'],
         'fallback': ''.join(random_choice(ascii_letters + digits + punctuation) for _ in range(50))
     },
-    'path_base': {'keys': ['AW_PATH_BASE'], 'fallback': '/tmp/ansible-webui'},
+    'path_run': {'keys': ['AW_PATH_RUN'], 'fallback': '/tmp/ansible-webui'},
     'path_play': {'keys': ['AW_PATH_PLAY', 'ANSIBLE_PLAYBOOK_DIR'], 'fallback': getcwd()},
     'ansible_config': {'keys': ['ANSIBLE_CONFIG'], 'fallback': get_existing_ansible_config_file()}
 }

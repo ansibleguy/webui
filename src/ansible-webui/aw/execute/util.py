@@ -43,12 +43,12 @@ def _runner_options(job: Job, execution: JobExecution) -> dict:
     #  limit, verbosity, envvars
 
     # build unique temporary execution directory
-    path_base = config['path_base']
-    if not path_base.endswith('/'):
-        path_base += '/'
+    path_run = config['path_run']
+    if not path_run.endswith('/'):
+        path_run += '/'
 
-    path_base += datetime.now().strftime(RUNNER_TMP_DIR_TIME_FORMAT)
-    path_base += ''.join(random_choice(digits) for _ in range(5))
+    path_run += datetime.now().strftime(RUNNER_TMP_DIR_TIME_FORMAT)
+    path_run += ''.join(random_choice(digits) for _ in range(5))
 
     # merge job + execution env-vars
     env_vars = {}
@@ -66,7 +66,7 @@ def _runner_options(job: Job, execution: JobExecution) -> dict:
 
     return {
         'runner_mode': 'pexpect',
-        'private_data_dir': path_base,
+        'private_data_dir': path_run,
         'project_dir': config['path_play'],
         'quiet': True,
         'limit': execution.limit if execution.limit is not None else job.limit,

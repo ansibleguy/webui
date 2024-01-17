@@ -28,3 +28,13 @@ Issues = "https://github.com/ansibleguy/issues"
 [tool.setuptools.dynamic]
 dependencies = {file = ["requirements.txt"]}
 version = {file = ["VERSION"]}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"*" = ["*.html", "*.js", "*.css", "*.svg"]
+
+# [project.scripts]
+# ansible-webui = "ansible-webui.__main__"
+# ansible-webui-db = "ansible-webui.manage"

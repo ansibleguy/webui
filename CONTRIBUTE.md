@@ -34,9 +34,3 @@ python3 -m pip install -r ${REPO}/requirements_test.txt
 bash ${REPO}/scripts/lint.sh
 bash ${REPO}/scripts/test.sh
 ```
-
-## Migrations
-
-Migrations should not be committed to `latest`.
-
-They will be generated & distributed cumulated for each release.

@@ -28,6 +28,7 @@ then
   echo "Creating DB ${TEST_DB}"
 fi
 
+export AW_DB="$TEST_DB"
 export DJANGO_SUPERUSER_USERNAME='ansible'
 export DJANGO_SUPERUSER_PASSWORD='automateMe'
 export DJANGO_SUPERUSER_EMAIL='ansible@localhost'

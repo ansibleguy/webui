@@ -6,6 +6,9 @@ from aw.config.hardcoded import LOGIN_PATH, ENV_KEY_DB
 from aw.utils.deployment import deployment_dev, deployment_prod
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+TEMPLATE_DIRS = [
+    BASE_DIR / 'aw' / 'templates/'
+]
 
 DEBUG = deployment_dev()
 ALLOWED_HOSTS = ['*']
@@ -71,7 +74,8 @@ if deployment_prod():
         if not DB_FILE.is_dir():
             raise ValueError(f"Home directory does not exist: '{DB_FILE}'")
 
-    DB_FILE = DB_FILE / 'aw.db'
+    if Path(DB_FILE).is_dir():
+        DB_FILE = DB_FILE / 'aw.db'
 
 else:
     DB_FILE = 'aw.dev.db' if deployment_dev() else 'aw.staging.db'

@@ -15,6 +15,7 @@ def get_version() -> str:
         return version('ansible-webui')
 
     except PackageNotFoundError:
+        # NOTE: not able to use aw.utils.debug.log_warn because of circular dependency
         stderr.write('\x1b[1;33mWARNING: Module version could not be determined!\x1b[0m\n')
         return '0.0.0'
 

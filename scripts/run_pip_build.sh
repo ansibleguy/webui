@@ -18,6 +18,7 @@ echo ''
 
 python3 -m virtualenv "$tmp_venv" >/dev/null
 source "${tmp_venv}/bin/activate"
+export AW_DB="${tmp_venv}/aw.dev.db"
 
 echo ''
 echo 'Building & Installing Module using PIP'
