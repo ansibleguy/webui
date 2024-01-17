@@ -41,13 +41,16 @@ jobs:
 
       - name: Testing DB migrations for errors & warnings
         run: |
+          python3 manage.py makemigrations
           m1=$(python3 manage.py makemigrations 2>&1)
           if echo "$m1" | grep -q 'WARNING'; then exit 1;fi
 
-          m2=$(python3 manage.py migrate 2>&1)
+          python3 manage.py makemigrations aw
+          m2=$(python3 manage.py migrate aw 2>&1)
           if echo "$m2" | grep -q 'WARNING'; then exit 1;fi
 
-          m3=$(python3 manage.py migrate aw 2>&1)
+          python3 manage.py migrate
+          m3=$(python3 manage.py migrate 2>&1)
           if echo "$m3" | grep -q 'WARNING'; then exit 1;fi
         shell: bash
         working-directory: src/ansible-webui/
