@@ -57,6 +57,7 @@ jobs:
 
       - name: Testing to start Ansible-WebUI
         run: |
+          set +e
           timeout 2 python3 ansible-webui
           ec="$?"
           if [[ "$ec" != "124" ]]
@@ -71,6 +72,7 @@ jobs:
 
       - name: Testing to build Ansible-WebUI with PIP
         run: |
+          set +e
           path_repo="$(pwd)"
           cd /tmp
           tmp_venv="/tmp/ansible-webui-venv/$(date +%s)"
