@@ -39,14 +39,7 @@ jobs:
           pip install -r requirements.txt
         shell: bash
 
-      - name: Testing DB migrations for errors
-        run: |
-          python3 manage.py makemigrations
-          python3 manage.py migrate
-        shell: bash
-        working-directory: ansible-webui/
-
-      - name: Testing DB migrations for warnings
+      - name: Testing DB migrations for errors & warnings
         run: |
           m1=$(python3 manage.py makemigrations 2>&1)
           if echo "$m1" | grep -q 'WARNING'; then exit 1;fi
@@ -72,17 +65,21 @@ jobs:
 
       - name: Testing to build Ansible-WebUI with PIP
         run: |
-          set +e
-          path_repo="$(pwd)"
           cd /tmp
+          echo 'CREATING TMP VENV'
           tmp_venv="/tmp/ansible-webui-venv/$(date +%s)"
           python3 -m virtualenv "$tmp_venv" >/dev/null
           source "${tmp_venv}/bin/activate"
-          python3 -m pip install -e "$path_repo" >/dev/null
 
+          echo 'INSTALLING MODULE'
+          python3 -m pip install -e "$GITHUB_WORKSPACE" >/dev/null
+
+          set +e
+          echo 'RUNNING APP'
           timeout 2 python3 -m ansible-webui
           ec="$?"
 
+          echo 'CLEANUP'
           deactivate
           rm -rf "$tmp_venv"
 
