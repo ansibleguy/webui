@@ -1,4 +1,11 @@
+import signal
+from os import getpid
+from os import kill as os_kill
+from sys import exit as sys_exit
+from threading import Thread
 from time import sleep, time
+
+from gunicorn.arbiter import Arbiter
 
 from base.threader import ThreadManager
 from aw.utils.debug import log
@@ -45,8 +52,8 @@ class Scheduler:
 
     def _thread(self, job: Job, execution: JobExecution = None):
         # todo: creation of execution object for ad-hoc execution (with user-provided values)
-        self.thread_manager.add_thread(job)
-        self.thread_manager.start_thread(job)
+        self.thread_manager.add_thread(job=job, execution=execution)
+        self.thread_manager.start_thread(job=job)
 
     def start(self):
         log('Starting..', level=3)
@@ -57,6 +64,7 @@ class Scheduler:
         self._run()
 
     def _run(self):
+        # pylint: disable=W0718
         try:
             sleep(self.WAIT_TIME)
             log('Entering Scheduler runtime', level=7)
@@ -76,3 +84,30 @@ class Scheduler:
             print(f'ERROR: {err}')
             self.stop()
             return
+
+
+def init_scheduler():
+    scheduler = Scheduler()
+    scheduler_thread = Thread(target=scheduler.start)
+
+    # override gunicorn signal handling to allow for graceful shutdown
+    Arbiter.SIGNALS.remove(signal.SIGHUP)
+    Arbiter.SIGNALS.remove(signal.SIGINT)
+    Arbiter.SIGNALS.remove(signal.SIGTERM)
+
+    def signal_exit(signum=None, stack=None):
+        del stack
+        scheduler.stop(signum)
+        os_kill(getpid(), signal.SIGQUIT)  # trigger 'Arbiter.stop'
+        sleep(3)
+        sys_exit(0)
+
+    def signal_reload(signum=None, stack=None):
+        del stack
+        scheduler.reload(signum)
+
+    signal.signal(signal.SIGHUP, signal_reload)
+    signal.signal(signal.SIGINT, signal_exit)
+    signal.signal(signal.SIGTERM, signal_exit)
+
+    scheduler_thread.start()

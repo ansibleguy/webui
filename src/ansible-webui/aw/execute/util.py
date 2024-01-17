@@ -74,7 +74,7 @@ def _runner_options(job: Job, execution: JobExecution) -> dict:
     }
 
 
-def runner_prep(job: Job, execution: (JobExecution, None)):
+def runner_prep(job: Job, execution: (JobExecution, None)) -> dict:
     if execution is None:
         execution = JobExecution(user=None, job=job, comment='Scheduled')
 
@@ -105,6 +105,8 @@ def runner_prep(job: Job, execution: (JobExecution, None)):
         chmod(path=pdd, mode=0o750)
 
     _update_execution_status(execution, status='Running')
+
+    return opts
 
 
 def runner_cleanup(opts: dict):

@@ -1,13 +1,11 @@
 from pathlib import Path
 from os import environ
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
-
 from aw.config.main import config
 from aw.config.hardcoded import LOGIN_PATH, ENV_KEY_DB
 from aw.utils.deployment import deployment_dev, deployment_prod
 
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 DEBUG = deployment_dev()
 ALLOWED_HOSTS = ['*']

@@ -1,3 +1,30 @@
 [build-system]
-requires = ['setuptools>=42']
-build-backend = 'setuptools.build_meta'
+requires = ["setuptools >= 61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ansible-webui"
+authors = [
+    {name = "AnsibleGuy", email = "contact@ansibleguy.net"},
+]
+description = "Basic WebUI for using Ansible"
+readme = "README.md"
+requires-python = ">=3.5"
+keywords = ["ansible", "webui", "automation", "iac"]
+license = {file = "LICENSE.txt"}
+classifiers = [
+    'Programming Language :: Python :: 3',
+    'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
+    'Framework :: Django',
+]
+dynamic = ["dependencies", "version"]
+
+[project.urls]
+Homepage = "https://github.com/ansibleguy/ansible-webui"
+Documentation = "https://ansible-webui.readthedocs.io/"
+Repository = "https://github.com/ansibleguy/ansible-webui.git"
+Issues = "https://github.com/ansibleguy/issues"
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+version = {file = ["VERSION"]}

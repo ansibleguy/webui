@@ -52,17 +52,15 @@ class Workload(Thread):
                 self.manager.threads.remove(self.job)
                 return
 
-            else:
-                wait_sec = self.cron.next()
-                log(f"Next execution of job {self.log_name} in {wait_sec}s", level=7)
-                while not self.state_stop.wait(wait_sec):
-                    if self.state_stop.is_set():
-                        log(f"Exiting thread {self.log_name}", level=5)
-                        break
+            wait_sec = self.cron.next()
+            log(f"Next execution of job {self.log_name} in {wait_sec}s", level=7)
+            while not self.state_stop.wait(wait_sec):
+                if self.state_stop.is_set():
+                    log(f"Exiting thread {self.log_name}", level=5)
+                    break
 
-                    else:
-                        log(f"Starting job {self.log_name}", level=5)
-                        self.run_playbook()
+                log(f"Starting job {self.log_name}", level=5)
+                self.run_playbook()
 
         except ValueError as err:
             log(f"Got unexpected error while executing job {self.log_name}: '{err}'")

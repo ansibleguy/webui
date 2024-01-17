@@ -39,15 +39,17 @@ class StandaloneApplication(WSGIApplication):
 
 def init_webserver():
     gunicorn.SERVER = ''.join(random_choice(ascii_letters) for _ in range(10))
-    run_options = {
+    opts = {
         'workers': (cpu_count() * 2) + 1,
         **OPTIONS_PROD
     }
     if deployment_dev():
         warn_if_development()
-        run_options = {**run_options, **OPTIONS_DEV}
+        opts = {**opts, **OPTIONS_DEV}
+
+    print(f"Listening on http://{opts['bind']}")
 
     StandaloneApplication(
         app_uri="aw.main:app",
-        options=run_options
+        options=opts
     ).run()

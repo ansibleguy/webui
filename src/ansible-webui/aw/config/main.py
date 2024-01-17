@@ -1,11 +1,16 @@
 from os import environ
+from importlib.metadata import version
 
 from pytz import all_timezones
 
 from aw.config.environment import ENVIRON_FALLBACK
 
 
+VERSION = environ['AW_VERSION'] if 'AW_VERSION' in environ else version('ansible-webui')
+
+
 def init_globals():
+    # pylint: disable=W0601
     global config
     config = {}
 

@@ -1,6 +1,6 @@
 from django import template
 
-from aw.config.hardcoded import VERSION
+from aw.config.main import VERSION
 from aw.config.navigation import NAVIGATION
 
 

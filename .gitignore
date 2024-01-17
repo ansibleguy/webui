@@ -5,3 +5,4 @@ ansible_webui.egg-info/
 __pychache__.py
 **/aw.db
 **/aw.dev.db
+VERSION

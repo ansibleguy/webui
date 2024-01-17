@@ -13,3 +13,5 @@ def get_choice_key_by_value(choices: list[tuple], value):
     for k, v in choices:
         if v == value:
             return k
+
+    return None

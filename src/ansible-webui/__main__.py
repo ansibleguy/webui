@@ -14,11 +14,12 @@ if __name__ == '__main__':
         sys_path.append(os_path.dirname(os_path.abspath(__file__)))
         from main import main
 
-    from aw.config.hardcoded import VERSION
+    from aw.config.main import VERSION
 
     if len(sys_argv) > 1:
         if sys_argv[1] == 'version':
             print(VERSION)
             sys_exit(0)
 
+    print(f'Ansible-WebUI Version {VERSION}')
     main()

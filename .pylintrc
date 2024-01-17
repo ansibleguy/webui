@@ -1,3 +1,6 @@
+[MASTER]
+init-hook='import sys; sys.path.append("src/ansible-webui/")'
+
 [MAIN]
 
 # Analyse import fallback blocks. This can be used to support both Python 2 and
@@ -52,7 +55,8 @@ ignore=CVS
 # ignore-list. The regex matches against paths and can be in Posix or Windows
 # format. Because '\\' represents the directory delimiter on Windows systems,
 # it can't be used as an escape character.
-ignore-paths=venv/*
+ignore-paths=venv/*,
+             src/ansible-webui/aw/migrations/*
 
 # Files or directories matching the regular expression patterns are skipped.
 # The regex matches against base names, not paths. The default value ignores
@@ -279,16 +283,17 @@ valid-metaclass-classmethod-first-arg=mcs
 # List of regular expressions of class ancestor names to ignore when counting
 # public methods (see R0903)
 exclude-too-few-public-methods=
+# todo: exclude models
 
 # List of qualified class names to ignore when counting class parents (see
 # R0901)
 ignored-parents=
 
 # Maximum number of arguments for function / method.
-max-args=5
+max-args=7
 
 # Maximum number of attributes for a class (see R0902).
-max-attributes=7
+max-attributes=10
 
 # Maximum number of boolean expressions in an if statement (see R0916).
 max-bool-expr=5
@@ -424,6 +429,9 @@ confidence=HIGH,
 disable=C0114, C0115, C0116,  # no inline docs
         C0103,  # var-naming..
         W0511,  # todo comments
+        W0707,  # has reasons
+        R0903,  # todo: exclude models
+        E0401
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option

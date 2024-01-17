@@ -34,9 +34,9 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install -r requirements_test.txt
-          pip install -r requirements_build.txt
-          pip install -r requirements.txt
+          pip install -r requirements_test.txt >/dev/null
+          pip install -r requirements_build.txt >/dev/null
+          pip install -r requirements.txt >/dev/null
         shell: bash
 
       - name: Testing DB migrations for errors & warnings
@@ -46,12 +46,12 @@ jobs:
           m2=$(python3 manage.py migrate 2>&1)
           if echo "$m2" | grep -q 'WARNING'; then exit 1;fi
         shell: bash
-        working-directory: ansible-webui/
+        working-directory: src/ansible-webui/
 
       - name: Testing to start Ansible-WebUI
         run: |
           set +e
-          timeout 2 python3 ansible-webui
+          timeout 2 python3 src/ansible-webui
           ec="$?"
           if [[ "$ec" != "124" ]]
           then

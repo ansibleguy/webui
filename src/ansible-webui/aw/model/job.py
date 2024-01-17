@@ -101,8 +101,8 @@ class JobExecutionResultHost(BareModel):
     tasks_ignored = models.PositiveSmallIntegerField(default=0)
     tasks_changed = models.PositiveSmallIntegerField(default=0)
 
-    error = models.ForeignKey(JobError, on_delete=models.CASCADE, related_name=f"jobresulthost_fk_error")
-    result = models.ForeignKey(JobExecutionResult, on_delete=models.CASCADE, related_name=f"jobresulthost_fk_result")
+    error = models.ForeignKey(JobError, on_delete=models.CASCADE, related_name='jobresulthost_fk_error')
+    result = models.ForeignKey(JobExecutionResult, on_delete=models.CASCADE, related_name='jobresulthost_fk_result')
 
     def __str__(self) -> str:
         if int(self.tasks_failed) > 0:
@@ -126,11 +126,11 @@ class JobExecution(MetaJob):
     # NOTE: scheduled execution will have no user
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.PROTECT, null=True,
-        related_name=f"jobexec_fk_user"
+        related_name='jobexec_fk_user'
     )
-    job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name=f"jobexec_fk_job")
+    job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name='jobexec_fk_job')
     result = models.ForeignKey(
-        JobExecutionResult, on_delete=models.CASCADE, related_name=f"jobexec_fk_result",
+        JobExecutionResult, on_delete=models.CASCADE, related_name='jobexec_fk_result',
         null=True, default=None,  # execution is created before result is available
     )
     status = models.PositiveSmallIntegerField(default=0, choices=CHOICES_JOB_EXEC_STATUS)
