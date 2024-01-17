@@ -70,6 +70,7 @@ def _make_migrations():
 
 
 def create_first_superuser():
+    # pylint: disable=C0415
     from django.contrib.auth.models import User
     if len(User.objects.filter(is_superuser=True)) == 0:
         name = 'ansible'

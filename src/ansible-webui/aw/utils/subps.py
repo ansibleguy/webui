@@ -19,8 +19,8 @@ def process(cmd: list, timeout_sec: int = None, shell: bool = False) -> dict:
             OSError, IOError) as error:
         stdout, stderr, rc = None, str(error), 1
 
-    return dict(
-        stdout=stdout,
-        stderr=stderr,
-        rc=rc,
-    )
+    return {
+        'stdout': stdout,
+        'stderr': stderr,
+        'rc': rc,
+    }
