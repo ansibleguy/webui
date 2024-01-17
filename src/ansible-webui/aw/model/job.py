@@ -105,10 +105,10 @@ class JobExecutionResultHost(BareModel):
     result = models.ForeignKey(JobExecutionResult, on_delete=models.CASCADE, related_name='jobresulthost_fk_result')
 
     def __str__(self) -> str:
+        result = 'succeeded'
+
         if int(self.tasks_failed) > 0:
             result = 'failed'
-        else:
-            result = 'success' if self.warning is None else 'warning'
 
         return f"Job execution {self.created} of host {self.hostname}: {result}"
 

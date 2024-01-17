@@ -35,7 +35,7 @@ export DJANGO_SUPERUSER_EMAIL='ansible@localhost'
 if [[ "$TEST_QUIET" != "1" ]]
 then
   log 'INSTALLING REQUIREMENTS'
-  python3 -m pip install --upgrade -r ../requirements.txt >/dev/null
+  python3 -m pip install --upgrade -r ./requirements.txt >/dev/null
 fi
 
 log 'SETTING VERSION'
