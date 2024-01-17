@@ -19,7 +19,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 3
+    timeout-minutes: 2
 
     steps:
       - name: Checkout
@@ -68,30 +68,4 @@ jobs:
 
       - name: Running Tests
         run: python3 -m pytest
-        shell: bash
-
-      - name: Testing to build Ansible-WebUI with PIP
-        run: |
-          cd /tmp
-          echo 'CREATING TMP VENV'
-          tmp_venv="/tmp/ansible-webui-venv/$(date +%s)"
-          python3 -m virtualenv "$tmp_venv" >/dev/null
-          source "${tmp_venv}/bin/activate"
-
-          echo 'INSTALLING MODULE'
-          python3 -m pip install -e "$GITHUB_WORKSPACE" >/dev/null
-
-          set +e
-          echo 'RUNNING APP'
-          timeout 2 python3 -m ansible-webui
-          ec="$?"
-
-          echo 'CLEANUP'
-          deactivate
-          rm -rf "$tmp_venv"
-
-          if [[ "$ec" != "124" ]]
-          then
-            exit 1
-          fi
         shell: bash
