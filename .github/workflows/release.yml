@@ -55,7 +55,7 @@ jobs:
 
       - name: Extract tag name
         id: version
-        run: echo ::set-output name=TAG_NAME::$(echo $GITHUB_REF | cut -d / -f 3 | cut -c 2-)
+        run: echo ::set-output name=TAG_NAME::$(echo $GITHUB_REF | cut -d / -f 3 | cut -c 1-)
 
       - name: Building
         run: |
