@@ -1,5 +1,3 @@
-from os import environ
-
 # pylint: disable=E0401
 from django.urls import path, re_path
 from django.conf.urls import include
@@ -7,12 +5,12 @@ from django.contrib import admin
 
 from base.serve_static import urlpatterns_static
 from aw.route import ui, catchall, logout, not_implemented, manage
-from aw.config.hardcoded import ENV_KEY_SERVE_STATIC
+from aw.config.environment import check_aw_env_var_true
 from aw.utils.deployment import deployment_dev
 
 urlpatterns = []
 
-if deployment_dev() or ENV_KEY_SERVE_STATIC not in environ:
+if deployment_dev() or check_aw_env_var_true(var='serve_static', fallback=True):
     urlpatterns += urlpatterns_static
 
 urlpatterns += [

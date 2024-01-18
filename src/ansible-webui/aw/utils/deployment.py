@@ -1,14 +1,12 @@
-from os import environ
-
-from aw.config.hardcoded import ENV_KEY_DEPLOYMENT
+from aw.config.environment import get_aw_env_var
 
 
 def deployment_dev() -> bool:
-    return ENV_KEY_DEPLOYMENT in environ and environ[ENV_KEY_DEPLOYMENT] == 'dev'
+    return get_aw_env_var('deployment') == 'dev'
 
 
 def deployment_staging() -> bool:
-    return ENV_KEY_DEPLOYMENT in environ and environ[ENV_KEY_DEPLOYMENT] == 'dev'
+    return get_aw_env_var('deployment') == 'staging'
 
 
 def deployment_prod() -> bool:

@@ -2,17 +2,24 @@ from pathlib import Path
 from shutil import copy
 from datetime import datetime
 from sys import exit as sys_exit
-from os import environ
 from secrets import choice as random_choice
 from string import digits, ascii_letters
+from os import listdir, remove
+from time import time
 
 from aw.settings import DB_FILE
 from aw.utils.subps import process
 from aw.utils.debug import log, log_error, log_warn
+from aw.utils.deployment import deployment_prod
+from aw.config.environment import check_aw_env_var_true, get_aw_env_var, check_aw_env_var_is_set
 
+DB_BACKUP_EXT = '.auto.bak'
+DB_BACKUP_RETENTION_DAYS = 7
 
-ENV_KEY_INIT_ADMIN_NAME = 'AW_ADMIN'
-ENV_KEY_INIT_ADMIN_PWD = 'AW_ADMIN_PWD'
+if not deployment_prod():
+    DB_BACKUP_RETENTION_DAYS = 1
+
+DB_BACKUP_RETENTION = DB_BACKUP_RETENTION_DAYS * 24 * 60 * 60
 
 
 def install_or_migrate_db():
@@ -22,11 +29,10 @@ def install_or_migrate_db():
     return migrate()
 
 
-def _manage_db(action: str, cmd: list, backup: str = None):
+def _manage_db(action: str, cmd: list, backup: str = None) -> str:
     cmd2 = ['python3', 'manage.py']
     cmd2.extend(cmd)
 
-    log(msg=f"Executing DB-management command: '{cmd2}'", level=6)
     result = process(cmd=cmd2)
 
     if result['rc'] != 0:
@@ -45,6 +51,20 @@ def _manage_db(action: str, cmd: list, backup: str = None):
         else:
             sys_exit(1)
 
+    return result['stdout']
+
+
+def _clean_old_db_backups():
+    possible_db_backup_files = listdir(DB_FILE.parent)
+    for file in possible_db_backup_files:
+        if file.startswith(DB_FILE.name) and file.endswith(DB_BACKUP_EXT):
+            backup_file = DB_FILE.parent / file
+            backup_age = time() - backup_file.stat().st_mtime
+            print(backup_file, backup_age, DB_BACKUP_RETENTION)
+            if backup_age > DB_BACKUP_RETENTION:
+                log(msg=f"Cleaning old backup file: '{backup_file}'", level=4)
+                remove(backup_file)
+
 
 def install():
     log(msg=f"Initializing database {DB_FILE}..", level=3)
@@ -53,34 +73,43 @@ def install():
 
 
 def migrate():
-    _make_migrations()
+    _clean_old_db_backups()
+    migration_needed = _make_migrations()
 
-    backup = f"{DB_FILE}.{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.bak"
-    log(msg=f"Creating database backup: '{backup}'", level=6)
-    copy(src=DB_FILE, dst=backup)
+    if migration_needed and check_aw_env_var_true('db_migrate'):
+        backup = f"{DB_FILE}.{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}{DB_BACKUP_EXT}"
+        log(msg=f"Creating database backup: '{backup}'", level=6)
+        copy(src=DB_FILE, dst=backup)
 
-    if 'AW_DB_MIGRATE' not in environ:
-        log(msg=f"Migrating database {DB_FILE}..", level=3)
+        log(msg=f"Upgrading database {DB_FILE}", level=3)
         _manage_db(action='migration', cmd=['migrate'], backup=backup)
 
 
-def _make_migrations():
-    _manage_db(action='schema-creation', cmd=['makemigrations'])
-    _manage_db(action='schema-creation', cmd=['makemigrations', 'aw'])
+def _make_migrations() -> bool:
+    changed = False
+
+    for stdout in [
+        _manage_db(action='schema-creation', cmd=['makemigrations']),
+        _manage_db(action='schema-creation', cmd=['makemigrations', 'aw']),
+    ]:
+        if stdout.find('No changes detected') == -1:
+            changed = True
+
+    return changed
 
 
 def create_first_superuser():
     # pylint: disable=C0415
     from django.contrib.auth.models import User
     if len(User.objects.filter(is_superuser=True)) == 0:
-        name = 'ansible'
-        pwd = ''.join(random_choice(ascii_letters + digits + '!.-+') for _ in range(14))
+        name = get_aw_env_var('init_admin')
+        pwd = get_aw_env_var('init_admin_pwd')
 
-        if ENV_KEY_INIT_ADMIN_NAME in environ:
-            name = environ[ENV_KEY_INIT_ADMIN_NAME]
+        if name is None:
+            name = 'ansible'
 
-        if ENV_KEY_INIT_ADMIN_PWD in environ:
-            pwd = environ[ENV_KEY_INIT_ADMIN_PWD]
+        if pwd is None:
+            pwd = ''.join(random_choice(ascii_letters + digits + '!.-+') for _ in range(14))
 
         User.objects.create_superuser(
             username=name,
@@ -89,8 +118,8 @@ def create_first_superuser():
         )
 
         log_warn('No admin was found in the database!')
-        if ENV_KEY_INIT_ADMIN_PWD in environ:
-            log(msg='The user was created as provided!', level=4)
+        if check_aw_env_var_is_set('init_admin_pwd'):
+            log(msg=f"The user '{name}' was created!", level=4)
 
         else:
             log(msg=f"Generated user: '{name}'", level=3)

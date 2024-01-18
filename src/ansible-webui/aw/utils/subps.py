@@ -1,9 +1,12 @@
 import subprocess
 
 from aw.settings import BASE_DIR
+from aw.utils.debug import log
 
 
 def process(cmd: list, timeout_sec: int = None, shell: bool = False) -> dict:
+    log(msg=f"Executing command: '{' '.join(cmd)}'", level=6)
+
     try:
         with subprocess.Popen(
             cmd,

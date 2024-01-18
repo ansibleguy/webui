@@ -1,12 +1,10 @@
 from datetime import datetime
 
-from pytz import timezone
-
 from aw.config.main import config
 
 
 def datetime_w_tz() -> datetime:
-    return timezone(config['timezone']).localize(datetime.now())
+    return datetime.now(config['timezone'])
 
 
 def get_choice_key_by_value(choices: list[tuple], value):

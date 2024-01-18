@@ -9,6 +9,7 @@ from ansible_runner import Runner as AnsibleRunner
 
 from aw.config.main import config
 from aw.config.hardcoded import RUNNER_TMP_DIR_TIME_FORMAT
+from aw.config.environment import check_aw_env_var_true, get_aw_env_var, check_aw_env_var_is_set
 from aw.utils.util import get_choice_key_by_value
 from aw.utils.handlers import AnsibleConfigError
 from aw.model.job import Job, JobExecution, JobExecutionResult, JobExecutionResultHost, CHOICES_JOB_EXEC_STATUS
@@ -64,7 +65,7 @@ def _runner_options(job: Job, execution: JobExecution) -> dict:
             **_decode_env_vars(env_vars_csv=execution.environment_vars, src='Execution')
         }
 
-    return {
+    opts = {
         'runner_mode': 'pexpect',
         'private_data_dir': path_run,
         'project_dir': config['path_play'],
@@ -72,6 +73,20 @@ def _runner_options(job: Job, execution: JobExecution) -> dict:
         'limit': execution.limit if execution.limit is not None else job.limit,
         'envvars': env_vars,
     }
+
+    if check_aw_env_var_is_set('run_timeout'):
+        opts['timeout'] = get_aw_env_var('run_timeout')
+
+    if check_aw_env_var_true('run_isolate_dir'):
+        opts['directory_isolation_base_path'] = path_run / 'play_base'
+
+    if check_aw_env_var_true('run_isolate_process'):
+        opts['process_isolation'] = True
+        opts['process_isolation_hide_paths'] = get_aw_env_var('run_isolate_process_path_hide')
+        opts['process_isolation_show_paths'] = get_aw_env_var('run_isolate_process_path_show')
+        opts['process_isolation_ro_paths'] = get_aw_env_var('run_isolate_process_path_ro')
+
+    return opts
 
 
 def runner_prep(job: Job, execution: (JobExecution, None)) -> dict:

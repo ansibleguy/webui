@@ -2,8 +2,9 @@ from pathlib import Path
 from os import environ
 
 from aw.config.main import config
-from aw.config.hardcoded import LOGIN_PATH, ENV_KEY_DB
+from aw.config.hardcoded import LOGIN_PATH
 from aw.utils.deployment import deployment_dev, deployment_prod
+from aw.config.environment import get_aw_env_var
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 TEMPLATE_DIRS = [
@@ -38,7 +39,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django_user_agents.middleware.UserAgentMiddleware',
 ]
-ROOT_URLCONF = 'route'
+ROOT_URLCONF = 'aw.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -57,12 +58,16 @@ TEMPLATES = [
 WSGI_APPLICATION = 'aw.main.app'
 
 # Database
-DB_FILE = None
 if deployment_prod():
-    if ENV_KEY_DB in environ:
-        DB_FILE = Path(environ[ENV_KEY_DB])
+    DB_FILE = get_aw_env_var('db')
+    if DB_FILE is not None:
+        DB_FILE = Path(DB_FILE)
         if not DB_FILE.parent.exists():
-            raise ValueError(f"Provided database directory does not exist: '{DB_FILE.parent}'")
+            try:
+                DB_FILE.parent.mkdir()
+
+            except (OSError, FileNotFoundError):
+                raise ValueError(f"Unable to created provided database directory: '{DB_FILE.parent}'")
 
     if DB_FILE is None:
         home_config = Path(environ['HOME']) / '.config'
@@ -74,7 +79,7 @@ if deployment_prod():
         if not DB_FILE.is_dir():
             raise ValueError(f"Home directory does not exist: '{DB_FILE}'")
 
-    if Path(DB_FILE).is_dir():
+    if DB_FILE.is_dir():
         DB_FILE = DB_FILE / 'aw.db'
 
 else:

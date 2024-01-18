@@ -2,14 +2,15 @@ from os import environ
 from importlib.metadata import version, PackageNotFoundError
 from sys import stderr
 
-from pytz import all_timezones
+from pytz import all_timezones, timezone
 
-from aw.config.environment import ENVIRON_FALLBACK
+from aw.config.environment import AW_ENV_VARS, get_aw_env_var
 
 
 def get_version() -> str:
-    if 'AW_VERSION' in environ:
-        return environ['AW_VERSION']
+    env_version = get_aw_env_var('version')
+    if env_version is not None:
+        return env_version
 
     try:
         return version('ansible-webui')
@@ -32,13 +33,12 @@ def init_globals():
     environ['PYTHONIOENCODING'] = 'utf8'
     environ['PYTHONUNBUFFERED'] = '1'
 
-    for cnf_key, values in ENVIRON_FALLBACK.items():
-        for env_key in values['keys']:
-            if env_key in environ:
-                config[cnf_key] = environ[env_key]
-
-        if cnf_key not in config:
-            config[cnf_key] = values['fallback']
+    for cnf_key in AW_ENV_VARS:
+        config[cnf_key] = get_aw_env_var(cnf_key)
 
     if config['timezone'] not in all_timezones:
         config['timezone'] = 'GMT'
+
+    environ.setdefault('TZ', config['timezone'])
+    config['timezone'] = timezone(config['timezone'])
+
