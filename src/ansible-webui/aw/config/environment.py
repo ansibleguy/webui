@@ -26,8 +26,10 @@ AW_ENV_VARS = {
     'run_isolate_process_path_show': ['AW_RUN_ISOLATE_PS_PATH_SHOW'],
     'run_isolate_process_path_ro': ['AW_RUN_ISOLATE_PS_PATH_RO'],
     'ansible_config': ['ANSIBLE_CONFIG'],
+    'path_log': ['AW_PATH_LOG'],
 }
 
+# todo: move typing to config-init
 AW_ENV_VARS_TYPING = {
     'csv': [
         'run_isolate_process_path_hide', 'run_isolate_process_path_show', 'run_isolate_process_path_ro',
@@ -50,10 +52,13 @@ def _get_existing_ansible_config_file() -> (str, None):
     return None
 
 
+# todo: move static defaults to config-model
 AW_ENV_VARS_DEFAULTS = {
     'run_timeout': 3600,
     'path_run': '/tmp/ansible-webui',
     'path_play': getcwd(),
+    'path_log': f"{environ['HOME']}/.local/share/ansible-webui",
+    'db': f"{environ['HOME']}/.config/ansible-webui",
     'timezone': datetime.now().astimezone().tzname(),
     '_secret': ''.join(random_choice(ascii_letters + digits + punctuation) for _ in range(50)),
     'ansible_config': _get_existing_ansible_config_file(),
@@ -82,6 +87,7 @@ def check_aw_env_var_is_set(var: str) -> bool:
     return get_aw_env_var(var) is not None
 
 
+# only use on edge-cases; as.config.main.check_config_is_true is preferred
 def check_aw_env_var_true(var: str, fallback: bool = False) -> bool:
     val = get_aw_env_var(var)
     if val is None:

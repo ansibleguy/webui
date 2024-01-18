@@ -4,4 +4,5 @@ RELOAD_INTERVAL = 10
 LOGIN_PATH = '/a/login/'
 LOGOUT_PATH = '/o/'
 LOG_TIME_FORMAT = '%Y-%m-%d %H:%M:%S %z'
-RUNNER_TMP_DIR_TIME_FORMAT = '%Y-%m-%d_%H-%M-%S'
+SHORT_TIME_FORMAT = '%Y-%m-%d %H:%M:%S'
+FILE_TIME_FORMAT = '%Y-%m-%d_%H-%M-%S'

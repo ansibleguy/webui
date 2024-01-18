@@ -33,22 +33,22 @@ export DJANGO_SUPERUSER_USERNAME='ansible'
 export DJANGO_SUPERUSER_PASSWORD='automateMe'
 export DJANGO_SUPERUSER_EMAIL='ansible@localhost'
 
-if [[ "$TEST_QUIET" != "1" ]]
-then
-  log 'INSTALLING REQUIREMENTS'
-  python3 -m pip install --upgrade -r ./requirements.txt >/dev/null
-fi
-
 log 'SETTING VERSION'
 bash ./scripts/update_version.sh
 version="$(cat './VERSION')"
 export AW_VERSION="$version"
 
-log 'INITIALIZING DATABASE SCHEMA'
-bash ./scripts/migrate_db.sh "$TEST_MIGRATE"
+if [[ "$TEST_QUIET" != "1" ]]
+then
+  log 'INSTALLING REQUIREMENTS'
+  python3 -m pip install --upgrade -r ./requirements.txt >/dev/null
 
-log 'CREATING USERS'
-python3 ./src/ansible-webui/manage.py createsuperuser --noinput || true
+  log 'INITIALIZING DATABASE SCHEMA'
+  bash ./scripts/migrate_db.sh "$TEST_MIGRATE"
+
+  log 'CREATING USERS'
+  python3 ./src/ansible-webui/manage.py createsuperuser --noinput || true
+fi
 
 log 'STARTING APP'
 python3 ./src/ansible-webui

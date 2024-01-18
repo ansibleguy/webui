@@ -1,5 +1,4 @@
 from pathlib import Path
-from os import environ
 
 from aw.config.main import config
 from aw.config.hardcoded import LOGIN_PATH
@@ -59,25 +58,21 @@ WSGI_APPLICATION = 'aw.main.app'
 
 # Database
 if deployment_prod():
-    DB_FILE = get_aw_env_var('db')
-    if DB_FILE is not None:
-        DB_FILE = Path(DB_FILE)
-        if not DB_FILE.parent.exists():
-            try:
-                DB_FILE.parent.mkdir()
+    DB_FILE = Path(get_aw_env_var('db'))
 
-            except (OSError, FileNotFoundError):
-                raise ValueError(f"Unable to created provided database directory: '{DB_FILE.parent}'")
+    if not DB_FILE.parent.exists():
+        try:
+            DB_FILE.parent.mkdir(mode=0o750)
 
-    if DB_FILE is None:
-        home_config = Path(environ['HOME']) / '.config'
-        if home_config.is_dir():
-            DB_FILE = home_config
+        except (OSError, FileNotFoundError):
+            raise ValueError(f"Unable to created database directory: '{DB_FILE.parent}'")
 
-    if DB_FILE is None:
-        DB_FILE = Path(environ['HOME'])
-        if not DB_FILE.is_dir():
-            raise ValueError(f"Home directory does not exist: '{DB_FILE}'")
+    if DB_FILE.name.find('.') == -1:
+        try:
+            DB_FILE.mkdir(mode=0o750)
+
+        except (OSError, FileNotFoundError):
+            raise ValueError(f"Unable to created database directory: '{DB_FILE}'")
 
     if DB_FILE.is_dir():
         DB_FILE = DB_FILE / 'aw.db'

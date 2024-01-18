@@ -19,13 +19,28 @@ Environmental variables
 
 * **AW_DB**
 
-   To define the path where the SQLite3 database is placed.
+   Define the path where the SQLite3 database is placed. Default: :code:`${HOME}/.config/ansible-webui/aw.db`
 
 
 * **AW_SECRET**
 
    Define a secret key to use for cookie encryption.
    By default it will be re-generated at service restart.
+
+
+* **AW_PATH_LOG**
+
+   Define the path where full job-logs are saved. Default: :code:`${HOME}/.local/share/ansible-webui/`
+
+
+* **AW_PATH_RUN**
+
+   Base directory for Ansible-Runner runtime files. Default: :code:`/tmp/ansible-webui/`
+
+
+* **AW_PATH_PLAY**
+
+   Path to the [Ansible base/playbook directory](https://docs.ansible.com/ansible/2.8/user_guide/playbooks_best_practices.html#directory-layout). Default: current working directory (*when executing ansible-webui*)
 
 
 * **AW_TIMEZONE**
@@ -58,14 +73,6 @@ Environmental variables
 * **AW_ADMIN_PWD**
 
    Define the password for the initial admin user.
-
-* **AW_PATH_RUN**
-
-   Base directory for Ansible-Runner runtime files. Default: :code:`/tmp/ansible-webui`
-
-* **AW_PATH_PLAY**
-
-   Path to the [Ansible base/playbook directory](https://docs.ansible.com/ansible/2.8/user_guide/playbooks_best_practices.html#directory-layout). Default: current working directory (*when executing ansible-webui*)
 
 * **AW_RUN_TIMEOUT**
 

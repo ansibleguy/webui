@@ -113,7 +113,7 @@ class ThreadManager:
     def stop_thread(self, job: Job):
         log(f"Stopping thread for \"{job.name}\"", level=6)
         for thread in self.threads:
-            if thread.job.job_id == job.job_id:
+            if thread.job == job:
                 if thread.started:
                     thread.stop()
                     self.threads.remove(job)
@@ -123,7 +123,7 @@ class ThreadManager:
 
     def start_thread(self, job: Job) -> None:
         for thread in self.threads:
-            if thread.job.job_id == job.job_id:
+            if thread.job == job:
                 if not thread.started:
                     thread.start()
                     log(f"Thread {job.name} started.", level=5)

@@ -11,6 +11,7 @@ from aw.settings import DB_FILE
 from aw.utils.subps import process
 from aw.utils.debug import log, log_error, log_warn
 from aw.utils.deployment import deployment_prod
+from aw.config.hardcoded import FILE_TIME_FORMAT
 from aw.config.environment import check_aw_env_var_true, get_aw_env_var, check_aw_env_var_is_set
 
 DB_BACKUP_EXT = '.auto.bak'
@@ -77,7 +78,7 @@ def migrate():
     migration_needed = _make_migrations()
 
     if migration_needed and check_aw_env_var_true('db_migrate'):
-        backup = f"{DB_FILE}.{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}{DB_BACKUP_EXT}"
+        backup = f"{DB_FILE}.{datetime.now().strftime(FILE_TIME_FORMAT)}{DB_BACKUP_EXT}"
         log(msg=f"Creating database backup: '{backup}'", level=6)
         copy(src=DB_FILE, dst=backup)
 

@@ -61,9 +61,9 @@ There are multiple Ansible WebUI products - how do they compare to this product?
 
    It is a single binary and built from Golang (backend) and Node.js/Vue.js (frontend).
 
-   Ansible job [execution is done using shell](https://github.com/ansible-semaphore/semaphore/blob/develop/db_lib/AnsiblePlaybook.go#L57).
+   Ansible job execution is done using [custom implementation](https://github.com/ansible-semaphore/semaphore/blob/develop/db_lib/AnsiblePlaybook.go).
 
-   The project is [managed by a single maintainer and has some issues](https://github.com/ansible-semaphore/semaphore/discussions/1111).
+   The project is [managed by a single maintainer and has some issues](https://github.com/ansible-semaphore/semaphore/discussions/1111). It seems to develop in the direction of large-scale containerized deployments.
 
    The 'Ansible-WebUI' project was inspired by Semaphore.
 
@@ -76,7 +76,7 @@ There are multiple Ansible WebUI products - how do they compare to this product?
 
    The backend stack is built of [gunicorn](https://gunicorn.org/)/[Django](https://www.djangoproject.com/) and the frontend consists of Django templates and JS.
 
-   Ansible job execution is done using the native [Python API](https://ansible.readthedocs.io/projects/runner/en/latest/python_interface/)!
+   Ansible job execution is done using the official [ansible-runner](https://ansible.readthedocs.io/projects/runner/en/latest/python_interface/) library!
 
    Target users are small to medium businesses and Ansible users which just want a UI to run their playbooks.
 

@@ -1,21 +1,20 @@
-from os import chmod
 from pathlib import Path
 from shutil import rmtree
 from random import choice as random_choice
 from string import digits
 from datetime import datetime
+from re import sub as regex_replace
 
 from ansible_runner import Runner as AnsibleRunner
 
-from aw.config.main import config
-from aw.config.hardcoded import RUNNER_TMP_DIR_TIME_FORMAT
-from aw.config.environment import check_aw_env_var_true, get_aw_env_var, check_aw_env_var_is_set
+from aw.config.main import config, check_config_is_true
+from aw.config.hardcoded import FILE_TIME_FORMAT
 from aw.utils.util import get_choice_key_by_value
 from aw.utils.handlers import AnsibleConfigError
 from aw.model.job import Job, JobExecution, JobExecutionResult, JobExecutionResultHost, CHOICES_JOB_EXEC_STATUS
 
 
-def _decode_env_vars(env_vars_csv: str, src: str) -> dict:
+def _decode_job_env_vars(env_vars_csv: str, src: str) -> dict:
     try:
         env_vars = {}
         for kv in env_vars_csv.split(','):
@@ -48,7 +47,7 @@ def _runner_options(job: Job, execution: JobExecution) -> dict:
     if not path_run.endswith('/'):
         path_run += '/'
 
-    path_run += datetime.now().strftime(RUNNER_TMP_DIR_TIME_FORMAT)
+    path_run += datetime.now().strftime(FILE_TIME_FORMAT)
     path_run += ''.join(random_choice(digits) for _ in range(5))
 
     # merge job + execution env-vars
@@ -56,37 +55,48 @@ def _runner_options(job: Job, execution: JobExecution) -> dict:
     if job.environment_vars is not None:
         env_vars = {
             **env_vars,
-            **_decode_env_vars(env_vars_csv=job.environment_vars, src='Job')
+            **_decode_job_env_vars(env_vars_csv=job.environment_vars, src='Job')
         }
 
     if execution.environment_vars is not None:
         env_vars = {
             **env_vars,
-            **_decode_env_vars(env_vars_csv=execution.environment_vars, src='Execution')
+            **_decode_job_env_vars(env_vars_csv=execution.environment_vars, src='Execution')
         }
 
     opts = {
-        'runner_mode': 'pexpect',
         'private_data_dir': path_run,
         'project_dir': config['path_play'],
         'quiet': True,
         'limit': execution.limit if execution.limit is not None else job.limit,
         'envvars': env_vars,
+        'timeout': config['run_timeout'],
     }
 
-    if check_aw_env_var_is_set('run_timeout'):
-        opts['timeout'] = get_aw_env_var('run_timeout')
-
-    if check_aw_env_var_true('run_isolate_dir'):
+    if check_config_is_true('run_isolate_dir'):
         opts['directory_isolation_base_path'] = path_run / 'play_base'
 
-    if check_aw_env_var_true('run_isolate_process'):
+    if check_config_is_true('run_isolate_process'):
         opts['process_isolation'] = True
-        opts['process_isolation_hide_paths'] = get_aw_env_var('run_isolate_process_path_hide')
-        opts['process_isolation_show_paths'] = get_aw_env_var('run_isolate_process_path_show')
-        opts['process_isolation_ro_paths'] = get_aw_env_var('run_isolate_process_path_ro')
+        opts['process_isolation_hide_paths'] = config['run_isolate_process_path_hide']
+        opts['process_isolation_show_paths'] = config['run_isolate_process_path_show']
+        opts['process_isolation_ro_paths'] = config['run_isolate_process_path_ro']
 
     return opts
+
+
+def _create_dirs(path: str, desc: str):
+    try:
+        path = Path(path)
+
+        if not path.is_dir():
+            if not path.parent.is_dir():
+                path.parent.mkdir(mode=0o775)
+
+            path.mkdir(mode=0o750)
+
+    except (OSError, FileNotFoundError):
+        raise OSError(f"Unable to created {desc} directory: '{path}'")
 
 
 def runner_prep(job: Job, execution: (JobExecution, None)) -> dict:
@@ -114,10 +124,8 @@ def runner_prep(job: Job, execution: (JobExecution, None)) -> dict:
         if not Path(pi).exists():
             raise AnsibleConfigError(f"Configured inventory not found: '{pi}'")
 
-    pdd = Path(opts['private_data_dir'])
-    if not pdd.is_dir():
-        pdd.mkdir()
-        chmod(path=pdd, mode=0o750)
+    _create_dirs(path=opts['private_data_dir'], desc='run')
+    _create_dirs(path=config['path_log'], desc='log')
 
     _update_execution_status(execution, status='Running')
 
@@ -128,7 +136,26 @@ def runner_cleanup(opts: dict):
     rmtree(opts['private_data_dir'])
 
 
+def job_logs(job: Job, execution: JobExecution) -> dict:
+    safe_job_name = regex_replace(pattern='[^0-9a-zA-Z-_]+', repl='', string=job.name)
+    if execution.user is None:
+        safe_user_name = 'scheduled'
+    else:
+        safe_user_name = execution.user.replace('.', '_')
+        safe_user_name = regex_replace(pattern='[^0-9a-zA-Z-_]+', repl='', string=safe_user_name)
+
+    timestamp = datetime.now().strftime(FILE_TIME_FORMAT)
+    log_file = f"{config['path_log']}/{safe_job_name}_{timestamp}_{safe_user_name}"
+
+    return {
+        'stdout': f'{log_file}_stdout.log',
+        'stderr': f'{log_file}_stderr.log',
+    }
+
+
 def parse_run_result(execution: JobExecution, time_start: datetime, result: AnsibleRunner):
+    # events = list(result.events)
+
     job_result = JobExecutionResult(
         time_start=time_start,
         failed=result.errored,

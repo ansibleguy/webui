@@ -39,6 +39,16 @@ def init_globals():
     if config['timezone'] not in all_timezones:
         config['timezone'] = 'GMT'
 
+    # todo: merge config from webUI
+    # todo: grey-out settings that are provided via env-var in webUI form and show value
+
     environ.setdefault('TZ', config['timezone'])
     config['timezone'] = timezone(config['timezone'])
 
+
+def check_config_is_true(var: str, fallback: bool = False) -> bool:
+    val = config[var]
+    if val is None:
+        return fallback
+
+    return str(val).lower() in ['1', 'true', 'y', 'yes']

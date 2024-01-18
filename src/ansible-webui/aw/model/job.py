@@ -4,7 +4,9 @@ from django.contrib.auth.models import Group
 
 from crontab import CronTab
 
+from aw.config.main import config
 from aw.model.base import BareModel, BaseModel, CHOICES_BOOL
+from aw.config.hardcoded import SHORT_TIME_FORMAT
 
 
 class JobError(BareModel):
@@ -41,10 +43,16 @@ class JobPermissionMemberUser(BareModel):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     permission = models.ForeignKey(JobPermission, on_delete=models.CASCADE)
 
+    def __str__(self) -> str:
+        return f"Permission '{self.permission.name}' member user '{self.user.username}'"
+
 
 class JobPermissionMemberGroup(BareModel):
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
     permission = models.ForeignKey(JobPermission, on_delete=models.CASCADE)
+
+    def __str__(self) -> str:
+        return f"Permission '{self.permission.name}' member group '{self.group.name}'"
 
 
 CHOICES_JOB_VERBOSITY = (
@@ -59,26 +67,26 @@ CHOICES_JOB_VERBOSITY = (
 
 
 class MetaJob(BaseModel):
-    limit = models.CharField(max_length=500, null=True, default=None)
+    limit = models.CharField(max_length=500, null=True, default=None, blank=True)
     verbosity = models.PositiveSmallIntegerField(choices=CHOICES_JOB_VERBOSITY, default=0)
 
     # NOTE: one or multiple comma-separated vars
-    environment_vars = models.CharField(max_length=1000, null=True, default=None)
+    environment_vars = models.CharField(max_length=1000, null=True, default=None, blank=True)
 
     class Meta:
         abstract = True
 
 
 class Job(MetaJob):
-    job_id = models.PositiveIntegerField(primary_key=True)
     name = models.CharField(max_length=150)
     inventory = models.CharField(max_length=300)  # NOTE: one or multiple comma-separated inventories
     playbook = models.CharField(max_length=300)  # NOTE: one or multiple comma-separated playbooks
-    schedule = models.CharField(max_length=50, validators=[CronTab])
-    permission = models.ForeignKey(JobPermission, on_delete=models.SET_NULL, null=True)
+    schedule = models.CharField(max_length=50, validators=[CronTab], blank=True)
+    permission = models.ForeignKey(JobPermission, on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self) -> str:
-        return f"Job '{self.name}' ('{self.playbook}')"
+        limit = '' if self.limit is None else f' [{self.limit}]'
+        return f"Job '{self.name}' ({self.playbook} => {self.inventory}{limit})"
 
 
 class JobExecutionResult(BareModel):
@@ -126,16 +134,21 @@ class JobExecution(MetaJob):
     # NOTE: scheduled execution will have no user
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.PROTECT, null=True,
-        related_name='jobexec_fk_user'
+        related_name='jobexec_fk_user', editable=False,
     )
     job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name='jobexec_fk_job')
     result = models.ForeignKey(
         JobExecutionResult, on_delete=models.CASCADE, related_name='jobexec_fk_result',
-        null=True, default=None,  # execution is created before result is available
+        null=True, default=None, blank=True,  # execution is created before result is available
     )
     status = models.PositiveSmallIntegerField(default=0, choices=CHOICES_JOB_EXEC_STATUS)
-    comment = models.CharField(max_length=300, null=True, default=None)
+    comment = models.CharField(max_length=150, null=True, default=None, blank=True)
 
     def __str__(self) -> str:
         status_name = CHOICES_JOB_EXEC_STATUS[int(self.status)][1]
-        return f"Job '{self.job.name}' execution {self.created}: {status_name}"
+        executor = 'scheduled'
+        if self.user is not None:
+            executor = self.user.username
+
+        timestamp = self.created.strftime(SHORT_TIME_FORMAT)
+        return f"Job '{self.job.name}' execution @ {timestamp} by '{executor}': {status_name}"
