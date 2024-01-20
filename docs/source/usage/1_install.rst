@@ -2,6 +2,8 @@
 
 .. include:: ../_include/head.rst
 
+.. include:: ../_include/warn_develop.rst
+
 ================
 1 - Installation
 ================

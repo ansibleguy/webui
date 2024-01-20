@@ -7,6 +7,7 @@ pyyaml
 ua-parser
 user-agents
 django-user-agents
+django-auto-logout
 
 ## api
 djangorestframework==3.*

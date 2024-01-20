@@ -1,10 +1,56 @@
+/* todo: update colors (red-ish?) */
+
 body {
+    padding: 0 0;
+    margin: 0 0;
     height: 100vh;
+    background-color: var(--bg) !important;
+    --whiteNormal: rgba(255, 255, 255, .9);
+    --whiteNice: rgba(255, 255, 255, .7);
+    --whiteSmooth: rgba(255, 255, 255, .5);
+    --logoutButton: #B00020;
+    --rad: 5px;
+    --bgMed: #3A9188;
+    --bgDawn: #044A42;
+    --bgDark: #062925;
+    --awLight: #B9BD19;
+    --awDark: #062925;
 }
+
 body.light {
+    --c1: #121212;
+    --tc1: #121212;
+    --tc2: rgba(255, 255, 255, .8);
+    --tc3: #fcfdff;
+    --textHead: #B9BD19;
+    --bg: #fcfdff;
+    --bgLight: #3A9188;
+    --bgNav: #343a40;
+    --bgNav2: #343a40;
+    --bgNav3: #343a40;
+    --tableHead: rgba(0, 0, 0, .05);
+    --tableActive: rgba(0, 0, 0, .075);
+    --bgError: #f8d7da;
+    --borderError: #f5c6cb;
+    --tcError: #721c24;
 }
 
 body.dark {
+    --c1: rgba(255, 255, 255, .9);
+    --tc1: #fcfdff;
+    --tc2: #fcfdff;
+    --tc3: #121212;
+    --textHead: #B9BD19;
+    --bg: #121212;
+    --bgNav: #343a40;
+    --bgNav2: #343a40;
+    --bgNav3: #343a40;
+    --tableHead: #282828;
+    --tableActive: #404040;
+    --bgLight: #062925;
+    --bgError: #282828;
+    --borderError: #404040;
+    --tcError: #721c24;
 }
 
 /* START basic */
@@ -125,7 +171,7 @@ td {
 .aw-nav-container {
     border-radius: 0 0 var(--rad) var(--rad);
     background-color: var(--bgNav) !important;
-    border-bottom: 2px solid var(--gaLight);
+    border-bottom: 2px solid var(--awLight);
 }
 
 .aw-nav-toggler {
@@ -150,7 +196,7 @@ td {
 .aw-nav-main-a2 {
     font-weight: normal;
     text-transform: none;
-    color: var(--tc1) !important;
+    color: var(--whiteNormal) !important;
     -webkit-transition: color 0.2s ease-in-out;
     -moz-transition: color 0.2s ease-in-out;
     -ms-transition: color 0.2s ease-in-out;
@@ -159,7 +205,7 @@ td {
 }
 
 .aw-nav-main-a1:hover, .aw-nav-main-a2:hover, .aw-nav-main-a3:hover {
-    background: var(--gaLight) !important;
+    background: var(--awLight) !important;
     opacity: 87%;
     -webkit-transition: color 0.3s ease-in-out;
     -moz-transition: color 0.3s ease-in-out;
@@ -193,7 +239,7 @@ td {
 }
 
 .aw-nav-right-li:hover .aw-nav-right-icon {
-    color: var(--gaLight);
+    color: var(--awLight);
     -webkit-transition: color 0.3s ease-in-out;
     -moz-transition: color 0.3s ease-in-out;
     -ms-transition: color 0.3s ease-in-out;
@@ -245,7 +291,7 @@ td {
     padding: 0.5% 1%;
     border-radius: var(--rad) var(--rad) 0 0;
     background-color: var(--bgNav);
-    border-top: 2px solid var(--gaLight);
+    border-top: 2px solid var(--awLight);
 }
 
 .aw-footer-text {
@@ -294,98 +340,6 @@ form .error-msg {
 }
 
 /* STOP forms */
-
-/* START charts */
-
-.aw-chart-config {
-    position: relative;
-    height: 45vh;
-    width: 90vw;
-    margin: 3vh auto;
-}
-
-.aw-db-preview {
-    width: 98%;
-    max-height: 70vh;
-    min-height: 15vh;
-    margin: 3vh auto;
-    border-style: solid;
-    border-radius: var(--rad);
-    border-color: var(--c1);
-    border-width: 3px;
-    background-color: var(--whiteNormal);
-    overflow-y: scroll;
-    overflow-x: hidden;
-}
-
-.aw-db-preview-grid {
-    margin: 1vw;
-    display: grid;
-    grid-auto-rows: 23vh;
-    grid-auto-columns: 1fr;
-    grid-gap: 7px;
-}
-
-.aw-db-preview > div {
-    text-align: center;
-}
-
-.aw-dbp {
-    max-width: 100%;
-    max-height: 100%;
-    overflow: hidden;
-    border-style: solid;
-    border-radius: var(--rad);
-    border-color: var(--c1);
-    border-width: 2px;
-    background-color: var(--bg);
-}
-
-.aw-dbp-preview-filler {
-    background-color: var(--bgLight);
-    padding-top: 2vw;
-}
-
-.aw-dbp-chart {
-    display: block;
-    max-height: 80%;
-    overflow: hidden;
-    color: var(--tc1) !important;
-}
-
-.aw-dbp-text {
-    background-color: var(--bgNav);
-    text-align: center;
-    color: var(--tc2);
-}
-
-.aw-dbp-title {
-    display: block;
-    line-height: 0;
-    padding-top: 12px;
-}
-
-.aw-dbp-description {
-    display: block;
-    font-style: italic;
-    font-size: x-small;
-    line-height: 0;
-    padding-bottom: 0.1px;
-}
-
-.aw-db {
-    width: 100%;
-    margin-top: 5vh;
-}
-
-.aw-db-grid {
-    display: grid;
-    grid-auto-rows: 23vh;
-    grid-auto-columns: 1fr;
-    grid-gap: 10px;
-}
-
-/* STOP charts */
 
 /* START errors */
 

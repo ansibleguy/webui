@@ -27,6 +27,7 @@ AW_ENV_VARS = {
     'run_isolate_process_path_ro': ['AW_RUN_ISOLATE_PS_PATH_RO'],
     'ansible_config': ['ANSIBLE_CONFIG'],
     'path_log': ['AW_PATH_LOG'],
+    'session_timeout': ['AW_SESSION_TIMEOUT'],
 }
 
 # todo: move typing to config-init
@@ -62,6 +63,7 @@ AW_ENV_VARS_DEFAULTS = {
     'timezone': datetime.now().astimezone().tzname(),
     '_secret': ''.join(random_choice(ascii_letters + digits + punctuation) for _ in range(50)),
     'ansible_config': _get_existing_ansible_config_file(),
+    'session_timeout': 12 * 60 * 60,  # 12h
 }
 
 

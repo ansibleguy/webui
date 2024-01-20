@@ -20,8 +20,9 @@ def main():
 
     from base.db import create_first_superuser
     from base.webserver import init_webserver
-    from base.scheduler import init_scheduler
+    # from base.scheduler import init_scheduler
 
     create_first_superuser()
-    init_scheduler()
+    # todo: test & fix once we can trigger jobs
+    # init_scheduler()
     init_webserver()

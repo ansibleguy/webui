@@ -7,10 +7,12 @@ NAVIGATION = {
             'Manage': '/ui/job/manage/',
             'Logs': '/ui/job/log/',
         },
-        'Manage': {
-            'Settings': '/ui/settings/',
-            'System': '/ui/mgmt/',
-            'API Docs': '/api',
+        'Settings': {
+            'API Keys': '/ui/settings/api_keys',
+        },
+        'System': {
+            'Admin': '/ui/admin/',
+            'API Docs': '/ui/api_docs',
         },
     },
     'right': {

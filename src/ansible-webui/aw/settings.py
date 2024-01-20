@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from aw.config.main import config, VERSION
-from aw.config.hardcoded import LOGIN_PATH
+from aw.config.hardcoded import LOGIN_PATH, PORT_WEB
 from aw.utils.deployment import deployment_dev, deployment_prod
 from aw.config.environment import get_aw_env_var
 
@@ -41,6 +41,13 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django_user_agents.middleware.UserAgentMiddleware',
+    'django_auto_logout.middleware.auto_logout',
+]
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost',
+    f'http://localhost:{PORT_WEB}',
+    'http://127.0.0.1',
+    f'http://127.0.0.1:{PORT_WEB}',
 ]
 ROOT_URLCONF = 'aw.urls'
 TEMPLATES = [
@@ -55,6 +62,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
+            'debug': DEBUG,
         },
     },
 ]
@@ -108,6 +116,11 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# Security
+AUTO_LOGOUT = {
+    'SESSION_TIME': config['session_timeout'],
+}
+
 # Internationalization
 LANGUAGE_CODE = 'en-us'
 USE_I18N = True
@@ -126,19 +139,19 @@ SECRET_KEY = config['_secret']
 TIMEZONE = config['timezone']
 
 # api
+API_KEY_CUSTOM_HEADER = 'HTTP_X_API_KEY'
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.SessionAuthentication',
     ),
     "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.IsAuthenticated",
-        "rest_framework_api_key.permissions.HasAPIKey",
+        # 'rest_framework.permissions.AllowAny',
+        'rest_framework.permissions.IsAuthenticated',
     ],
-    'PAGE_SIZE': 100,
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'Ansible-WebUI API',
+    # 'TITLE': 'AW API',
     # 'DESCRIPTION': 'Your project description',
     'VERSION': VERSION,
     'SERVE_INCLUDE_SCHEMA': False,
@@ -149,7 +162,7 @@ SPECTACULAR_SETTINGS = {
             'apiKey': {
                 'type': 'apiKey',
                 'in': 'header',
-                'name': 'Authorization',
+                'name': 'X-Api-Key',
             },
             # 'session': {
             #     'type': 'apiKey',
