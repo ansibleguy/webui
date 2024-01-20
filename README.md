@@ -70,7 +70,7 @@ There are multiple Ansible WebUI products - how do they compare to this product?
 
 * **This project**
 
-   It is built to be very lightweight.
+   It is built to be lightweight.
 
    As Ansible already requires Python3 - I chose it as primary language.
 

@@ -7,15 +7,15 @@ from drf_spectacular.utils import extend_schema, OpenApiResponse
 from aw.utils.util import datetime_w_tz
 from aw.config.hardcoded import KEY_TIME_FORMAT
 from aw.model.api import AwAPIKey
-from aw.api_endpoints.base import API_PERMISSION, get_api_user
+from aw.api_endpoints.base import API_PERMISSION, get_api_user, BaseResponse
 
 
 # todo: allow user to add comment to easier identify token
-class KeyReadResponse(serializers.Serializer):
+class KeyReadResponse(BaseResponse):
     tokens = serializers.ListSerializer(child=serializers.CharField())
 
 
-class KeyWriteResponse(serializers.Serializer):
+class KeyWriteResponse(BaseResponse):
     token = serializers.CharField()
     secret = serializers.CharField()
 
@@ -50,7 +50,7 @@ class KeyReadWrite(APIView):
         return Response({'token': token, 'key': key})
 
 
-class KeyDeleteResponse(serializers.Serializer):
+class KeyDeleteResponse(BaseResponse):
     msg = serializers.CharField()
 
 

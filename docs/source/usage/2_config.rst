@@ -78,6 +78,10 @@ Environmental variables
 
 * **AW_RUN_TIMEOUT**
 
-   Timeout for the execution of a playbook in seconds. Default: 3600 (1h)
+   Timeout for the execution of a playbook in seconds. Default: 3.600 (1h)
 
    You might want to lower this value to a sane value for your use-cases.
+
+* **AW_SESSION_TIMEOUT**
+
+   Timeout for WebUI sessions in seconds. Default: 43.200 (12h)

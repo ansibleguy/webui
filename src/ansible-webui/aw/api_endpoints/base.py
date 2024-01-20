@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import ObjectDoesNotExist
+from rest_framework import serializers
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_api_key.permissions import BaseHasAPIKey
 
@@ -27,3 +28,12 @@ def get_api_user(request) -> settings.AUTH_USER_MODEL:
             pass
 
     return request.user
+
+
+class BaseResponse(serializers.Serializer):
+
+    def create(self, validated_data):
+        pass
+
+    def update(self, instance, validated_data):
+        pass
