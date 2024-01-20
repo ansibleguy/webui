@@ -27,6 +27,7 @@ jobs:
           pip install -r requirements.txt >/dev/null
         shell: bash
 
+      # NOTE: timeout for running the app includes db migrations
       - name: Testing to build Ansible-WebUI with PIP
         run: |
           cd /tmp
@@ -40,7 +41,7 @@ jobs:
 
           set +e
           echo 'RUNNING APP'
-          timeout 2 python3 -m ansible-webui
+          timeout 5 python3 -m ansible-webui
           ec="$?"
 
           echo 'CLEANUP'
