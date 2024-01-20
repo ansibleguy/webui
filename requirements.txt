@@ -8,6 +8,11 @@ ua-parser
 user-agents
 django-user-agents
 
+## api
+djangorestframework==3.*
+djangorestframework-api-key==2.*
+drf-spectacular
+
 ## styles
 django-bootstrap-v5
 fontawesomefree

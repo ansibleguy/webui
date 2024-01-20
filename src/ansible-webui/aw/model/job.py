@@ -4,7 +4,6 @@ from django.contrib.auth.models import Group
 
 from crontab import CronTab
 
-from aw.config.main import config
 from aw.model.base import BareModel, BaseModel, CHOICES_BOOL
 from aw.config.hardcoded import SHORT_TIME_FORMAT
 
@@ -109,8 +108,10 @@ class JobExecutionResultHost(BareModel):
     tasks_ignored = models.PositiveSmallIntegerField(default=0)
     tasks_changed = models.PositiveSmallIntegerField(default=0)
 
-    error = models.ForeignKey(JobError, on_delete=models.CASCADE, related_name='jobresulthost_fk_error')
-    result = models.ForeignKey(JobExecutionResult, on_delete=models.CASCADE, related_name='jobresulthost_fk_result')
+    error = models.ForeignKey(JobError, on_delete=models.SET_NULL, related_name='jobresulthost_fk_error', null=True)
+    result = models.ForeignKey(
+        JobExecutionResult, on_delete=models.SET_NULL, related_name='jobresulthost_fk_result', null=True
+    )
 
     def __str__(self) -> str:
         result = 'succeeded'
@@ -133,12 +134,12 @@ CHOICES_JOB_EXEC_STATUS = [
 class JobExecution(MetaJob):
     # NOTE: scheduled execution will have no user
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.PROTECT, null=True,
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True,
         related_name='jobexec_fk_user', editable=False,
     )
     job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name='jobexec_fk_job')
     result = models.ForeignKey(
-        JobExecutionResult, on_delete=models.CASCADE, related_name='jobexec_fk_result',
+        JobExecutionResult, on_delete=models.SET_NULL, related_name='jobexec_fk_result',
         null=True, default=None, blank=True,  # execution is created before result is available
     )
     status = models.PositiveSmallIntegerField(default=0, choices=CHOICES_JOB_EXEC_STATUS)

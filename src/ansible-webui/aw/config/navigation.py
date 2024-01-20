@@ -9,7 +9,8 @@ NAVIGATION = {
         },
         'Manage': {
             'Settings': '/ui/settings/',
-            'System': '/ui/m/',
+            'System': '/ui/mgmt/',
+            'API Docs': '/api',
         },
     },
     'right': {

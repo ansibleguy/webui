@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from aw.config.main import config
+from aw.config.main import config, VERSION
 from aw.config.hardcoded import LOGIN_PATH
 from aw.utils.deployment import deployment_dev, deployment_prod
 from aw.config.environment import get_aw_env_var
@@ -24,6 +24,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_user_agents',
+    # api
+    'rest_framework',
+    'rest_framework_api_key',
+    'drf_spectacular',
     # styles
     'bootstrap5',
     'fontawesomefree',
@@ -120,3 +124,48 @@ handler500 = 'aw.utils.handlers.handler500'
 
 SECRET_KEY = config['_secret']
 TIMEZONE = config['timezone']
+
+# api
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.SessionAuthentication',
+    ),
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",
+        "rest_framework_api_key.permissions.HasAPIKey",
+    ],
+    'PAGE_SIZE': 100,
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Ansible-WebUI API',
+    # 'DESCRIPTION': 'Your project description',
+    'VERSION': VERSION,
+    'SERVE_INCLUDE_SCHEMA': False,
+    'SERVE_PERMISSIONS': ['rest_framework.permissions.IsAuthenticated'],
+    'SWAGGER_UI_FAVICON_HREF': STATIC_URL + 'img/ansible.svg',
+    'APPEND_COMPONENTS': {
+        'securitySchemes': {
+            'apiKey': {
+                'type': 'apiKey',
+                'in': 'header',
+                'name': 'Authorization',
+            },
+            # 'session': {
+            #     'type': 'apiKey',
+            #     'in': 'cookie',
+            #    'name': 'sessionid',
+            # },
+        },
+    },
+    'SECURITY': [
+        {'apiKey': []},
+        # {'session': []},
+    ],
+    'SWAGGER_UI_SETTINGS': {
+        'displayOperationId': False,
+    },
+}
+
+if deployment_dev():
+    SPECTACULAR_SETTINGS['SWAGGER_UI_SETTINGS']['persistAuthorization'] = True

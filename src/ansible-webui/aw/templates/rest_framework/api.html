@@ -1,0 +1,17 @@
+{% extends "rest_framework/base.html" %}
+{# https://github.com/encode/django-rest-framework/blob/master/rest_framework/templates/rest_framework/base.html #}
+{% load static %}
+{% block title %}
+Ansible-WebUI API
+{% endblock %}
+{% block meta %}
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta name="robots" content="NONE,NOARCHIVE" />
+
+<link rel="icon" type="image/svg" href="{% static 'img/ansible.svg' %}">
+{% endblock %}
+{% block branding %}
+<a class='navbar-brand' rel="nofollow" href='/'>
+    Ansible-WebUI
+</a>
+{% endblock %}

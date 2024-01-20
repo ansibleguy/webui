@@ -5,6 +5,7 @@ from django.contrib import admin
 
 from base.serve_static import urlpatterns_static
 from aw.route import ui, catchall, logout, not_implemented, manage
+from aw.api import urlpatterns_api
 from aw.config.environment import check_aw_env_var_true
 from aw.utils.deployment import deployment_dev
 
@@ -12,6 +13,8 @@ urlpatterns = []
 
 if deployment_dev() or check_aw_env_var_true(var='serve_static', fallback=True):
     urlpatterns += urlpatterns_static
+
+urlpatterns += urlpatterns_api
 
 urlpatterns += [
     # auth
@@ -21,7 +24,7 @@ urlpatterns += [
 
     # app
     path('ui/', ui),
-    path('ui/m/', manage),
+    path('ui/mgmt/', manage),
     path('ui/job/', not_implemented),
     path('ui/settings/', not_implemented),
     re_path(r'^ui/*', ui),
