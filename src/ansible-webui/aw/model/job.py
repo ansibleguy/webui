@@ -43,6 +43,7 @@ class JobPermissionMemberUser(BareModel):
     permission = models.ForeignKey(JobPermission, on_delete=models.CASCADE)
 
     def __str__(self) -> str:
+        # pylint: disable=E1101
         return f"Permission '{self.permission.name}' member user '{self.user.username}'"
 
 
@@ -146,6 +147,7 @@ class JobExecution(MetaJob):
     comment = models.CharField(max_length=150, null=True, default=None, blank=True)
 
     def __str__(self) -> str:
+        # pylint: disable=E1101
         status_name = CHOICES_JOB_EXEC_STATUS[int(self.status)][1]
         executor = 'scheduled'
         if self.user is not None:
