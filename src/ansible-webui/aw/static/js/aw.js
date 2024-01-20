@@ -43,17 +43,43 @@ $( document ).ready(function() {
     $(".aw-btn-refresh").click(function(){
         refreshPage(0);
     });
-    $(".aw-api-add").click(function(){
+    $(".aw-api-click").click(function(){
         let endpoint = $(this).attr("aw-api-endpoint");
-        $.post("/api/" + endpoint, function(data, status){
-            refreshPage();
-        });
+        let method = $(this).attr("aw-api-method");
+
+        if (this.hasAttribute("aw-api-item")) {
+            let item = $(this).attr("aw-api-item");
+            $.ajax({
+                url: "/api/" + endpoint + "/" + item,
+                type: method,
+                success: function(result) {
+                    refreshPage();
+                }
+            });
+        } else {
+            $.ajax({
+                url: "/api/" + endpoint,
+                type: method,
+                success: function(result) {
+                    refreshPage();
+                }
+            });
+        }
     });
-    $(".aw-api-del").click(function(){
-        let endpoint = $(this).attr("aw-api-endpoint");
-        let item = $(this).attr("aw-api-item");
-        $.post("/api/" + endpoint + "/" + item, function(data, status){
-            refreshPage();
+    $(".aw-api-form").submit(function(e) {
+        e.preventDefault(); // avoid to execute the actual submit of the form.
+
+        var form = $(this);
+        var actionUrl = form.attr('action');
+        var method = form.attr('method');
+
+        $.ajax({
+            type: method,
+            url: actionUrl,
+            data: form.serialize(),
+            success: function(data) {
+                console.log(data);
+            }
         });
     });
 });

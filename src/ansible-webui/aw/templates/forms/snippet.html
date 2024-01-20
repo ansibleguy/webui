@@ -1,0 +1,14 @@
+{% load util %}
+{{ form.non_field_errors }}
+{% for field in form.visible_fields %}
+    <div class="mb-3">
+        <div class="error-msg">{{ field.errors }}</div>
+        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+        <input value="{{ field.value|ignore_none}}">
+        <!--That's where the magic hides: {{ field.field|to_dict }}-->
+        <div class="help-block">
+            {{ field.help_text|safe }}
+        </div>
+    </div>
+{% endfor %}
+<button type="submit" class="btn btn-primary">Submit</button>

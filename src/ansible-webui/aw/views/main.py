@@ -8,6 +8,7 @@ from django.urls import path, re_path
 from aw.config.hardcoded import LOGIN_PATH
 from aw.utils.http import ui_endpoint_wrapper
 from aw.views.settings import urlpatterns_settings
+from aw.views.jobs import urlpatterns_jobs
 
 
 def _local_iframe(_path: str, title: str) -> str:
@@ -19,7 +20,7 @@ def _local_iframe(_path: str, title: str) -> str:
 @ui_endpoint_wrapper
 def admin(request) -> HttpResponse:
     return render(request, status=200, template_name='fallback.html', context={
-        'content': _local_iframe('/_admin/', title='Manage')
+        'content': _local_iframe('/_admin/', title='Admin')
     })
 
 
@@ -53,9 +54,8 @@ urlpatterns_ui = [
     path('ui/', not_implemented),
     path('ui/admin/', admin),
     path('ui/api_docs', api_docs),
-    re_path(r'^ui/job*', not_implemented),
-    re_path(r'^ui/job*', not_implemented),
 ]
+urlpatterns_ui += urlpatterns_jobs
 urlpatterns_ui += urlpatterns_settings
 urlpatterns_ui += [
     re_path(r'^ui/*', not_implemented),

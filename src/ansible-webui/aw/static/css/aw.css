@@ -228,6 +228,10 @@ td {
     border-radius: 50%;
 }
 
+.aw-nav-right {
+    margin-left: auto;
+}
+
 .aw-nav-right-icon {
     color: var(--whiteSmooth);
     /* un-hover effect */

@@ -17,12 +17,62 @@ class JobError(BareModel):
         return f"Job error {self.created}: '{self.short}'"
 
 
+CHOICES_JOB_VERBOSITY = (
+    (0, 'None'),
+    (1, 'v'),
+    (2, 'vv'),
+    (3, 'vvv'),
+    (4, 'vvvv'),
+    (5, 'vvvv'),
+    (6, 'vvvvvv'),
+)
+
+
+class MetaJob(BaseModel):
+    limit = models.CharField(max_length=500, null=True, default=None, blank=True)
+    verbosity = models.PositiveSmallIntegerField(choices=CHOICES_JOB_VERBOSITY, default=0)
+    comment = models.CharField(max_length=150, null=True, default=None, blank=True)
+
+    # NOTE: one or multiple comma-separated vars
+    environment_vars = models.CharField(max_length=1000, null=True, default=None, blank=True)
+
+    class Meta:
+        abstract = True
+
+
+class Job(MetaJob):
+    api_fields = [
+        'name', 'inventory', 'playbook', 'schedule', 'limit',
+        'verbosity', 'comment', 'environment_vars',
+    ]
+    form_fields = api_fields
+
+    name = models.CharField(max_length=150)
+    inventory = models.CharField(max_length=300)  # NOTE: one or multiple comma-separated inventories
+    playbook = models.CharField(max_length=300)  # NOTE: one or multiple comma-separated playbooks
+    schedule = models.CharField(max_length=50, validators=[CronTab], blank=True)
+
+    def __str__(self) -> str:
+        limit = '' if self.limit is None else f' [{self.limit}]'
+        return f"Job '{self.name}' ({self.playbook} => {self.inventory}{limit})"
+
+
+CHOICE_JOB_PERMISSION_READ = 5
+CHOICE_JOB_PERMISSION_EXECUTE = 10
+CHOICE_JOB_PERMISSION_WRITE = 15
+CHOICE_JOB_PERMISSION_FULL = 20
+CHOICES_JOB_PERMISSION = (
+    (0, 'None'),
+    (CHOICE_JOB_PERMISSION_READ, 'Read'),
+    (CHOICE_JOB_PERMISSION_EXECUTE, 'Execute'),
+    (CHOICE_JOB_PERMISSION_WRITE, 'Write'),
+    (CHOICE_JOB_PERMISSION_FULL, 'Full'),
+)
+
+
 class JobPermission(BaseModel):
     name = models.CharField(max_length=100)
-    permission = models.CharField(
-        max_length=50,
-        choices=[('full', 'Full'), ('read', 'Read'), ('write', 'Write'), ('execute', 'Execute')],
-    )
+    permission = models.PositiveSmallIntegerField(choices=CHOICES_JOB_PERMISSION, default=0)
     users = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
         through='JobPermissionMemberUser',
@@ -36,6 +86,14 @@ class JobPermission(BaseModel):
 
     def __str__(self) -> str:
         return f"Permission '{self.name}' - {self.permission}"
+
+
+class JobPermissionMapping(BareModel):
+    job = models.ForeignKey(Job, on_delete=models.CASCADE)
+    permission = models.ForeignKey(JobPermission, on_delete=models.CASCADE)
+
+    def __str__(self) -> str:
+        return f"Permission '{self.permission.name}' linked to job '{self.job.name}'"
 
 
 class JobPermissionMemberUser(BareModel):
@@ -53,40 +111,6 @@ class JobPermissionMemberGroup(BareModel):
 
     def __str__(self) -> str:
         return f"Permission '{self.permission.name}' member group '{self.group.name}'"
-
-
-CHOICES_JOB_VERBOSITY = (
-    (0, 'None'),
-    (1, 'v'),
-    (2, 'vv'),
-    (3, 'vvv'),
-    (4, 'vvvv'),
-    (5, 'vvvv'),
-    (6, 'vvvvvv'),
-)
-
-
-class MetaJob(BaseModel):
-    limit = models.CharField(max_length=500, null=True, default=None, blank=True)
-    verbosity = models.PositiveSmallIntegerField(choices=CHOICES_JOB_VERBOSITY, default=0)
-
-    # NOTE: one or multiple comma-separated vars
-    environment_vars = models.CharField(max_length=1000, null=True, default=None, blank=True)
-
-    class Meta:
-        abstract = True
-
-
-class Job(MetaJob):
-    name = models.CharField(max_length=150)
-    inventory = models.CharField(max_length=300)  # NOTE: one or multiple comma-separated inventories
-    playbook = models.CharField(max_length=300)  # NOTE: one or multiple comma-separated playbooks
-    schedule = models.CharField(max_length=50, validators=[CronTab], blank=True)
-    permission = models.ForeignKey(JobPermission, on_delete=models.SET_NULL, null=True, blank=True)
-
-    def __str__(self) -> str:
-        limit = '' if self.limit is None else f' [{self.limit}]'
-        return f"Job '{self.name}' ({self.playbook} => {self.inventory}{limit})"
 
 
 class JobExecutionResult(BareModel):
@@ -144,7 +168,6 @@ class JobExecution(MetaJob):
         null=True, default=None, blank=True,  # execution is created before result is available
     )
     status = models.PositiveSmallIntegerField(default=0, choices=CHOICES_JOB_EXEC_STATUS)
-    comment = models.CharField(max_length=150, null=True, default=None, blank=True)
 
     def __str__(self) -> str:
         # pylint: disable=E1101

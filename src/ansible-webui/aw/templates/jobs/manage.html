@@ -1,0 +1,72 @@
+{% extends "../body.html" %}
+{% load static %}
+{% load util %}
+{% block content %}
+<script src="{% static 'js/settings/api_key.js' %}"></script>
+<!--<input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" id="aw-job-search">-->
+{# todo: build table using ajax to allow dynamic search #}
+<div class="table-responsive">
+    <table class="table table-striped aw-text-responsive">
+        <tr>
+            <th>Job</th>
+            <th>Inventory</th>
+            <th>Playbook</th>
+            <th>Comment</th>
+            <th>Schedule</th>
+            <th>Last run</th>
+            <th>Actions</th>
+        </tr>
+{%   if not jobs|exists %}
+        <tr>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+        </tr>
+{%   endif %}
+{%   for job in jobs %}
+{%     set_var executions|get_value:job.id as execution %}
+        <tr>
+            <td>{{ job.name }}</td>
+            <td>{{ job.inventory }}</td>
+            <td>{{ job.playbook }}</td>
+            <td>{{ job.comment }}</td>
+            <td>{{ job.schedule }}</td>
+{%     if execution is none %}
+            <td>-</td>
+{%     else %}
+            <td>{{ execution.updated }} - {{ execution|get_value:"user"|get_fallback:"Scheduled" }} - {{ execution_stati|get_choice:execution.status }}</td>
+{%     endif %}
+            <td>
+                <a href="/ui/jobs/manage/job/{{ job.id }}">
+                    <button class="btn btn-warning aw-btn-action" title="Edit">
+                        {% include "../button/icon/edit.html" %}
+                    </button>
+                </a>
+                <button class="btn btn-danger aw-btn-action aw-api-click" title="Delete" aw-api-endpoint="job" aw-api-item="{{ job.id }}" aw-api-method="delete">
+                    {% include "../button/icon/delete.html" %}
+                </button>
+            </td>
+        </tr>
+{%   endfor %}
+        <tr>
+            <td colspan="100%">
+                {% include "../button/refresh.html" %}
+                <a href="/ui/jobs/manage/job">
+                    <button class="btn btn-success aw-btn-action" title="Add">
+                        {% include "../button/icon/add.html" %}
+                    </button>
+                </a>
+                <a href="/ui/admin/">
+                    <button class="btn btn-warning aw-btn-action" title="Admin">
+                        <i class="fa fa-cog fa-2x aw-btn-action-icon" aria-hidden="true"></i>
+                    </button>
+                </a>
+            </td>
+        </tr>
+    </table>
+</div>
+{% endblock %}

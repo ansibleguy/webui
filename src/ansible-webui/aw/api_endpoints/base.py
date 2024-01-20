@@ -31,7 +31,6 @@ def get_api_user(request) -> settings.AUTH_USER_MODEL:
 
 
 class BaseResponse(serializers.Serializer):
-
     def create(self, validated_data):
         pass
 

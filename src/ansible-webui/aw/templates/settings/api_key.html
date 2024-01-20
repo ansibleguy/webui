@@ -13,8 +13,8 @@
         <tr>
             <td>{{ token }}</td>
             <td>
-                <button class="btn btn-danger aw-btn-action aw-api-del" title="Delete" aw-api-endpoint="key" aw-api-item="{{ token }}">
-                    <i class="fas fa-trash fa-2x aw-btn-action-icon"></i>
+                <button class="btn btn-danger aw-btn-action aw-api-click" title="Delete" aw-api-endpoint="key" aw-api-item="{{ token }}" aw-api-method="delete">
+                    {% include "../button/icon/delete.html" %}
                 </button>
             </td>
         </tr>
@@ -23,13 +23,10 @@
             <td colspan="100%">
                 {% include "../button/refresh.html" %}
                 <button class="btn btn-success aw-btn-action aw-api-key-add" title="Add">
-                    <i class="fas fa-plus-circle fa-2x aw-btn-action-icon"></i>
+                    {% include "../button/icon/add.html" %}
                 </button>
             </td>
         </tr>
     </table>
 </div>
-
-
-{{ token }}<br>
 {% endblock %}

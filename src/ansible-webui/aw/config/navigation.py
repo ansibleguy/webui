@@ -4,8 +4,8 @@ NAVIGATION = {
     'left': {
         'Dashboard': '/ui/',
         'Jobs': {
-            'Manage': '/ui/job/manage/',
-            'Logs': '/ui/job/log/',
+            'Manage': '/ui/jobs/manage',
+            'Logs': '/ui/jobs/log',
         },
         'Settings': {
             'API Keys': '/ui/settings/api_keys',

@@ -31,3 +31,54 @@ def get_nav(key: str) -> dict:
 @register.filter
 def get_type(value):
     return str(type(value)).replace("<class '", '').replace("'>", '')
+
+
+@register.filter
+def get_value(data: dict, key: str):
+    if hasattr(data, 'get'):
+        return data.get(key, None)
+
+    if hasattr(data, key):
+        return getattr(data, key)
+
+    return None
+
+
+@register.filter
+def get_fallback(data, fallback):
+    return data if data is not None else fallback
+
+
+@register.filter
+def exists(data: (dict, list, str, bool)) -> bool:
+    if data is None:
+        return False
+
+    if isinstance(data, bool):
+        return data
+
+    if isinstance(data, (list, dict)):
+        return len(data) > 0
+
+    if isinstance(data, str):
+        return data.strip() != ''
+
+    return False
+
+
+@register.filter
+def get_choice(choices: list[tuple[int, any]], idx: int):
+    return choices[idx][1]
+
+
+@register.filter
+def to_dict(data):
+    return data.__dict__
+
+
+@register.filter
+def ignore_none(data):
+    if data is None:
+        return ''
+
+    return data

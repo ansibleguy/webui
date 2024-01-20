@@ -55,38 +55,27 @@ class KeyDeleteResponse(BaseResponse):
 
 
 class KeyDelete(APIView):
-    http_method_names = ['post', 'delete']
+    http_method_names = ['delete']
     serializer_class = KeyDeleteResponse
     permission_classes = API_PERMISSION
-    _schema_responses = {
-        200: OpenApiResponse(response=KeyDeleteResponse, description='API key deleted'),
-        404: OpenApiResponse(response=KeyDeleteResponse, description='API key does not exist'),
-    }
-    _schema_summary = 'Delete one of the existing API keys of the current user.'
 
     @extend_schema(
         request=None,
-        responses=_schema_responses,
-        summary=_schema_summary,
+        responses={
+            200: OpenApiResponse(response=KeyDeleteResponse, description='API key deleted'),
+            404: OpenApiResponse(response=KeyDeleteResponse, description='API key does not exist'),
+        },
+        summary='Delete one of the existing API keys of the current user.',
     )
     def delete(self, request, token: str):
         try:
-            results = AwAPIKey.objects.filter(user=get_api_user(request), name=token)
+            result = AwAPIKey.objects.filter(user=get_api_user(request), name=token)
 
-            if len(results) == 1:
-                results.delete()
-                return Response({'msg': f"API key '{token}' deleted"})
+            if result.exists():
+                result.delete()
+                return Response(data={'msg': 'API key deleted'}, status=200)
 
         except ObjectDoesNotExist:
             pass
 
-        return Response(data={'msg': f"API key '{token}' not found"}, status=404)
-
-    @extend_schema(
-        request=None,
-        responses=_schema_responses,
-        summary=_schema_summary,
-        operation_id='del',
-    )
-    def post(self, request, token: str):
-        return self.delete(request, token)
+        return Response(data={'msg': 'API key not found'}, status=404)

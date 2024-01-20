@@ -9,6 +9,15 @@
 }
 
 @media only screen and (max-width: 991px) {
+
+
+}
+
+@media only screen and (max-width: 767px) {  /* tablets */
+    .aw-text-responsive, .aw-text-responsive .btn {
+        font-size: 0.9rem;
+    }
+
     .aw-nav-main {
         font-weight: bold;
         text-transform: uppercase;
@@ -19,24 +28,17 @@
         text-align: center !important;
     }
 
+    .aw-nav-right-li {
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+
     .aw-nav-right {
         flex-direction: row !important;
         align-items: center;
         justify-content: center;
         border-top: 2px solid rgba(255, 255, 255, 0.6);
         margin-top: 10px;
-    }
-
-    .aw-nav-right-li {
-        padding-left: 8px;
-        padding-right: 8px;
-    }
-
-}
-
-@media only screen and (max-width: 801px) {  /* tablets */
-    .aw-text-responsive, .aw-text-responsive .btn {
-        font-size: 0.9rem;
     }
 
 }
