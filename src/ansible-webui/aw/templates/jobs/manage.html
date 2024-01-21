@@ -5,7 +5,7 @@
 <script src="{% static 'js/settings/api_key.js' %}"></script>
 <!--<input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" id="aw-job-search">-->
 {# todo: build table using ajax to allow dynamic search #}
-<div class="table-responsive">
+<div class="table-responsive aw-data">
     <table class="table table-striped aw-text-responsive">
         <tr>
             <th>Job</th>
@@ -33,9 +33,9 @@
             <td>{{ job.name }}</td>
             <td>{{ job.inventory }}</td>
             <td>{{ job.playbook }}</td>
-            <td>{{ job.comment }}</td>
-            <td>{{ job.schedule }}</td>
-{%     if execution is none %}
+            <td>{{ job.comment|get_fallback:"-" }}</td>
+            <td>{{ job.schedule|get_fallback:"-" }}</td>
+{%     if execution is none or execution|length == 0%}
             <td>-</td>
 {%     else %}
             <td>{{ execution.updated }} - {{ execution|get_value:"user"|get_fallback:"Scheduled" }} - {{ execution_stati|get_choice:execution.status }}</td>
@@ -48,6 +48,9 @@
                 </a>
                 <button class="btn btn-danger aw-btn-action aw-api-click" title="Delete" aw-api-endpoint="job" aw-api-item="{{ job.id }}" aw-api-method="delete">
                     {% include "../button/icon/delete.html" %}
+                </button>
+                <button class="btn btn-primary aw-btn-action aw-api-click" title="Run" aw-api-endpoint="job" aw-api-item="{{ job.id }}" aw-api-method="post">
+                    {% include "../button/icon/run.html" %}
                 </button>
             </td>
         </tr>

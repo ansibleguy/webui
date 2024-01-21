@@ -22,3 +22,16 @@ def ui_endpoint_wrapper(func) -> Callable:
         return func(request)
 
     return wrapper
+
+
+def ui_endpoint_wrapper_kwargs(func) -> Callable:
+    def wrapper(request, *args, **kwargs):
+        del args
+
+        bad, deny = deny_request(request)
+        if bad:
+            return deny
+
+        return func(request, **kwargs)
+
+    return wrapper

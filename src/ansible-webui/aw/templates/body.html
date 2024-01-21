@@ -16,8 +16,12 @@
             {% if title %}
             <h1 class="aw-header">{{ title }}</h1>
             {% endif %}
+            <div id="aw-api-error" class="aw-error-msg aw-mark-warn"></div>
+            <div id="aw-ui-error" class="aw-error-msg aw-mark-warn">{{ request.GET|get_value:"error"|ignore_none }}</div>
+            <div id="aw-api-result" class="aw-success-msg aw-mark-ok"></div>
             {% block content %}
             {% endblock %}
+            <iframe hidden="hidden" id="aw-api-error-full" src="about:blank" width="100%" height="100%" marginheight="0" marginwidth="0" frameborder="0" scrolling="auto"></iframe>
         </main>
         <br>
         <div class="aw-footer-wrapper">

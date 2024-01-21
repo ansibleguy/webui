@@ -1,8 +1,7 @@
 from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import Group
-
-from crontab import CronTab
+from django.core.validators import RegexValidator
 
 from aw.model.base import BareModel, BaseModel, CHOICES_BOOL
 from aw.config.hardcoded import SHORT_TIME_FORMAT
@@ -18,7 +17,7 @@ class JobError(BareModel):
 
 
 CHOICES_JOB_VERBOSITY = (
-    (0, 'None'),
+    (0, 'Default'),
     (1, 'v'),
     (2, 'vv'),
     (3, 'vvv'),
@@ -40,6 +39,14 @@ class MetaJob(BaseModel):
         abstract = True
 
 
+# source: https://stackoverflow.com/a/57639657
+cronjob_validator = RegexValidator(
+    regex=r'/(@(annually|yearly|monthly|weekly|daily|hourly|reboot))|(@every (\d+(ns|us|µs|ms|s|m|h))+)|((((\d+,)+\d+|'
+          r'(\d+(\/|-)\d+)|\d+|\*) ?){5,7})/',
+    message='Schedule is not a valid CronJob format'
+)
+
+
 class Job(MetaJob):
     api_fields = [
         'name', 'inventory', 'playbook', 'schedule', 'limit',
@@ -50,11 +57,18 @@ class Job(MetaJob):
     name = models.CharField(max_length=150)
     inventory = models.CharField(max_length=300)  # NOTE: one or multiple comma-separated inventories
     playbook = models.CharField(max_length=300)  # NOTE: one or multiple comma-separated playbooks
-    schedule = models.CharField(max_length=50, validators=[CronTab], blank=True)
+    schedule_max_len = 50
+    schedule_validators = [cronjob_validator]
+    schedule = models.CharField(max_length=schedule_max_len, validators=schedule_validators, blank=True)
 
     def __str__(self) -> str:
         limit = '' if self.limit is None else f' [{self.limit}]'
         return f"Job '{self.name}' ({self.playbook} => {self.inventory}{limit})"
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['name'], name='job_name_unique')
+        ]
 
 
 CHOICE_JOB_PERMISSION_READ = 5
@@ -87,6 +101,11 @@ class JobPermission(BaseModel):
     def __str__(self) -> str:
         return f"Permission '{self.name}' - {self.permission}"
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['name'], name='jobperm_name_unique')
+        ]
+
 
 class JobPermissionMapping(BareModel):
     job = models.ForeignKey(Job, on_delete=models.CASCADE)
@@ -94,6 +113,11 @@ class JobPermissionMapping(BareModel):
 
     def __str__(self) -> str:
         return f"Permission '{self.permission.name}' linked to job '{self.job.name}'"
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['job', 'permission'], name='jobpermmap_unique')
+        ]
 
 
 class JobPermissionMemberUser(BareModel):
@@ -104,6 +128,11 @@ class JobPermissionMemberUser(BareModel):
         # pylint: disable=E1101
         return f"Permission '{self.permission.name}' member user '{self.user.username}'"
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['user', 'permission'], name='jobpermmemberuser_unique')
+        ]
+
 
 class JobPermissionMemberGroup(BareModel):
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
@@ -111,6 +140,11 @@ class JobPermissionMemberGroup(BareModel):
 
     def __str__(self) -> str:
         return f"Permission '{self.permission.name}' member group '{self.group.name}'"
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['group', 'permission'], name='jobpermmembergrp_unique')
+        ]
 
 
 class JobExecutionResult(BareModel):

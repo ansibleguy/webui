@@ -11,7 +11,8 @@ from aw.config.main import config, check_config_is_true
 from aw.config.hardcoded import FILE_TIME_FORMAT
 from aw.utils.util import get_choice_key_by_value
 from aw.utils.handlers import AnsibleConfigError
-from aw.model.job import Job, JobExecution, JobExecutionResult, JobExecutionResultHost, CHOICES_JOB_EXEC_STATUS
+from aw.model.job import Job, JobExecution, JobExecutionResult, JobExecutionResultHost, \
+    CHOICES_JOB_EXEC_STATUS
 
 
 def _decode_job_env_vars(env_vars_csv: str, src: str) -> dict:
@@ -64,11 +65,19 @@ def _runner_options(job: Job, execution: JobExecution) -> dict:
             **_decode_job_env_vars(env_vars_csv=execution.environment_vars, src='Execution')
         }
 
+    verbosity = None
+    if execution.verbosity != 0:
+        verbosity = execution.verbosity
+
+    elif job.verbosity != 0:
+        verbosity = job.verbosity
+
     opts = {
         'private_data_dir': path_run,
         'project_dir': config['path_play'],
         'quiet': True,
         'limit': execution.limit if execution.limit is not None else job.limit,
+        'verbosity': verbosity,
         'envvars': env_vars,
         'timeout': config['run_timeout'],
     }

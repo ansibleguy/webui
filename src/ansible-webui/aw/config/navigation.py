@@ -5,6 +5,7 @@ NAVIGATION = {
         'Dashboard': '/ui/',
         'Jobs': {
             'Manage': '/ui/jobs/manage',
+            'Queue': '/ui/jobs/queue',
             'Logs': '/ui/jobs/log',
         },
         'Settings': {

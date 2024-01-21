@@ -84,11 +84,11 @@ hr {
 }
 
 iframe {
- display: block;
- width: 100%;
- border: none;
- overflow-y: auto;
- overflow-x: hidden;
+    display: block;
+    width: 100%;
+    border: none;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .aw-img-float {
@@ -176,6 +176,10 @@ td {
 
 .aw-nav-toggler {
     color: var(--whiteNormal) !important;
+}
+
+.navbar-brand {
+    margin-left: 1vw;
 }
 
 .aw-nav-main-a1 {
@@ -330,9 +334,32 @@ form .form-control {
     background-color: var(--bg) !important;
 }
 
-form .error-msg {
+.aw-success-msg {
+    color: rgb(135,169,107);
+    font-weight: bold;
+    margin-bottom: 2vh;
+}
+
+/* todo: custom bootstrap-alert-like warning/alert/success */
+.aw-mark-ok {
+}
+
+.aw-mark-warn {
+}
+
+.aw-mark-error {
+}
+
+.aw-error-msg {
     color: rgb(164, 0, 15);
     font-weight: bold;
+    margin-bottom: 2vh;
+}
+
+.aw-error-msg-large {
+    margin-top: 3vh;
+    margin-bottom: 3vh;
+    max-width: 80vw !important;
 }
 
 .aw-form-inline {

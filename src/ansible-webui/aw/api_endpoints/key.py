@@ -20,7 +20,7 @@ class KeyWriteResponse(BaseResponse):
     secret = serializers.CharField()
 
 
-class KeyReadWrite(APIView):
+class APIKey(APIView):
     http_method_names = ['post', 'get']
     serializer_class = KeyReadResponse
     permission_classes = API_PERMISSION
@@ -54,7 +54,7 @@ class KeyDeleteResponse(BaseResponse):
     msg = serializers.CharField()
 
 
-class KeyDelete(APIView):
+class APIKeyItem(APIView):
     http_method_names = ['delete']
     serializer_class = KeyDeleteResponse
     permission_classes = API_PERMISSION

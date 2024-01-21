@@ -1,14 +1,27 @@
 {% load util %}
-{{ form.non_field_errors }}
-{% for field in form.visible_fields %}
-    <div class="mb-3">
-        <div class="error-msg">{{ field.errors }}</div>
-        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-        <input value="{{ field.value|ignore_none}}">
-        <!--That's where the magic hides: {{ field.field|to_dict }}-->
+{% load form_util %}
+<div class="aw-error-msg">
+    {{ form.non_field_errors }}
+</div>
+{% for bf in form.visible_fields %}
+    <div class="mb-3 row">
+        <label for="{{ bf.id_for_label }}" class="form-label col-sm-2 col-form-label">{{ bf.label }}</label>
+        <div class="col-sm-10">
+{%  if bf|form_field_is_dropdown %}
+            {{ bf|get_form_field_select:existing|safe }}
+{% else %}
+            {{ bf|get_form_field_input:existing|safe }}
+{% endif %}
+        </div>
+{%  if bf.help_text|exists %}
         <div class="help-block">
-            {{ field.help_text|safe }}
+            <b>Info:</b> {{ bf.help_text|safe }}
+        </div>
+{%  endif %}
+        <div class="aw-error-msg">
+            {# bf.field|to_dict #}
+            {{ bf.errors }}
         </div>
     </div>
 {% endfor %}
-<button type="submit" class="btn btn-primary">Submit</button>
+<button type="submit" class="btn btn-primary" title="Save">Save</button>

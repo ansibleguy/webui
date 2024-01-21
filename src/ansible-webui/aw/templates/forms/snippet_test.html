@@ -1,0 +1,16 @@
+{% load util %}
+{% load form_util %}
+{{ form.non_field_errors }}
+{% for bf in form %}
+    <div class="fieldWrapper">
+        {{ bf.errors }}
+        {{ bf.label_tag }} {{ field }}
+        {{ bf.field|to_dict }}
+{%  if bf|form_field_is_dropdown %}
+        <hr>
+{{ bf|get_form_field_select|safe }}
+        <hr>
+{%  endif %}
+    </div>
+{% endfor %}
+{{ form }}

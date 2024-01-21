@@ -46,7 +46,7 @@ def get_value(data: dict, key: str):
 
 @register.filter
 def get_fallback(data, fallback):
-    return data if data is not None else fallback
+    return data if data not in [None, ''] else fallback
 
 
 @register.filter

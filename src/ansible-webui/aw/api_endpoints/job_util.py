@@ -16,6 +16,9 @@ def get_job_if_allowed(user: settings.AUTH_USER_MODEL, job: Job, permission_need
     if job is None:
         return None
 
+    if not isinstance(job, Job):
+        raise ValueError(f"Provided job is invalid: '{job}'")
+
     # if job has no permissions set
     permission_links = JobPermissionMapping.objects.filter(job=job)
     if not permission_links.exists():
@@ -38,6 +41,10 @@ def get_job_if_allowed(user: settings.AUTH_USER_MODEL, job: Job, permission_need
             return job
 
     return None
+
+
+def job_action_allowed(user: settings.AUTH_USER_MODEL, job: Job, permission_needed: int) -> bool:
+    return get_job_if_allowed(user=user, job=job, permission_needed=permission_needed) is not None
 
 
 def get_viewable_jobs(user: settings.AUTH_USER_MODEL) -> list[Job]:
