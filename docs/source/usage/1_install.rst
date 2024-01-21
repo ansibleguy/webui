@@ -22,6 +22,23 @@ Install
 
     python3 -m pip install ansible-webui
 
+
+Latest/Testing
+==============
+
+.. code-block:: bash
+
+    # download
+    git clone https://github.com/ansibleguy/ansible-webui
+
+    # install dependencies
+    cd ansible-webui
+    python3 -m pip install --upgrade requirements.txt
+
+    # run
+    python3 src/ansible-webui/
+
+
 Start
 *****
 
