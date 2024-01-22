@@ -13,7 +13,7 @@ body {
     --bgMed: #3A9188;
     --bgDawn: #044A42;
     --bgDark: #062925;
-    --awLight: #B9BD19;
+    --awLight: #ff7400; /* #B9BD19 */
     --awDark: #062925;
 }
 
@@ -22,7 +22,7 @@ body.light {
     --tc1: #121212;
     --tc2: rgba(255, 255, 255, .8);
     --tc3: #fcfdff;
-    --textHead: #B9BD19;
+    --textHead: #ff7400;
     --bg: #fcfdff;
     --bgLight: #3A9188;
     --bgNav: #343a40;
@@ -40,7 +40,7 @@ body.dark {
     --tc1: #fcfdff;
     --tc2: #fcfdff;
     --tc3: #121212;
-    --textHead: #B9BD19;
+    --textHead: #ff7400;
     --bg: #121212;
     --bgNav: #343a40;
     --bgNav2: #343a40;
@@ -356,7 +356,7 @@ form .form-control {
     margin-bottom: 2vh;
 }
 
-.aw-error-msg-large {
+.aw-api-error-full {
     margin-top: 3vh;
     margin-bottom: 3vh;
     max-width: 80vw !important;

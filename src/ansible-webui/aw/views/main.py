@@ -51,12 +51,12 @@ def logout(request) -> HttpResponse:
 
 
 urlpatterns_ui = [
-    path('ui/', not_implemented),
     path('ui/admin/', admin),
     path('ui/api_docs', api_docs),
 ]
 urlpatterns_ui += urlpatterns_jobs
 urlpatterns_ui += urlpatterns_settings
 urlpatterns_ui += [
+    path('ui/', not_implemented),
     re_path(r'^ui/*', not_implemented),
 ]

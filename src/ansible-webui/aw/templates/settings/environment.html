@@ -1,0 +1,9 @@
+{% extends "../body.html" %}
+{% load static %}
+{% block content %}
+<script src="{% static 'js/settings/environment.js' %}"></script>
+<div class="table-responsive aw-data">
+{# show installed ansible collections, pip modules, versions and allow to check for updates #}
+{# maybe even perform update of pip modules/ansible collections #}
+</div>
+{% endblock %}

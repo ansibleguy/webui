@@ -42,7 +42,7 @@ See also: [Contributing](https://github.com/ansibleguy/ansible-webui/blob/latest
 
 ----
 
-## Placement
+## Comparison
 
 There are multiple Ansible WebUI products - how do they compare to this product?
 
@@ -92,7 +92,7 @@ There are multiple Ansible WebUI products - how do they compare to this product?
 
 - [ ] Users
 
-  - [ ] Management interface (Django built-in)
+  - [x] Management interface (Django built-in)
 
   - [ ] Groups & Job Permissions
 
@@ -100,11 +100,13 @@ There are multiple Ansible WebUI products - how do they compare to this product?
 
 - [ ] Jobs
 
-  - [ ] Execute Ansible using its [Python API](https://ansible.readthedocs.io/projects/runner/en/latest/python_interface/)
+  - [ ] Execute Ansible using [ansible-runner](https://ansible.readthedocs.io/projects/runner/en/latest/python_interface/)
 
-  - [ ] Ad-Hoc execution
+    - [ ] Scheduled execution (Cron-Format)
 
-  - [ ] Scheduled execution (Cron-Format)
+    - [ ] Manual/immediate execution
+
+    - [ ] Support for [ad-hoc commands](https://docs.ansible.com/ansible/latest/command_guide/intro_adhoc.html)
 
   - [ ] Job Logging
 

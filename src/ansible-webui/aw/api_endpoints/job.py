@@ -31,6 +31,7 @@ class APIJob(APIView):
             200: OpenApiResponse(JobReadResponse, description='Return list of jobs'),
         },
         summary='Return list of all jobs the current user is privileged to view.',
+        operation_id='job_list'
     )
     def get(request):
         return Response(data=get_viewable_jobs_serialized(get_api_user(request)), status=200)
@@ -42,11 +43,15 @@ class APIJob(APIView):
             400: OpenApiResponse(JobWriteResponse, description='Invalid job data provided'),
         },
         summary='Create a new job.',
+        operation_id='job_create'
     )
     def post(self, request):
         serializer = JobWriteRequest(data=request.data)
         if not serializer.is_valid():
-            return Response(data={'msg': 'Provided job data is not valid'}, status=400)
+            return Response(
+                data={'msg': f"Provided job data is not valid: '{serializer.errors}'"},
+                status=400,
+            )
 
         serializer.save()
         return Response(data={'msg': 'Job created'}, status=200)
@@ -69,6 +74,7 @@ class APIJobItem(APIView):
             404: OpenApiResponse(JobReadResponse, description='Job does not exist'),
         },
         summary='Return information about an existing job.',
+        operation_id='job_view'
     )
     def get(self, request, job_id: int):
         self.serializer_class = JobReadResponse
@@ -90,6 +96,7 @@ class APIJobItem(APIView):
             404: OpenApiResponse(JobWriteResponse, description='Job does not exist'),
         },
         summary='Delete an existing job.',
+        operation_id='job_delete'
     )
     def delete(self, request, job_id: int):
         user = get_api_user(request)
@@ -117,6 +124,7 @@ class APIJobItem(APIView):
             404: OpenApiResponse(JobWriteResponse, description='Job does not exist'),
         },
         summary='Modify an existing job.',
+        operation_id='job_edit'
     )
     def put(self, request, job_id: int):
         user = get_api_user(request)
@@ -129,7 +137,10 @@ class APIJobItem(APIView):
 
                 serializer = JobWriteRequest(data=request.data)
                 if not serializer.is_valid():
-                    return Response(data={'msg': 'Provided job data is not valid'}, status=400)
+                    return Response(
+                        data={'msg': f"Provided job data is not valid: '{serializer.errors}'"},
+                        status=400,
+                    )
 
                 # pylint: disable=E1101
                 Job.objects.filter(id=job_id).update(**serializer.data)
@@ -147,7 +158,8 @@ class APIJobItem(APIView):
             403: OpenApiResponse(JobReadResponse, description='Not privileged to execute the job'),
             404: OpenApiResponse(JobReadResponse, description='Job does not exist'),
         },
-        summary='Execute an existing job.',
+        summary='Execute a job.',
+        operation_id='job_execute'
     )
     def post(self, request, job_id: int):
         user = get_api_user(request)

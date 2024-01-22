@@ -109,7 +109,7 @@ $( document ).ready(function() {
         headers: {'X-CSRFToken': csrf_token},
     });
     $(".aw-main").on("click", ".aw-btn-refresh", function(){
-        reloadAwData(0);
+        reloadAwData();
     });
     $(".aw-main").on("click", ".aw-api-click", function(){
         let endpoint = $(this).attr("aw-api-endpoint");

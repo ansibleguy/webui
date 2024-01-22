@@ -2,6 +2,7 @@ from django.shortcuts import redirect, render
 from django.shortcuts import HttpResponse
 from django.urls import path
 from django.forms import ModelForm, CharField
+from django.core.validators import RegexValidator
 
 from aw.utils.http import ui_endpoint_wrapper, ui_endpoint_wrapper_kwargs
 from aw.model.job import Job, JobExecution, CHOICES_JOB_EXEC_STATUS, CHOICE_JOB_PERMISSION_WRITE
@@ -34,7 +35,12 @@ class JobForm(ModelForm):
     # form not picking up regex-validator
     schedule = CharField(
         max_length=Job.schedule_max_len,
-        validators=Job.schedule_validators,
+        validators=[RegexValidator(
+            regex=r'^(@(annually|yearly|monthly|weekly|daily|hourly))|'
+                  r'(@every (\d+(s|m|h))+)|'
+                  r'((((\d+,)+\d+|(\d+(\/|-|#)\d+)|\d+L?|\*(\/\d+)?|L(-\d+)?|\?|[A-Z]{3}(-[A-Z]{3})?) ?){5,7})$',
+            message='The provided schedule is not in a valid cron format',
+        )],
         required=False,
         help_text=Meta.help_texts['schedule'],
     )
@@ -72,7 +78,7 @@ def job_edit(request, job_id: int = None) -> HttpResponse:
 
 
 urlpatterns_jobs = [
-    path('ui/jobs/manage', manage),
+    path('ui/jobs/manage/job/<int:job_id>', job_edit),
     path('ui/jobs/manage/job', job_edit),
-    path('ui/jobs/manage/job/<int:job_id>', job_edit, name='job_id'),
+    path('ui/jobs/manage', manage),
 ]

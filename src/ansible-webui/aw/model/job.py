@@ -1,7 +1,8 @@
+from crontab import CronTab
 from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import Group
-from django.core.validators import RegexValidator
+from django.core.validators import ValidationError
 
 from aw.model.base import BareModel, BaseModel, CHOICES_BOOL
 from aw.config.hardcoded import SHORT_TIME_FORMAT
@@ -39,17 +40,18 @@ class MetaJob(BaseModel):
         abstract = True
 
 
-# source: https://stackoverflow.com/a/57639657
-cronjob_validator = RegexValidator(
-    regex=r'/(@(annually|yearly|monthly|weekly|daily|hourly|reboot))|(@every (\d+(ns|us|µs|ms|s|m|h))+)|((((\d+,)+\d+|'
-          r'(\d+(\/|-)\d+)|\d+|\*) ?){5,7})/',
-    message='Schedule is not a valid CronJob format'
-)
+def validate_cronjob(value):
+    try:
+        _ = CronTab(value)
+        return value
+
+    except ValueError:
+        raise ValidationError('The provided schedule is not in a valid cron format')
 
 
 class Job(MetaJob):
     api_fields = [
-        'name', 'inventory', 'playbook', 'schedule', 'limit',
+        'id', 'name', 'inventory', 'playbook', 'schedule', 'limit',
         'verbosity', 'comment', 'environment_vars',
     ]
     form_fields = api_fields
@@ -58,8 +60,7 @@ class Job(MetaJob):
     inventory = models.CharField(max_length=300)  # NOTE: one or multiple comma-separated inventories
     playbook = models.CharField(max_length=300)  # NOTE: one or multiple comma-separated playbooks
     schedule_max_len = 50
-    schedule_validators = [cronjob_validator]
-    schedule = models.CharField(max_length=schedule_max_len, validators=schedule_validators, blank=True)
+    schedule = models.CharField(max_length=schedule_max_len, validators=[validate_cronjob], blank=True)
 
     def __str__(self) -> str:
         limit = '' if self.limit is None else f' [{self.limit}]'
