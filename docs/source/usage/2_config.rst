@@ -69,7 +69,7 @@ Environmental variables
 
 * **AW_PATH_PLAY**
 
-   Path to the [Ansible base/playbook directory](https://docs.ansible.com/ansible/2.8/user_guide/playbooks_best_practices.html#directory-layout). Default: current working directory (*when executing ansible-webui*)
+   Path to the `Ansible base/playbook directory <https://docs.ansible.com/ansible/2.8/user_guide/playbooks_best_practices.html#directory-layout>`_. Default: current working directory (*when executing ansible-webui*)
 
 
 * **AW_RUN_TIMEOUT**
