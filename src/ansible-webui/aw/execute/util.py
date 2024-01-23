@@ -8,8 +8,8 @@ from re import sub as regex_replace
 from ansible_runner import Runner as AnsibleRunner
 
 from aw.config.main import config, check_config_is_true
-from aw.config.hardcoded import FILE_TIME_FORMAT, SHORT_TIME_FORMAT
-from aw.utils.util import get_choice_key_by_value, is_set, is_null, datetime_w_tz, datetime_from_db
+from aw.config.hardcoded import FILE_TIME_FORMAT
+from aw.utils.util import get_choice_key_by_value, is_set, is_null, datetime_w_tz
 from aw.utils.handlers import AnsibleConfigError
 from aw.model.job import Job, JobExecution, JobExecutionResult, JobExecutionResultHost, \
     CHOICES_JOB_EXEC_STATUS, JobError

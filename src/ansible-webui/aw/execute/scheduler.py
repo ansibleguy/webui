@@ -7,7 +7,6 @@ from time import sleep, time
 
 from gunicorn.arbiter import Arbiter
 from django.core.validators import ValidationError
-from django.conf import settings
 
 from aw.execute.threader import ThreadManager
 from aw.utils.debug import log
