@@ -10,6 +10,10 @@ jobs:
     name: Upload release to PyPI
     runs-on: ubuntu-latest
     timeout-minutes: 3
+    defaults:
+      run:
+        shell: bash
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -25,7 +29,6 @@ jobs:
         run: |
           pip install -r requirements_build.txt >/dev/null
           pip install -r requirements.txt >/dev/null
-        shell: bash
 
       # NOTE: timeout for running the app includes db migrations
       - name: Testing to build Ansible-WebUI with PIP
@@ -53,7 +56,6 @@ jobs:
           then
             exit 1
           fi
-        shell: bash
 
       - name: Extract tag name
         id: version
@@ -63,7 +65,6 @@ jobs:
         run: |
           echo "${{ steps.version.outputs.TAG_NAME }}" > VERSION
           python3 -m build
-        shell: bash
 
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
