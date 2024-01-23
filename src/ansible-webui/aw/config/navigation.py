@@ -2,11 +2,11 @@ from aw.config.hardcoded import LOGOUT_PATH
 
 NAVIGATION = {
     'left': {
-        'Dashboard': '/ui/',
+        # 'Dashboard': '/ui/',
         'Jobs': {
             'Manage': '/ui/jobs/manage',
-            'Queue': '/ui/jobs/queue',
-            'Logs': '/ui/jobs/log',
+            # 'Queue': '/ui/jobs/queue',
+            # 'Logs': '/ui/jobs/log',
         },
         'Settings': {
             'API Keys': '/ui/settings/api_keys',
