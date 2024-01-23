@@ -9,10 +9,10 @@ from ansible_runner import Runner as AnsibleRunner
 
 from aw.config.main import config, check_config_is_true
 from aw.config.hardcoded import FILE_TIME_FORMAT
-from aw.utils.util import get_choice_key_by_value
+from aw.utils.util import get_choice_key_by_value, is_set, is_null, datetime_w_tz
 from aw.utils.handlers import AnsibleConfigError
 from aw.model.job import Job, JobExecution, JobExecutionResult, JobExecutionResultHost, \
-    CHOICES_JOB_EXEC_STATUS
+    CHOICES_JOB_EXEC_STATUS, JobError
 
 
 def _decode_job_env_vars(env_vars_csv: str, src: str) -> dict:
@@ -31,7 +31,7 @@ def _decode_job_env_vars(env_vars_csv: str, src: str) -> dict:
         )
 
 
-def _update_execution_status(execution: JobExecution, status: str):
+def update_execution_status(execution: JobExecution, status: str):
     execution.status = get_choice_key_by_value(choices=CHOICES_JOB_EXEC_STATUS, value=status)
     execution.save()
 
@@ -53,13 +53,13 @@ def _runner_options(job: Job, execution: JobExecution) -> dict:
 
     # merge job + execution env-vars
     env_vars = {}
-    if job.environment_vars is not None:
+    if is_set(job.environment_vars.strip()):
         env_vars = {
             **env_vars,
             **_decode_job_env_vars(env_vars_csv=job.environment_vars, src='Job')
         }
 
-    if execution.environment_vars is not None:
+    if is_set(execution.environment_vars):
         env_vars = {
             **env_vars,
             **_decode_job_env_vars(env_vars_csv=execution.environment_vars, src='Execution')
@@ -76,7 +76,7 @@ def _runner_options(job: Job, execution: JobExecution) -> dict:
         'private_data_dir': path_run,
         'project_dir': config['path_play'],
         'quiet': True,
-        'limit': execution.limit if execution.limit is not None else job.limit,
+        'limit': execution.limit if is_set(execution.limit) else job.limit,
         'verbosity': verbosity,
         'envvars': env_vars,
         'timeout': config['run_timeout'],
@@ -109,10 +109,10 @@ def _create_dirs(path: str, desc: str):
 
 
 def runner_prep(job: Job, execution: (JobExecution, None)) -> dict:
-    if execution is None:
+    if is_null(execution):
         execution = JobExecution(user=None, job=job, comment='Scheduled')
 
-    _update_execution_status(execution, status='Starting')
+    update_execution_status(execution, status='Starting')
 
     opts = _runner_options(job=job, execution=execution)
     opts['playbook'] = job.playbook.split(',')
@@ -136,7 +136,7 @@ def runner_prep(job: Job, execution: (JobExecution, None)) -> dict:
     _create_dirs(path=opts['private_data_dir'], desc='run')
     _create_dirs(path=config['path_log'], desc='log')
 
-    _update_execution_status(execution, status='Running')
+    update_execution_status(execution, status='Running')
 
     return opts
 
@@ -147,13 +147,13 @@ def runner_cleanup(opts: dict):
 
 def job_logs(job: Job, execution: JobExecution) -> dict:
     safe_job_name = regex_replace(pattern='[^0-9a-zA-Z-_]+', repl='', string=job.name)
-    if execution.user is None:
+    if is_null(execution.user):
         safe_user_name = 'scheduled'
     else:
         safe_user_name = execution.user.replace('.', '_')
         safe_user_name = regex_replace(pattern='[^0-9a-zA-Z-_]+', repl='', string=safe_user_name)
 
-    timestamp = datetime.now().strftime(FILE_TIME_FORMAT)
+    timestamp = datetime_w_tz().strftime(FILE_TIME_FORMAT)
     log_file = f"{config['path_log']}/{safe_job_name}_{timestamp}_{safe_user_name}"
 
     return {
@@ -167,6 +167,7 @@ def parse_run_result(execution: JobExecution, time_start: datetime, result: Ansi
 
     job_result = JobExecutionResult(
         time_start=time_start,
+        time_fin=datetime_w_tz(),
         failed=result.errored,
     )
     job_result.save()
@@ -192,7 +193,28 @@ def parse_run_result(execution: JobExecution, time_start: datetime, result: Ansi
 
     execution.result = job_result
     if job_result.failed:
-        _update_execution_status(execution, status='Failed')
+        update_execution_status(execution, status='Failed')
 
     else:
-        _update_execution_status(execution, status='Finished')
+        update_execution_status(execution, status='Finished')
+
+
+def failure(job: Job, execution: JobExecution, time_start: datetime, error_s: str, error_m: str):
+    if is_null(execution):
+        execution = JobExecution(user=None, job=job, comment='Scheduled')
+
+    update_execution_status(execution, status='Failed')
+    job_error = JobError(
+        short=error_s,
+        med=error_m,
+    )
+    job_error.save()
+    job_result = JobExecutionResult(
+        time_start=time_start,
+        time_fin=datetime_w_tz(),
+        failed=True,
+        error=job_error,
+    )
+    job_result.save()
+    execution.result = job_result
+    execution.save()

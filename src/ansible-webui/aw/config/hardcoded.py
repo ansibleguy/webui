@@ -1,6 +1,7 @@
 PORT_WEB = 8000
 THREAD_JOIN_TIMEOUT = 3
-RELOAD_INTERVAL = 10
+INTERVAL_RELOAD = 10  # start/stop threads for configured jobs
+INTERVAL_CHECK = 5  # check for queued jobs
 LOGIN_PATH = '/a/login/'
 LOGOUT_PATH = '/o/'
 LOG_TIME_FORMAT = '%Y-%m-%d %H:%M:%S %z'

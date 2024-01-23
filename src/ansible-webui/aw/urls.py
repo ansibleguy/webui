@@ -3,7 +3,7 @@ from django.urls import path, re_path
 from django.conf.urls import include
 from django.contrib import admin
 
-from base.serve_static import urlpatterns_static
+from web_serve_static import urlpatterns_static
 from aw.api import urlpatterns_api
 from aw.views.main import urlpatterns_ui, catchall, logout
 from aw.config.environment import check_aw_env_var_true

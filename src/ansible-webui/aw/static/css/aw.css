@@ -490,3 +490,31 @@ form .form-control {
 }
 
 /* STOP external content */
+
+.aw-job-status {
+    font-weight: bold;
+}
+
+.aw-job-status-failed {
+    color: red;
+}
+
+.aw-job-status-finished {
+    color: green;
+}
+
+.aw-job-status-finished {
+    color: green;
+}
+
+.aw-job-status-running {
+    color: blue;
+}
+
+.aw-job-status-starting {
+    color: blue;
+}
+
+.aw-job-status-waiting {
+    color: blue;
+}

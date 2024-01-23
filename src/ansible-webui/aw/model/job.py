@@ -60,7 +60,7 @@ class Job(MetaJob):
     inventory = models.CharField(max_length=300)  # NOTE: one or multiple comma-separated inventories
     playbook = models.CharField(max_length=300)  # NOTE: one or multiple comma-separated playbooks
     schedule_max_len = 50
-    schedule = models.CharField(max_length=schedule_max_len, validators=[validate_cronjob], blank=True)
+    schedule = models.CharField(max_length=schedule_max_len, validators=[validate_cronjob], blank=True, default=None)
 
     def __str__(self) -> str:
         limit = '' if self.limit is None else f' [{self.limit}]'
@@ -154,6 +154,7 @@ class JobExecutionResult(BareModel):
     time_fin = models.DateTimeField(blank=True, null=True, default=None)
 
     failed = models.BooleanField(choices=CHOICES_BOOL, default=False)
+    error = models.ForeignKey(JobError, on_delete=models.SET_NULL, related_name='jobresult_fk_error', null=True)
 
 
 class JobExecutionResultHost(BareModel):
@@ -213,3 +214,7 @@ class JobExecution(MetaJob):
 
         timestamp = self.created.strftime(SHORT_TIME_FORMAT)
         return f"Job '{self.job.name}' execution @ {timestamp} by '{executor}': {status_name}"
+
+
+class JobQueue(BareModel):
+    job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name='jobqueue_fk_job')

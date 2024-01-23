@@ -1,6 +1,8 @@
 from typing import Callable
 
-from django.shortcuts import HttpResponse
+from django.shortcuts import HttpResponse, redirect
+
+from aw.config.hardcoded import LOGIN_PATH
 
 
 def deny_request(request) -> (bool, HttpResponse):
@@ -19,6 +21,9 @@ def ui_endpoint_wrapper(func) -> Callable:
         if bad:
             return deny
 
+        if not request.user.is_authenticated:
+            return redirect(LOGIN_PATH)
+
         return func(request)
 
     return wrapper
@@ -31,6 +36,9 @@ def ui_endpoint_wrapper_kwargs(func) -> Callable:
         bad, deny = deny_request(request)
         if bad:
             return deny
+
+        if not request.user.is_authenticated:
+            return redirect(LOGIN_PATH)
 
         return func(request, **kwargs)
 

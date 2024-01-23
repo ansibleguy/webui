@@ -4,7 +4,7 @@
 
 .. include:: ../_include/warn_develop.rst
 
-.. |api_docs| image:: ../_static/img/config_admin.png
+.. |api_docs| image:: ../_static/img/api_docs.png
    :class: wiki-img
 
 

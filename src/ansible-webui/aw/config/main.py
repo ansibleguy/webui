@@ -5,6 +5,7 @@ from sys import stderr
 from pytz import all_timezones, timezone
 
 from aw.config.environment import AW_ENV_VARS, get_aw_env_var
+from aw.utils.util_no_config import set_timezone
 
 
 def get_version() -> str:
@@ -42,7 +43,7 @@ def init_globals():
     # todo: merge config from webUI
     # todo: grey-out settings that are provided via env-var in webUI form and show value
 
-    environ.setdefault('TZ', config['timezone'])
+    set_timezone(config['timezone'])
     config['timezone'] = timezone(config['timezone'])
 
 

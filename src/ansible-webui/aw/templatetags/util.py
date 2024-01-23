@@ -2,6 +2,8 @@ from django import template
 
 from aw.config.main import VERSION
 from aw.config.navigation import NAVIGATION
+from aw.model.job import JobExecution, CHOICES_JOB_EXEC_STATUS
+from aw.config.hardcoded import SHORT_TIME_FORMAT
 
 
 register = template.Library()
@@ -34,7 +36,7 @@ def get_type(value):
 
 
 @register.filter
-def get_value(data: dict, key: str):
+def get_value(data: dict, key: (str, int)):
     if hasattr(data, 'get'):
         return data.get(key, None)
 
@@ -82,3 +84,18 @@ def ignore_none(data):
         return ''
 
     return data
+
+
+@register.filter
+def last_execution_info(execution: JobExecution) -> (str, None):
+    if execution is None:
+        return None
+
+    status = CHOICES_JOB_EXEC_STATUS[execution.status][1]
+    user = 'Scheduled'
+    if execution.user is not None:
+        user = f'by {execution.user.username}'
+
+    run_time = execution.created.strftime(SHORT_TIME_FORMAT)
+
+    return f'{run_time}<br>{user}<br><div class="aw-job-status aw-job-status-{status.lower()}">{status}</div>'

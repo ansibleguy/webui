@@ -1,14 +1,23 @@
-from datetime import datetime
+import traceback
+
 from ansible_runner import run as ansible_run
 
 from aw.model.job import Job, JobExecution
-from aw.execute.util import runner_cleanup, runner_prep, parse_run_result, job_logs
+from aw.execute.util import runner_cleanup, runner_prep, parse_run_result, job_logs, failure
+from aw.utils.handlers import AnsibleConfigError
+from aw.utils.util import datetime_w_tz
 
 
 def ansible_playbook(job: Job, execution: (JobExecution, None)):
-    time_start = datetime.now()
-    opts = runner_prep(job=job, execution=execution)
-    logs = job_logs(job=job, execution=execution)
+    time_start = datetime_w_tz()
+    try:
+        opts = runner_prep(job=job, execution=execution)
+        logs = job_logs(job=job, execution=execution)
+
+    except (OSError, AnsibleConfigError) as err:
+        tb = traceback.format_exc(limit=1024)
+        failure(job=job, execution=execution, time_start=time_start, error_s=err, error_m=tb)
+        raise
 
     with (open(logs['stdout'], 'w', encoding='utf-8') as stdout,
           open(logs['stderr'], 'w', encoding='utf-8') as stderr):

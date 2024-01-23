@@ -20,13 +20,22 @@ function sleep(ms = 0) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+function updateReloadTime() {
+    var element =  document.getElementById("aw-last-update");
+    if (typeof(element) != 'undefined' && element != null) {
+      element.innerHTML = "Last update: " + (new Date()).toLocaleTimeString({ hour12: false });
+    }
+}
+
 function reloadPage(ms = 50) {
     sleep(ms);  // wait for data to be processed by backend
     location.reload();
+    updateReloadTime();
 }
 
 function reloadElement(element) {
     $(element).load(document.URL +  ' ' + element);
+    updateReloadTime();
 }
 
 function reloadAwData(ms = 50) {
@@ -35,17 +44,24 @@ function reloadAwData(ms = 50) {
 }
 
 function autoReloadPage(sec) {
-    setTimeout(function(){
-        reloadPage();
-    }, (sec * 1000));
+    setInterval('reloadPage()', (sec * 1000));
 }
 
 function autoReloadData(sec) {
-    setTimeout(function(){
-        reloadAwData();
-    }, (sec * 1000));
+    setInterval('reloadAwData()', (sec * 1000));
 }
 
+function autoReloadToggle(button) {
+  if (button.value == "OFF") {
+    button.value = "ON";
+    button.classList.add("btn-primary");
+    button.classList.remove("btn-secondary");
+  } else {
+    button.value = "OFF";
+    button.classList.remove("btn-primary");
+    button.classList.add("btn-secondary");
+  }
+}
 
 function apiActionSuccess(result) {
     // todo: fix success message not showing after refresh
@@ -111,6 +127,13 @@ $( document ).ready(function() {
     $(".aw-main").on("click", ".aw-btn-refresh", function(){
         reloadAwData();
     });
+    $(".aw-main").on("click", ".aw-btn-autorefresh", function(){
+        sleep(50);
+        if ($(this).attr("value") == "ON") {
+            console.log("OK");
+            autoReloadData(2);
+        }
+    });
     $(".aw-main").on("click", ".aw-api-click", function(){
         let endpoint = $(this).attr("aw-api-endpoint");
         let method = $(this).attr("aw-api-method");
@@ -150,4 +173,5 @@ $( document ).ready(function() {
 
         return false;
     });
+    updateReloadTime();
 });

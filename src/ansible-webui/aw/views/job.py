@@ -5,23 +5,36 @@ from django.forms import ModelForm, CharField
 from django.core.validators import RegexValidator
 
 from aw.utils.http import ui_endpoint_wrapper, ui_endpoint_wrapper_kwargs
-from aw.model.job import Job, JobExecution, CHOICES_JOB_EXEC_STATUS, CHOICE_JOB_PERMISSION_WRITE
+from aw.model.job import Job, JobExecution, CHOICE_JOB_PERMISSION_WRITE
 from aw.api_endpoints.job_util import get_viewable_jobs, job_action_allowed
 from aw.config.form_metadata import FORM_LABEL, FORM_HELP
+from aw.utils.util import get_next_cron_execution_str
 
 
 @ui_endpoint_wrapper
 def manage(request) -> HttpResponse:
     jobs_viewable = get_viewable_jobs(request.user)
     executions = {}
+    next_executions = {}
 
     for job in jobs_viewable:
         # pylint: disable=E1101
-        executions[job.id] = JobExecution.objects.filter(job=job).order_by('-updated')
+        executions[job.id] = JobExecution.objects.filter(job=job).order_by('-updated').first()
+
+        try:
+            cron = get_next_cron_execution_str(job.schedule)
+
+        except ValueError:
+            cron = '-'
+
+        next_executions[job.id] = cron
 
     return render(
         request, status=200, template_name='jobs/manage.html',
-        context={'jobs': jobs_viewable, 'executions': executions, 'execution_stati': CHOICES_JOB_EXEC_STATUS}
+        context={
+            'jobs': jobs_viewable, 'executions': executions, 'next_executions': next_executions,
+            'show_update_time': True,
+        }
     )
 
 

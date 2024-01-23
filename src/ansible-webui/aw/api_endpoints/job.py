@@ -1,4 +1,5 @@
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.utils import IntegrityError
 from rest_framework.views import APIView
 from rest_framework import serializers
 from rest_framework.response import Response
@@ -9,6 +10,7 @@ from aw.api_endpoints.base import API_PERMISSION, get_api_user, BaseResponse
 from aw.api_endpoints.job_util import get_viewable_jobs_serialized, job_action_allowed, \
     JobReadResponse
 from aw.model.job import CHOICE_JOB_PERMISSION_READ, CHOICE_JOB_PERMISSION_WRITE, CHOICE_JOB_PERMISSION_EXECUTE
+from aw.execute.queue import queue_add
 
 
 class JobWriteRequest(JobReadResponse):
@@ -53,7 +55,15 @@ class APIJob(APIView):
                 status=400,
             )
 
-        serializer.save()
+        try:
+            serializer.save()
+
+        except IntegrityError as err:
+            return Response(
+                data={'msg': f"Provided job data is not valid: '{err}'"},
+                status=400,
+            )
+
         return Response(data={'msg': 'Job created'}, status=200)
 
 
@@ -143,7 +153,15 @@ class APIJobItem(APIView):
                     )
 
                 # pylint: disable=E1101
-                Job.objects.filter(id=job_id).update(**serializer.data)
+                try:
+                    Job.objects.filter(id=job_id).update(**serializer.data)
+
+                except IntegrityError as err:
+                    return Response(
+                        data={'msg': f"Provided job data is not valid: '{err}'"},
+                        status=400,
+                    )
+
                 return Response(data={'msg': f"Job '{job.name}' updated"}, status=200)
 
         except ObjectDoesNotExist:
@@ -170,7 +188,7 @@ class APIJobItem(APIView):
                 if not job_action_allowed(user=user, job=job, permission_needed=CHOICE_JOB_PERMISSION_EXECUTE):
                     return Response(data={'msg': f"Not privileged to execute the job '{job.name}'"}, status=403)
 
-                # todo: queue job for execution
+                queue_add(job)
                 return Response(data={'msg': f"Job '{job.name}' execution queued"}, status=200)
 
         except ObjectDoesNotExist:

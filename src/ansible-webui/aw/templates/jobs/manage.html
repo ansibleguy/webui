@@ -14,6 +14,7 @@
             <th>Comment</th>
             <th>Schedule</th>
             <th>Last run</th>
+            <th>Next run</th>
             <th>Actions</th>
         </tr>
 {%   if not jobs|exists %}
@@ -25,21 +26,18 @@
             <td>-</td>
             <td>-</td>
             <td>-</td>
+            <td>-</td>
         </tr>
 {%   endif %}
 {%   for job in jobs %}
-{%     set_var executions|get_value:job.id as execution %}
         <tr>
             <td>{{ job.name }}</td>
             <td>{{ job.inventory }}</td>
             <td>{{ job.playbook }}</td>
             <td>{{ job.comment|get_fallback:"-" }}</td>
             <td>{{ job.schedule|get_fallback:"-" }}</td>
-{%     if execution is none or execution|length == 0%}
-            <td>-</td>
-{%     else %}
-            <td>{{ execution.updated }} - {{ execution|get_value:"user"|get_fallback:"Scheduled" }} - {{ execution_stati|get_choice:execution.status }}</td>
-{%     endif %}
+            <td>{{ executions|get_value:job.id|last_execution_info|get_fallback:"-"|safe }}</td>
+            <td>{{ next_executions|get_value:job.id }}</td>
             <td>
                 <a href="/ui/jobs/manage/job/{{ job.id }}">
                     <button class="btn btn-warning aw-btn-action" title="Edit">
@@ -58,6 +56,7 @@
         <tr>
             <td colspan="100%">
                 {% include "../button/refresh.html" %}
+                {% include "../button/autoRefresh.html" %}
                 <a href="/ui/jobs/manage/job">
                     <button class="btn btn-success aw-btn-action" title="Add">
                         {% include "../button/icon/add.html" %}
