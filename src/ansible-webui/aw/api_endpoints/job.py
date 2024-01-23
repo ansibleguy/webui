@@ -188,7 +188,7 @@ class APIJobItem(APIView):
                 if not job_action_allowed(user=user, job=job, permission_needed=CHOICE_JOB_PERMISSION_EXECUTE):
                     return Response(data={'msg': f"Not privileged to execute the job '{job.name}'"}, status=403)
 
-                queue_add(job)
+                queue_add(job=job, user=user)
                 return Response(data={'msg': f"Job '{job.name}' execution queued"}, status=200)
 
         except ObjectDoesNotExist:

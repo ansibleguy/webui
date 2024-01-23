@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 CHOICES_BOOL = (
     (True, 'Yes'),
@@ -7,14 +8,14 @@ CHOICES_BOOL = (
 
 
 class BareModel(models.Model):
-    created = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField(default=timezone.now)
 
     class Meta:
         abstract = True
 
 
 class BaseModel(BareModel):
-    updated = models.DateTimeField(auto_now=True)
+    updated = models.DateTimeField(default=timezone.now)
 
     class Meta:
         abstract = True

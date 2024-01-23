@@ -7,6 +7,7 @@ from time import sleep, time
 
 from gunicorn.arbiter import Arbiter
 from django.core.validators import ValidationError
+from django.conf import settings
 
 from aw.execute.threader import ThreadManager
 from aw.utils.debug import log
@@ -95,12 +96,14 @@ class Scheduler:
     def check(self):
         log('Checking for queued jobs', level=7)
         while True:
-            next_job = queue_get()
-            if next_job is None:
+            queue_item = queue_get()
+            if queue_item is None:
                 break
 
-            log(f"Adding job-thread for queued job: '{next_job.name}'", level=4)
-            self._add_thread(job=next_job, once=True)
+            job, user = queue_item
+
+            log(f"Adding job-thread for queued job: '{job.name}' (triggered by user '{user.username}')", level=4)
+            self._add_thread(job=job, execution=JobExecution(user=user, job=job, comment='Triggered'), once=True)
 
     def reload(self, signum=None):
         if not self.reloading and not self.stopping:
@@ -121,7 +124,7 @@ class Scheduler:
             any_changed = True
             log(f"Adding job-threads: {[job.name for job in added]}", level=4)
             for job in added:
-                self._add_thread(job)
+                self._add_thread(job=job)
 
         if len(removed) > 0:
             any_changed = True
@@ -166,7 +169,7 @@ class Scheduler:
                     if getattr(run_job, field) != getattr(job, field):
                         result['changed'].append(job)
                         log(f"Job '{job.name}' config changed", level=6)
-                        continue
+                        break
 
         for job in running:
             if job.id not in configured_ids:

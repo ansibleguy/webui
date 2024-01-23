@@ -1,5 +1,7 @@
 // https://docs.djangoproject.com/en/5.0/howto/csrf/#using-csrf-protection-with-ajax
 
+
+// UTIL FUNCTIONS
 function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
@@ -63,6 +65,18 @@ function autoReloadToggle(button) {
   }
 }
 
+function toggleHidden(elementID) {
+    let element = document.getElementById(elementID);
+    let hidden = element.getAttribute("hidden");
+
+    if (hidden) {
+       element.removeAttribute("hidden");
+    } else {
+       element.setAttribute("hidden", "hidden");
+    }
+}
+
+// API CALLS
 function apiActionSuccess(result) {
     // todo: fix success message not showing after refresh
     reloadAwData();
@@ -108,22 +122,15 @@ function apiActionSuccessClear() {
 }
 
 function apiActionFullError() {
-    let element = document.getElementById("aw-api-error-full");
-    let hidden = element.getAttribute("hidden");
-
-    if (hidden) {
-       element.removeAttribute("hidden");
-    } else {
-       element.setAttribute("hidden", "hidden");
-    }
+    toggleHidden("aw-api-error-full");
 }
 
 const csrf_token = getCookie('csrftoken');
 
+// EVENTHANDLER
 $( document ).ready(function() {
-    $.ajaxSetup({
-        headers: {'X-CSRFToken': csrf_token},
-    });
+    // UTIL
+    updateReloadTime();
     $(".aw-main").on("click", ".aw-btn-refresh", function(){
         reloadAwData();
     });
@@ -133,6 +140,19 @@ $( document ).ready(function() {
             console.log("OK");
             autoReloadData(2);
         }
+    });
+    $(".aw-main").on("click", ".aw-btn-expand", function(){
+        let spoiler = $(this).attr("aw-expand");
+        toggleHidden(spoiler);
+    });
+    $(".aw-main").on("click", ".aw-btn-collapse", function(){
+        let spoiler = $(this).attr("aw-collapse");
+        toggleHidden(spoiler);
+    });
+
+    // API
+    $.ajaxSetup({
+        headers: {'X-CSRFToken': csrf_token},
     });
     $(".aw-main").on("click", ".aw-api-click", function(){
         let endpoint = $(this).attr("aw-api-endpoint");
@@ -173,5 +193,4 @@ $( document ).ready(function() {
 
         return false;
     });
-    updateReloadTime();
 });

@@ -79,7 +79,7 @@ if deployment_prod():
         except (OSError, FileNotFoundError):
             raise ValueError(f"Unable to created database directory: '{DB_FILE.parent}'")
 
-    if DB_FILE.name.find('.') == -1:
+    if DB_FILE.name.find('.') == -1 and not DB_FILE.exists():
         try:
             DB_FILE.mkdir(mode=0o750)
 

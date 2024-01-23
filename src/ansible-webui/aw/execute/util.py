@@ -8,8 +8,8 @@ from re import sub as regex_replace
 from ansible_runner import Runner as AnsibleRunner
 
 from aw.config.main import config, check_config_is_true
-from aw.config.hardcoded import FILE_TIME_FORMAT
-from aw.utils.util import get_choice_key_by_value, is_set, is_null, datetime_w_tz
+from aw.config.hardcoded import FILE_TIME_FORMAT, SHORT_TIME_FORMAT
+from aw.utils.util import get_choice_key_by_value, is_set, is_null, datetime_w_tz, datetime_from_db
 from aw.utils.handlers import AnsibleConfigError
 from aw.model.job import Job, JobExecution, JobExecutionResult, JobExecutionResultHost, \
     CHOICES_JOB_EXEC_STATUS, JobError
@@ -28,7 +28,7 @@ def _decode_job_env_vars(env_vars_csv: str, src: str) -> dict:
         raise AnsibleConfigError(
             f"Environmental variables of {src} are not in a valid format "
             f"(comma-separated key-value pairs). Example: 'key1=val1,key2=val2'"
-        )
+        ).with_traceback(None) from None
 
 
 def update_execution_status(execution: JobExecution, status: str):
@@ -105,13 +105,10 @@ def _create_dirs(path: str, desc: str):
             path.mkdir(mode=0o750)
 
     except (OSError, FileNotFoundError):
-        raise OSError(f"Unable to created {desc} directory: '{path}'")
+        raise OSError(f"Unable to created {desc} directory: '{path}'").with_traceback(None) from None
 
 
-def runner_prep(job: Job, execution: (JobExecution, None)) -> dict:
-    if is_null(execution):
-        execution = JobExecution(user=None, job=job, comment='Scheduled')
-
+def runner_prep(job: Job, execution: JobExecution) -> dict:
     update_execution_status(execution, status='Starting')
 
     opts = _runner_options(job=job, execution=execution)
@@ -126,18 +123,17 @@ def runner_prep(job: Job, execution: (JobExecution, None)) -> dict:
     for playbook in opts['playbook']:
         ppf = project_dir + playbook
         if not Path(ppf).is_file():
-            raise AnsibleConfigError(f"Configured playbook not found: '{ppf}'")
+            raise AnsibleConfigError(f"Configured playbook not found: '{ppf}'").with_traceback(None) from None
 
     for inventory in opts['inventory']:
         pi = project_dir + inventory
         if not Path(pi).exists():
-            raise AnsibleConfigError(f"Configured inventory not found: '{pi}'")
+            raise AnsibleConfigError(f"Configured inventory not found: '{pi}'").with_traceback(None) from None
 
     _create_dirs(path=opts['private_data_dir'], desc='run')
     _create_dirs(path=config['path_log'], desc='log')
 
     update_execution_status(execution, status='Running')
-
     return opts
 
 
@@ -199,10 +195,7 @@ def parse_run_result(execution: JobExecution, time_start: datetime, result: Ansi
         update_execution_status(execution, status='Finished')
 
 
-def failure(job: Job, execution: JobExecution, time_start: datetime, error_s: str, error_m: str):
-    if is_null(execution):
-        execution = JobExecution(user=None, job=job, comment='Scheduled')
-
+def failure(execution: JobExecution, time_start: datetime, error_s: str, error_m: str):
     update_execution_status(execution, status='Failed')
     job_error = JobError(
         short=error_s,

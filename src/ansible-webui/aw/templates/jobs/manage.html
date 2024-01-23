@@ -29,30 +29,7 @@
             <td>-</td>
         </tr>
 {%   endif %}
-{%   for job in jobs %}
-        <tr>
-            <td>{{ job.name }}</td>
-            <td>{{ job.inventory }}</td>
-            <td>{{ job.playbook }}</td>
-            <td>{{ job.comment|get_fallback:"-" }}</td>
-            <td>{{ job.schedule|get_fallback:"-" }}</td>
-            <td>{{ executions|get_value:job.id|last_execution_info|get_fallback:"-"|safe }}</td>
-            <td>{{ next_executions|get_value:job.id }}</td>
-            <td>
-                <a href="/ui/jobs/manage/job/{{ job.id }}">
-                    <button class="btn btn-warning aw-btn-action" title="Edit">
-                        {% include "../button/icon/edit.html" %}
-                    </button>
-                </a>
-                <button class="btn btn-danger aw-btn-action aw-api-click" title="Delete" aw-api-endpoint="job" aw-api-item="{{ job.id }}" aw-api-method="delete">
-                    {% include "../button/icon/delete.html" %}
-                </button>
-                <button class="btn btn-primary aw-btn-action aw-api-click" title="Run" aw-api-endpoint="job" aw-api-item="{{ job.id }}" aw-api-method="post">
-                    {% include "../button/icon/run.html" %}
-                </button>
-            </td>
-        </tr>
-{%   endfor %}
+        {% include "./manage_job.html" %}
         <tr>
             <td colspan="100%">
                 {% include "../button/refresh.html" %}

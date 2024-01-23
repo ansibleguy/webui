@@ -3,6 +3,7 @@ from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.core.validators import ValidationError
+from django.utils import timezone
 
 from aw.model.base import BareModel, BaseModel, CHOICES_BOOL
 from aw.config.hardcoded import SHORT_TIME_FORMAT
@@ -150,7 +151,7 @@ class JobPermissionMemberGroup(BareModel):
 
 class JobExecutionResult(BareModel):
     # ansible_runner.runner.Runner
-    time_start = models.DateTimeField(auto_now_add=True)
+    time_start = models.DateTimeField(default=timezone.now)
     time_fin = models.DateTimeField(blank=True, null=True, default=None)
 
     failed = models.BooleanField(choices=CHOICES_BOOL, default=False)
@@ -218,3 +219,7 @@ class JobExecution(MetaJob):
 
 class JobQueue(BareModel):
     job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name='jobqueue_fk_job')
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True,
+        related_name='jobqueue_fk_user',
+    )

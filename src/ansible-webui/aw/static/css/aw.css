@@ -354,6 +354,7 @@ form .form-control {
     color: rgb(164, 0, 15);
     font-weight: bold;
     margin-bottom: 2vh;
+    background-color: var(--bgError);
 }
 
 .aw-api-error-full {
@@ -517,4 +518,28 @@ form .form-control {
 
 .aw-job-status-waiting {
     color: blue;
+}
+
+code {
+    background-color: #404040;
+    color: var(--awLight);
+    border-radius: 0.3em;
+    padding: 4px 5px 6px;
+    white-space: nowrap;
+}
+
+div .code {
+    border: none;
+    background: none;
+    background-color: #404040;
+    color: var(--awLight);
+    letter-spacing: normal;
+    word-break: break-all;
+    white-space: pre-wrap;
+    padding: 1% 1.5%;
+}
+
+td div hr {
+    padding-top: 0.5vh;
+    padding-bottom: 0.5vh;
 }

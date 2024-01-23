@@ -10,6 +10,8 @@ from aw.api_endpoints.job_util import get_viewable_jobs, job_action_allowed
 from aw.config.form_metadata import FORM_LABEL, FORM_HELP
 from aw.utils.util import get_next_cron_execution_str
 
+LIMIT_JOB_RESULTS = 10
+
 
 @ui_endpoint_wrapper
 def manage(request) -> HttpResponse:
@@ -19,7 +21,7 @@ def manage(request) -> HttpResponse:
 
     for job in jobs_viewable:
         # pylint: disable=E1101
-        executions[job.id] = JobExecution.objects.filter(job=job).order_by('-updated').first()
+        executions[job.id] = JobExecution.objects.filter(job=job).order_by('-updated')[:LIMIT_JOB_RESULTS]
 
         try:
             cron = get_next_cron_execution_str(job.schedule)
