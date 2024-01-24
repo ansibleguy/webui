@@ -3,6 +3,16 @@ FORM_LABEL = {
         'manage': {
             'job': {
                 'environment_vars': 'Environmental Variables',
+                'mode_diff': 'Diff Mode',
+                'mode_check': 'Check Mode (Try Run)',
+                'vault_pass': 'Vault Password',
+                'vault_file': 'Vault Password File',
+                'connect_user': 'Connect User',
+                'connect_pass': 'Connect Password',
+                'become_user': 'Become User',
+                'become_pass': 'Become Password',
+                'cmd_args': 'Commandline Arguments',
+                'user_credentials': 'User Credentials',
             }
         }
     }

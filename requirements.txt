@@ -8,6 +8,7 @@ ua-parser
 user-agents
 django-user-agents
 django-auto-logout
+pycryptodome
 
 ## api
 djangorestframework==3.*

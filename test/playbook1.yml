@@ -1,0 +1,11 @@
+---
+
+- hosts: localhost
+  become: false
+  gather_facts: false
+
+  vars:
+    test: 'run1'
+
+  roles:
+    - test1

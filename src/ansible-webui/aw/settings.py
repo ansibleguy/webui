@@ -135,7 +135,7 @@ LOGOUT_REDIRECT_URL = LOGIN_PATH
 handler403 = 'aw.utils.handlers.handler403'
 handler500 = 'aw.utils.handlers.handler500'
 
-SECRET_KEY = config['_secret']
+SECRET_KEY = config['secret']
 TIMEZONE = config['timezone']
 
 # api

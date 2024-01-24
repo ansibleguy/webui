@@ -43,8 +43,9 @@ Environmental variables
 
 * **AW_SECRET**
 
-   Define a secret key to use for cookie encryption.
+   Define a secret key to use for cookie and password encryption.
    By default it will be re-generated at service restart.
+   It **has to be set** for job-secrets like passwords to be loadable after restart.
 
 
 * **AW_ADMIN**
@@ -64,7 +65,7 @@ Environmental variables
 
 * **AW_PATH_RUN**
 
-   Base directory for Ansible-Runner runtime files. Default: :code:`/tmp/ansible-webui/`
+   Base directory for `Ansible-Runner runtime files <https://ansible.readthedocs.io/projects/runner/en/latest/intro/>`_. Default: :code:`/tmp/ansible-webui/`
 
 
 * **AW_PATH_PLAY**

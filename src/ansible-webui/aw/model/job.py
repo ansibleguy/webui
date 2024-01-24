@@ -5,14 +5,15 @@ from django.contrib.auth.models import Group
 from django.core.validators import ValidationError
 from django.utils import timezone
 
-from aw.model.base import BareModel, BaseModel, CHOICES_BOOL
+from aw.model.base import BareModel, BaseModel, CHOICES_BOOL, DEFAULT_NONE
 from aw.config.hardcoded import SHORT_TIME_FORMAT
+from aw.utils.crypto import encrypt, decrypt
 
 
 class JobError(BareModel):
     short = models.CharField(max_length=100)
     med = models.TextField(max_length=1024, null=True)
-    logfile = models.FilePathField()
+    logfile = models.CharField(max_length=300, **DEFAULT_NONE)
 
     def __str__(self) -> str:
         return f"Job error {self.created}: '{self.short}'"
@@ -29,16 +30,89 @@ CHOICES_JOB_VERBOSITY = (
 )
 
 
-class MetaJob(BaseModel):
-    limit = models.CharField(max_length=500, null=True, default=None, blank=True)
-    verbosity = models.PositiveSmallIntegerField(choices=CHOICES_JOB_VERBOSITY, default=0)
-    comment = models.CharField(max_length=150, null=True, default=None, blank=True)
+class BaseJobCredentials(BaseModel):
+    connect_user = models.CharField(max_length=100, **DEFAULT_NONE)
+    become_user = models.CharField(max_length=100, **DEFAULT_NONE)
+    vault_file = models.CharField(max_length=300, **DEFAULT_NONE)
+    vault_id = models.CharField(max_length=50, **DEFAULT_NONE)
 
-    # NOTE: one or multiple comma-separated vars
-    environment_vars = models.CharField(max_length=1000, null=True, default=None, blank=True)
+    _enc_vault_pass = models.CharField(max_length=500, **DEFAULT_NONE)
+    _enc_become_pass = models.CharField(max_length=500, **DEFAULT_NONE)
+    _enc_connect_pass = models.CharField(max_length=500, **DEFAULT_NONE)
+
+    @property
+    def vault_pass(self) -> str:
+        return decrypt(self._enc_vault_pass)
+
+    @vault_pass.setter
+    def vault_pass(self, value: str):
+        self._enc_vault_pass = encrypt(value)
+
+    @property
+    def become_pass(self) -> str:
+        return decrypt(self._enc_become_pass)
+
+    @become_pass.setter
+    def become_pass(self, value: str):
+        self._enc_become_pass = encrypt(value)
+
+    @property
+    def connect_pass(self) -> str:
+        return decrypt(self._enc_connect_pass)
+
+    @connect_pass.setter
+    def connect_pass(self, value: str):
+        self._enc_connect_pass = encrypt(value)
 
     class Meta:
         abstract = True
+
+
+class JobUserCredentials(BaseJobCredentials):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
+
+    def __str__(self) -> str:
+        # pylint: disable=E1101
+        return f"Credentials '{self.name}' of user '{self.user.username}'"
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['user', 'name'], name='jobusercreds_user_name')
+        ]
+
+
+class BaseJob(BaseJobCredentials):
+    BAD_ANSIBLE_FLAGS = [
+        'step', 'ask-vault-password', 'ask-vault-pass', 'k', 'ask-pass',
+    ]
+
+    limit = models.CharField(max_length=500, **DEFAULT_NONE)
+    verbosity = models.PositiveSmallIntegerField(choices=CHOICES_JOB_VERBOSITY, default=0)
+    comment = models.CharField(max_length=150, **DEFAULT_NONE)
+    mode_diff = models.BooleanField(choices=CHOICES_BOOL, default=False)
+    mode_check = models.BooleanField(choices=CHOICES_BOOL, default=False)
+
+    # NOTE: one or multiple comma-separated vars
+    environment_vars = models.CharField(max_length=1000, **DEFAULT_NONE)
+
+    cmd_args = models.CharField(max_length=150, **DEFAULT_NONE)
+    tags = models.CharField(max_length=150, **DEFAULT_NONE)
+    tags_skip = models.CharField(max_length=150, **DEFAULT_NONE)
+
+    class Meta:
+        abstract = True
+
+    def clean(self):
+        # pylint: disable=E1101
+        super().clean()
+
+        for flag in self.BAD_ANSIBLE_FLAGS:
+            for search in [f'-{flag} ', f'-{flag}=', f'-{flag}']:
+                if self.cmd_args.find(search) != -1:
+                    raise ValidationError(
+                        f"Found one or more bad flags in commandline arguments: {self.BAD_ANSIBLE_FLAGS} (prompts)"
+                    )
 
 
 def validate_cronjob(value):
@@ -50,10 +124,11 @@ def validate_cronjob(value):
         raise ValidationError('The provided schedule is not in a valid cron format')
 
 
-class Job(MetaJob):
+class Job(BaseJob):
     api_fields = [
-        'id', 'name', 'inventory', 'playbook', 'schedule', 'limit',
-        'verbosity', 'comment', 'environment_vars',
+        'id', 'name', 'inventory', 'playbook', 'schedule', 'limit', 'mode_diff', 'mode_check', 'tags', 'tags_skip',
+        'verbosity', 'comment', 'environment_vars', 'connect_user', 'become_user', 'cmd_args',
+        'vault_id', 'vault_file',
     ]
     form_fields = api_fields
 
@@ -152,7 +227,7 @@ class JobPermissionMemberGroup(BareModel):
 class JobExecutionResult(BareModel):
     # ansible_runner.runner.Runner
     time_start = models.DateTimeField(default=timezone.now)
-    time_fin = models.DateTimeField(blank=True, null=True, default=None)
+    time_fin = models.DateTimeField(**DEFAULT_NONE)
 
     failed = models.BooleanField(choices=CHOICES_BOOL, default=False)
     error = models.ForeignKey(JobError, on_delete=models.SET_NULL, related_name='jobresult_fk_error', null=True)
@@ -193,7 +268,7 @@ CHOICES_JOB_EXEC_STATUS = [
 ]
 
 
-class JobExecution(MetaJob):
+class JobExecution(BaseJob):
     # NOTE: scheduled execution will have no user
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True,
@@ -202,9 +277,12 @@ class JobExecution(MetaJob):
     job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name='jobexec_fk_job')
     result = models.ForeignKey(
         JobExecutionResult, on_delete=models.SET_NULL, related_name='jobexec_fk_result',
-        null=True, default=None, blank=True,  # execution is created before result is available
+        **DEFAULT_NONE,  # execution is created before result is available
     )
     status = models.PositiveSmallIntegerField(default=0, choices=CHOICES_JOB_EXEC_STATUS)
+    user_credentials = models.ForeignKey(
+        Job, on_delete=models.SET_NULL, related_name='jobexec_fk_usercreds', **DEFAULT_NONE,
+    )
 
     def __str__(self) -> str:
         # pylint: disable=E1101

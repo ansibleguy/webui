@@ -1,0 +1,12 @@
+---
+
+- name: TEST 1 | Basic
+  ansible.builtin.debug:
+    msg: "TEST 1: '{{ test1_var1 }}'"
+  when: test == 'run1'
+
+- name: TEST 1 | Checking environmental variable
+  ansible.builtin.assert:
+    that:
+      - lookup('ansible.builtin.env', 'TEST1_VAR2') == 'run2'
+  when: test == 'run2'

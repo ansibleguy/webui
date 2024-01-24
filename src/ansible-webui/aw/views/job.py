@@ -1,7 +1,7 @@
 from django.shortcuts import redirect, render
 from django.shortcuts import HttpResponse
 from django.urls import path
-from django.forms import ModelForm, CharField
+from django.forms import ModelForm, CharField, PasswordInput
 from django.core.validators import RegexValidator
 
 from aw.utils.http import ui_endpoint_wrapper, ui_endpoint_wrapper_kwargs
@@ -46,6 +46,10 @@ class JobForm(ModelForm):
         fields = Job.form_fields
         labels = FORM_LABEL['jobs']['manage']['job']
         help_texts = FORM_HELP['jobs']['manage']['job']
+
+    vault_pass = CharField(widget=PasswordInput(), max_length=100)
+    become_pass = CharField(widget=PasswordInput(), max_length=100)
+    connect_pass = CharField(widget=PasswordInput(), max_length=100)
 
     # form not picking up regex-validator
     schedule = CharField(

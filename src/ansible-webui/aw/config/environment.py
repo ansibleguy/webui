@@ -8,7 +8,7 @@ from functools import cache
 
 AW_ENV_VARS = {
     'timezone': ['AW_TIMEZONE'],
-    '_secret': ['AW_SECRET'],
+    'secret': ['AW_SECRET'],
     'path_run': ['AW_PATH_RUN'],
     'path_play': ['AW_PATH_PLAY', 'ANSIBLE_PLAYBOOK_DIR'],
     'version': ['AW_VERSION'],
@@ -61,7 +61,7 @@ AW_ENV_VARS_DEFAULTS = {
     'path_log': f"{environ['HOME']}/.local/share/ansible-webui",
     'db': f"{environ['HOME']}/.config/ansible-webui",
     'timezone': datetime.now().astimezone().tzname(),
-    '_secret': ''.join(random_choice(ascii_letters + digits + punctuation) for _ in range(50)),
+    'secret': ''.join(random_choice(ascii_letters + digits + punctuation) for _ in range(50)),
     'ansible_config': _get_existing_ansible_config_file(),
     'session_timeout': 12 * 60 * 60,  # 12h
 }
