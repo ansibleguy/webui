@@ -35,12 +35,6 @@ def init_globals():
     environ['PYTHONIOENCODING'] = 'utf8'
     environ['PYTHONUNBUFFERED'] = '1'
 
-    if 'AW_SECRET' not in environ:
-        warn(
-            "The environmental variable 'AW_SECRET' was not supplied! "
-            "Job-secrets like passwords might not be loadable after restart."
-        )
-
     for cnf_key in AW_ENV_VARS:
         config[cnf_key] = get_aw_env_var(cnf_key)
 

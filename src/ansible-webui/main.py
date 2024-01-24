@@ -7,6 +7,8 @@ from aw.config.main import init_globals
 
 init_globals()
 
+from aw.utils.debug import log_warn
+
 # pylint: disable=C0413,C0415
 from db import install_or_migrate_db
 
@@ -14,6 +16,12 @@ from db import install_or_migrate_db
 def main():
     if uname().system.lower() != 'linux':
         raise SystemError('Currently only linux systems are supported!')
+
+    if 'AW_SECRET' not in environ:
+        log_warn(
+            "The environmental variable 'AW_SECRET' was not supplied! "
+            "Job-secrets like passwords might not be loadable after restart."
+        )
 
     environ['MAINPID'] = str(getpid())
     install_or_migrate_db()
