@@ -7,6 +7,7 @@ from django.utils import timezone
 
 from aw.model.base import BareModel, BaseModel, CHOICES_BOOL, DEFAULT_NONE
 from aw.config.hardcoded import SHORT_TIME_FORMAT
+from aw.utils.util import is_null
 from aw.utils.crypto import encrypt, decrypt
 
 
@@ -42,26 +43,44 @@ class BaseJobCredentials(BaseModel):
 
     @property
     def vault_pass(self) -> str:
+        if is_null(self._enc_vault_pass):
+            return ''
+
         return decrypt(self._enc_vault_pass)
 
     @vault_pass.setter
     def vault_pass(self, value: str):
+        if is_null(value):
+            self._enc_vault_pass = None
+
         self._enc_vault_pass = encrypt(value)
 
     @property
     def become_pass(self) -> str:
+        if is_null(self._enc_become_pass):
+            return ''
+
         return decrypt(self._enc_become_pass)
 
     @become_pass.setter
     def become_pass(self, value: str):
+        if is_null(value):
+            self._enc_become_pass = None
+
         self._enc_become_pass = encrypt(value)
 
     @property
     def connect_pass(self) -> str:
+        if is_null(self._enc_connect_pass):
+            return ''
+
         return decrypt(self._enc_connect_pass)
 
     @connect_pass.setter
     def connect_pass(self, value: str):
+        if is_null(value):
+            self._enc_connect_pass = None
+
         self._enc_connect_pass = encrypt(value)
 
     class Meta:
@@ -96,9 +115,9 @@ class BaseJob(BaseJobCredentials):
     # NOTE: one or multiple comma-separated vars
     environment_vars = models.CharField(max_length=1000, **DEFAULT_NONE)
 
-    cmd_args = models.CharField(max_length=150, **DEFAULT_NONE)
     tags = models.CharField(max_length=150, **DEFAULT_NONE)
     tags_skip = models.CharField(max_length=150, **DEFAULT_NONE)
+    cmd_args = models.CharField(max_length=150, **DEFAULT_NONE)
 
     class Meta:
         abstract = True
@@ -125,18 +144,21 @@ def validate_cronjob(value):
 
 
 class Job(BaseJob):
-    api_fields = [
-        'id', 'name', 'inventory', 'playbook', 'schedule', 'limit', 'mode_diff', 'mode_check', 'tags', 'tags_skip',
-        'verbosity', 'comment', 'environment_vars', 'connect_user', 'become_user', 'cmd_args',
-        'vault_id', 'vault_file',
+    CHANGE_FIELDS = [
+        'name', 'inventory', 'playbook', 'schedule', 'limit', 'verbosity', 'environment_vars', 'mode_diff',
+        'mode_check', 'tags', 'tags_skip', 'verbosity', 'comment', 'environment_vars', 'connect_user', 'become_user',
+        'cmd_args', 'vault_id', 'vault_file', 'enabled',
     ]
-    form_fields = api_fields
+    form_fields = CHANGE_FIELDS
+    api_fields = ['id']
+    api_fields.extend(CHANGE_FIELDS)
 
     name = models.CharField(max_length=150)
     inventory = models.CharField(max_length=300)  # NOTE: one or multiple comma-separated inventories
-    playbook = models.CharField(max_length=300)  # NOTE: one or multiple comma-separated playbooks
+    playbook = models.CharField(max_length=100)
     schedule_max_len = 50
     schedule = models.CharField(max_length=schedule_max_len, validators=[validate_cronjob], blank=True, default=None)
+    enabled = models.BooleanField(choices=CHOICES_BOOL, default=True)
 
     def __str__(self) -> str:
         limit = '' if self.limit is None else f' [{self.limit}]'
@@ -232,10 +254,22 @@ class JobExecutionResult(BareModel):
     failed = models.BooleanField(choices=CHOICES_BOOL, default=False)
     error = models.ForeignKey(JobError, on_delete=models.SET_NULL, related_name='jobresult_fk_error', null=True)
 
+    def __str__(self) -> str:
+        result = 'succeeded'
+
+        if self.failed:
+            result = 'failed'
+
+        return f"Job execution {self.time_start}: {result}"
+
 
 class JobExecutionResultHost(BareModel):
+    STATS = [
+        'unreachable', 'tasks_skipped', 'tasks_ok', 'tasks_failed', 'tasks_rescued',
+        'tasks_ignored', 'tasks_changed',
+    ]
     # ansible_runner.runner.Runner.stats
-    hostname = models.CharField(max_length=300)
+    hostname = models.CharField(max_length=300, null=False)
     unreachable = models.BooleanField(choices=CHOICES_BOOL, default=False)
 
     tasks_skipped = models.PositiveSmallIntegerField(default=0)
@@ -247,7 +281,7 @@ class JobExecutionResultHost(BareModel):
 
     error = models.ForeignKey(JobError, on_delete=models.SET_NULL, related_name='jobresulthost_fk_error', null=True)
     result = models.ForeignKey(
-        JobExecutionResult, on_delete=models.SET_NULL, related_name='jobresulthost_fk_result', null=True
+        JobExecutionResult, on_delete=models.CASCADE, related_name='jobresulthost_fk_result', null=True
     )
 
     def __str__(self) -> str:
@@ -256,7 +290,7 @@ class JobExecutionResultHost(BareModel):
         if int(self.tasks_failed) > 0:
             result = 'failed'
 
-        return f"Job execution {self.created} of host {self.hostname}: {result}"
+        return f"Job execution {self.created} of host '{self.hostname}': {result}"
 
 
 CHOICES_JOB_EXEC_STATUS = [

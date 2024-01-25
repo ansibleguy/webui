@@ -2,6 +2,12 @@
 {% load static %}
 {% load util %}
 {% block content %}
+<a href="/ui/jobs/manage">
+    <button class="btn btn-info aw-btn-action" title="Return">
+        {% include "../button/icon/return.html" %}
+    </button>
+</a>
+
 {% include "../forms/base.html" %}
 
 <a href="/ui/jobs/manage">

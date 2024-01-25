@@ -334,6 +334,10 @@ form .form-control {
     background-color: var(--bg) !important;
 }
 
+.mb-3 {
+    margin-bottom: 0.1rem !important;
+}
+
 .aw-success-msg {
     color: rgb(135,169,107);
     font-weight: bold;

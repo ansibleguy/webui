@@ -13,6 +13,12 @@ from aw.execute.config import PWD_ATTRS_ARGS
 
 
 def overwrite_and_delete_file(file: (str, Path)):
+    if not isinstance(file, Path):
+        file = Path(file)
+
+    if not file.is_file():
+        return
+
     with open(file, 'w', encoding='utf-8') as _file:
         _file.write(''.join(random_choice(ascii_letters + digits + punctuation) for _ in range(50)),)
 

@@ -88,6 +88,7 @@ function apiActionSuccess(result) {
         resultDiv.innerHTML = 'Success';
     }
     apiActionErrorClear();
+    $('html, body').animate({ scrollTop: 0 }, 'fast');
 }
 
 function apiActionError(result, exception) {
@@ -107,6 +108,7 @@ function apiActionError(result, exception) {
     errorDiv.innerHTML = errorHTML;
 
     apiActionSuccessClear();
+    $('html, body').animate({ scrollTop: 0 }, 'fast');
 }
 
 function apiActionErrorClear() {

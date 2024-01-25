@@ -5,12 +5,16 @@ from Crypto import Random
 from Crypto.Cipher import AES
 
 from aw.config.main import config
+from aw.utils.util import is_null
 from aw.utils.debug import log_warn
 
 __KEY = sha256(config['secret'].encode()).digest()
 
 
 def encrypt(raw: str) -> str:
+    if is_null(raw):
+        return ''
+
     raw = _pad(raw)
     iv = Random.new().read(AES.block_size)
     cipher = AES.new(__KEY, AES.MODE_CBC, iv)
@@ -18,6 +22,9 @@ def encrypt(raw: str) -> str:
 
 
 def decrypt(enc: str) -> str:
+    if is_null(enc):
+        return ''
+
     try:
         enc = b64decode(enc)
         iv = enc[:AES.block_size]

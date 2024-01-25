@@ -47,7 +47,13 @@ def get_form_field_value(bf: BoundField, existing: dict) -> str:
 
 @register.filter
 def get_form_field_select(bf: BoundField, existing: dict) -> str:
-    selected = get_form_field_value(bf, existing)
+    selected = None
+    if bf.field.initial is not None:
+        selected = bf.field.initial
+    elif bf.name in existing:
+        selected = str(existing[bf.name])
+
+    get_form_field_value(bf, existing)
     options_str = f'<select class="form-control" id="{bf.id_for_label}" name="{bf.name}">'
 
     # pylint: disable=W0212

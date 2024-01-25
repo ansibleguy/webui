@@ -8,7 +8,7 @@
 
 The goal is to allow users to quickly install & run a WebUI for using Ansible locally.
 
-This is achived by [distributing it using pip](https://pypi.org/project/ansible-webui/).
+This is archived by [distributing it using pip](https://pypi.org/project/ansible-webui/).
 
 Keep it simple.
 
@@ -37,6 +37,8 @@ python3 -m ansible-webui
 ## Contribute
 
 Feel free to contribute to this project using [pull-requests](https://github.com/ansibleguy/ansible-webui/pulls), [issues](https://github.com/ansibleguy/ansible-webui/issues) and [discussions](https://github.com/ansibleguy/ansible-webui/discussions)!
+
+Testers are also very welcome! Please [give feedback](https://github.com/ansibleguy/ansible-webui/issues)
 
 See also: [Contributing](https://github.com/ansibleguy/ansible-webui/blob/latest/CONTRIBUTE.md)
 
@@ -84,9 +86,9 @@ There are multiple Ansible WebUI products - how do they compare to this product?
 
 ## Roadmap
 
-- [ ] Ansible Config
+- [x] Ansible Config
 
-  - [ ] Static Playbook-Directory
+  - [x] Static Playbook-Directory
 
   - [ ] Git Repository support
 
@@ -100,31 +102,44 @@ There are multiple Ansible WebUI products - how do they compare to this product?
 
 - [ ] Jobs
 
-  - [ ] Execute Ansible using [ansible-runner](https://ansible.readthedocs.io/projects/runner/en/latest/python_interface/)
+  - [x] Execute Ansible using [ansible-runner](https://ansible.readthedocs.io/projects/runner/en/latest/python_interface/)
 
-    - [ ] Scheduled execution (Cron-Format)
+    - [x] Scheduled execution (Cron-Format)
 
-    - [ ] Manual/immediate execution
+    - [x] Manual/immediate execution
 
     - [ ] Support for [ad-hoc commands](https://docs.ansible.com/ansible/latest/command_guide/intro_adhoc.html)
 
   - [ ] Job Logging
 
-    - [ ] Write job metadata to database
+    - [x] Write job metadata to database
 
     - [ ] Write full job-logs to Filesystem
 
-  - [ ] Secret handling (Connect, Become, Vault)
+  - [x] Secret handling (Connect, Become, Vault)
 
+    - [ ] User-specific credentials
 
 - [ ] WebUI
 
-  - [ ] Job Dashboard
+  - [x] Job Dashboard
 
       Status, Execute, Time of last & next execution, Last run User, Links to Warnings/Errors
+
+  - [ ] Job Output
+
+      Follow the jobs output in realtime
+
+  - [ ] Job Errors
+
+      UI that allows for easy error analysis. Access to logs and provide links to possible solutions
 
   - [ ] Show Ansible Running-Config
 
   - [ ] Show Ansible Collections
 
     - [ ] Check Collections for available updates (galaxy + github releases)
+
+- [ ] API
+
+  - [x] Manage and execute Jobs

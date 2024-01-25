@@ -18,9 +18,6 @@ from aw.execute.queue import queue_get
 
 class Scheduler:
     WAIT_TIME = 1
-    JOB_CHANGE_FIELDS = [
-        'name', 'inventory', 'playbook', 'schedule', 'limit', 'verbosity', 'environment_vars',
-    ]
 
     def __init__(self):
         self.thread_manager = ThreadManager()
@@ -152,7 +149,11 @@ class Scheduler:
         for job in configured:
             if job.id not in running_ids:
                 if is_null(job.schedule):
-                    log(f"Skipping job '{job.name}' because it has no schedule", level=6)
+                    log(f"Ignoring job '{job.name}' because it has no schedule", level=6)
+                    continue
+
+                if not job.enabled:
+                    log(f"Ignoring job '{job.name}' because it is disabled", level=6)
                     continue
 
                 try:
@@ -164,8 +165,13 @@ class Scheduler:
 
             else:
                 run_job = [run_job for run_job in running if run_job.id == job.id][0]
-                for field in self.JOB_CHANGE_FIELDS:
+                for field in Job.CHANGE_FIELDS:
                     if getattr(run_job, field) != getattr(job, field):
+                        if run_job.enabled and not job.enabled:
+                            result['removed'].append(job)
+                            log(f"Job '{job.name}' was disabled", level=6)
+                            break
+
                         result['changed'].append(job)
                         log(f"Job '{job.name}' config changed", level=6)
                         break

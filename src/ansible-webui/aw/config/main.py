@@ -1,7 +1,6 @@
 from os import environ
 from importlib.metadata import version, PackageNotFoundError
 from sys import stderr
-from warnings import warn
 
 from pytz import all_timezones, timezone
 

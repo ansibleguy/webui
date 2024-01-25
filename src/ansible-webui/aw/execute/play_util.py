@@ -14,6 +14,7 @@ from aw.model.job import Job, JobExecution, JobExecutionResult, JobExecutionResu
 from aw.execute.util import update_execution_status, write_pwd_file, overwrite_and_delete_file, \
     decode_job_env_vars, create_dirs
 from aw.execute.config import PWD_ATTRS
+from aw.utils.debug import log
 
 # see: https://ansible.readthedocs.io/projects/runner/en/latest/intro/
 
@@ -24,8 +25,6 @@ def _commandline_arguments(job: Job, path_run: Path) -> str:
         cmd_arguments.append(job.cmd_args)
 
     for attr, flag in {
-        'tags': '--tags',
-        'tags_skip': '--skip-tags',
         'connect_user': '-u',
         'become_user': '--become-user',
         'vault_file': '--vault-password-file',
@@ -46,6 +45,18 @@ def _commandline_arguments(job: Job, path_run: Path) -> str:
             cmd_arguments.append(pwd_arg)
 
     return ' '.join(cmd_arguments)
+
+
+def _execution_or_job(job: Job, execution: JobExecution, attr: str):
+    exec_val = getattr(execution, attr)
+    if is_set(exec_val):
+        return exec_val
+
+    job_val = getattr(job, attr)
+    if is_set(job_val):
+        return job_val
+
+    return None
 
 
 def _runner_options(job: Job, execution: JobExecution, path_run: Path) -> dict:
@@ -70,16 +81,22 @@ def _runner_options(job: Job, execution: JobExecution, path_run: Path) -> dict:
     elif job.verbosity != 0:
         verbosity = job.verbosity
 
+    cmdline_args = _commandline_arguments(job=job, path_run=path_run)
     opts = {
         'private_data_dir': path_run,
         'project_dir': config['path_play'],
         'quiet': True,
-        'limit': execution.limit if is_set(execution.limit) else job.limit,
+        'limit': _execution_or_job(job, execution, 'limit'),
+        'tags': _execution_or_job(job, execution, 'tags'),
+        'skip_tags': _execution_or_job(job, execution, 'tags_skip'),
         'verbosity': verbosity,
         'envvars': env_vars,
         'timeout': config['run_timeout'],
-        'cmdline': _commandline_arguments(job=job, path_run=path_run),
+        'cmdline': cmdline_args if is_set(cmdline_args) else None,
     }
+
+    if is_set(cmdline_args):
+        log(msg=f"Custom commandline arguments: '{cmdline_args}'", level=5)
 
     if check_config_is_true('run_isolate_dir'):
         opts['directory_isolation_base_path'] = path_run / 'play_base'
@@ -97,7 +114,7 @@ def runner_prep(job: Job, execution: JobExecution, path_run: Path) -> dict:
     update_execution_status(execution, status='Starting')
 
     opts = _runner_options(job=job, execution=execution, path_run=path_run)
-    opts['playbook'] = job.playbook.split(',')
+    opts['playbook'] = job.playbook
     opts['inventory'] = job.inventory.split(',')
 
     # https://docs.ansible.com/ansible/2.8/user_guide/playbooks_best_practices.html#directory-layout
@@ -105,10 +122,9 @@ def runner_prep(job: Job, execution: JobExecution, path_run: Path) -> dict:
     if not project_dir.endswith('/'):
         project_dir += '/'
 
-    for playbook in opts['playbook']:
-        ppf = project_dir + playbook
-        if not Path(ppf).is_file():
-            raise AnsibleConfigError(f"Configured playbook not found: '{ppf}'").with_traceback(None) from None
+    ppf = project_dir + opts['playbook']
+    if not Path(ppf).is_file():
+        raise AnsibleConfigError(f"Configured playbook not found: '{ppf}'").with_traceback(None) from None
 
     for inventory in opts['inventory']:
         pi = project_dir + inventory
@@ -128,7 +144,7 @@ def runner_cleanup(path_run: Path):
         for attr in PWD_ATTRS:
             overwrite_and_delete_file(f"{path_run}/.aw_{attr}")
 
-    rmtree(path_run)
+    rmtree(path_run, ignore_errors=True)
 
 
 def job_logs(job: Job, execution: JobExecution) -> dict:
@@ -136,7 +152,7 @@ def job_logs(job: Job, execution: JobExecution) -> dict:
     if is_null(execution.user):
         safe_user_name = 'scheduled'
     else:
-        safe_user_name = execution.user.replace('.', '_')
+        safe_user_name = execution.user.username.replace('.', '_')
         safe_user_name = regex_replace(pattern='[^0-9a-zA-Z-_]+', repl='', string=safe_user_name)
 
     timestamp = datetime_w_tz().strftime(FILE_TIME_FORMAT)
@@ -148,27 +164,25 @@ def job_logs(job: Job, execution: JobExecution) -> dict:
     }
 
 
-def parse_run_result(execution: JobExecution, time_start: datetime, result: AnsibleRunner):
-    # events = list(result.events)
-
+def parse_run_result(execution: JobExecution, time_start: datetime, runner: AnsibleRunner):
     job_result = JobExecutionResult(
         time_start=time_start,
         time_fin=datetime_w_tz(),
-        failed=result.errored,
+        failed=runner.errored,
     )
     job_result.save()
 
     # https://stackoverflow.com/questions/70348314/get-python-ansible-runner-module-stdout-key-value
-    for host in result.stats['processed']:
-        result_host = JobExecutionResultHost()
+    for host in runner.stats['processed']:
+        result_host = JobExecutionResultHost(hostname=host)
 
-        result_host.unreachable = host in result.stats['unreachable']
-        result_host.tasks_skipped = result.stats['skipped'][host] if host in result.stats['skipped'] else 0
-        result_host.tasks_ok = result.stats['ok'][host] if host in result.stats['ok'] else 0
-        result_host.tasks_failed = result.stats['failures'][host] if host in result.stats['failures'] else 0
-        result_host.tasks_ignored = result.stats['ignored'][host] if host in result.stats['ignored'] else 0
-        result_host.tasks_rescued = result.stats['rescued'][host] if host in result.stats['rescued'] else 0
-        result_host.tasks_changed = result.stats['changed'][host] if host in result.stats['changed'] else 0
+        result_host.unreachable = host in runner.stats['dark']
+        result_host.tasks_skipped = runner.stats['skipped'][host] if host in runner.stats['skipped'] else 0
+        result_host.tasks_ok = runner.stats['ok'][host] if host in runner.stats['ok'] else 0
+        result_host.tasks_failed = runner.stats['failures'][host] if host in runner.stats['failures'] else 0
+        result_host.tasks_ignored = runner.stats['ignored'][host] if host in runner.stats['ignored'] else 0
+        result_host.tasks_rescued = runner.stats['rescued'][host] if host in runner.stats['rescued'] else 0
+        result_host.tasks_changed = runner.stats['changed'][host] if host in runner.stats['changed'] else 0
 
         if result_host.tasks_failed > 0:
             # todo: create errors

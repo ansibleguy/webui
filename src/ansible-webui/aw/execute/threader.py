@@ -3,6 +3,7 @@
 
 from threading import Thread, Event
 from time import sleep
+import traceback
 
 from aw.utils.debug import log
 from aw.config.hardcoded import THREAD_JOIN_TIMEOUT
@@ -14,6 +15,7 @@ from aw.utils.util import get_next_cron_execution_sec, get_next_cron_execution_s
 
 class Workload(Thread):
     FAIL_SLEEP = 5
+    MAX_CONFIG_INVALID = 3
 
     def __init__(self, job: Job, manager, name: str, execution: JobExecution, once: bool = False, daemon: bool = True):
         Thread.__init__(self, daemon=daemon, name=name)
@@ -27,6 +29,7 @@ class Workload(Thread):
         self.log_name_debug = f"'{self.job.name}' (Job-ID {self.job.id}; {self.name})"
         self.log_name = f"'{self.job.name}' (Job-ID {self.job.id})"
         self.next_execution_time = None
+        self.config_invalid = 0
 
     def stop(self) -> bool:
         log(f"Thread stopping {self.log_name_debug}", level=6)
@@ -38,7 +41,7 @@ class Workload(Thread):
                 log(f"Unable to join thread {self.log_name_debug}", level=5)
 
         except RuntimeError:
-            log(f"Got error stopping thread {self.log_name_debug}", level=5)
+            log(f"Got error stopping thread {self.log_name_debug}", level=6)
 
         log(f"Stopped thread {self.log_name}", level=4)
         self.started = False
@@ -50,9 +53,16 @@ class Workload(Thread):
 
     def run(self, error: bool = False) -> None:
         if self.once and self.started:
+            self.stop()
             return
 
         if self.stopped:
+            return
+
+        if self.config_invalid >= self.MAX_CONFIG_INVALID:
+            self.next_execution_time = None
+            log(msg=f"Disabling job {self.log_name} because of invalid config! Please fix it", level=2)
+            # exit loop because it will always fail; fixing the config will replace this threat instance
             return
 
         if error:
@@ -64,36 +74,41 @@ class Workload(Thread):
             if self.once:
                 self.run_playbook()
                 self.stop()
-                self.manager.threads.remove(self.job)
+                self.manager.threads.remove(self)
                 return
 
-            wait_sec = get_next_cron_execution_sec(self.job.schedule)
-            self.next_execution_time = get_next_cron_execution_str(schedule=self.job.schedule, wait_sec=wait_sec)
-            log(
-                f"Next execution of job {self.log_name_debug} at "
-                f"{self.next_execution_time}",
-                level=7,
-            )
+            while not self.state_stop.is_set():
+                wait_sec = get_next_cron_execution_sec(self.job.schedule)
+                self.next_execution_time = get_next_cron_execution_str(schedule=self.job.schedule, wait_sec=wait_sec)
+                log(
+                    f"Next execution of job {self.log_name_debug} at "
+                    f"{self.next_execution_time}",
+                    level=7,
+                )
 
-            while not self.state_stop.wait(wait_sec):
-                if self.state_stop.is_set():
-                    log(f"Exiting thread {self.log_name_debug}", level=5)
+                while not self.state_stop.wait(wait_sec):
+                    if self.state_stop.is_set():
+                        log(f"Exiting thread {self.log_name_debug}", level=5)
+                        break
+
+                    log(f"Starting job {self.log_name_debug}", level=5)
+                    self.run_playbook()
                     break
 
-                log(f"Starting job {self.log_name_debug}", level=5)
-                self.run_playbook()
-
         except (AnsibleConfigError, OSError) as err:
+            self.config_invalid += 1
             log(
-                msg=f"Got invalid config/environment for job {self.log_name}: \"{err}\"",
+                msg=f"Got invalid config/environment for job {self.log_name} "
+                    f"({self.config_invalid}/{self.MAX_CONFIG_INVALID}): \"{err}\"",
                 level=2,
             )
             self.run(error=True)
 
         # pylint: disable=W0718
         except Exception as err:
+            tb = traceback.format_exc(limit=256)
             log(
-                msg=f"Got unexpected error while executing job {self.log_name}: \"{err}\"",
+                msg=f"Got unexpected error while executing job {self.log_name}: \"{err}\"\n{tb}",
                 level=2,
             )
             self.run(error=True)
@@ -148,7 +163,7 @@ class ThreadManager:
                 if thread.started:
                     thread.stop()
                     self.threads.remove(thread)
-                    log(f"Thread {job.name} stopped.", level=4)
+                    log(f"Thread '{job.name}' stopped.", level=4)
                     break
 
     def start_thread(self, job: Job) -> None:
@@ -156,7 +171,7 @@ class ThreadManager:
             if thread.job == job:
                 if not thread.started:
                     thread.start()
-                    log(f"Thread {job.name} started.", level=5)
+                    log(f"Thread '{job.name}' started.", level=5)
                     break
 
     def replace_thread(self, job: Job) -> None:

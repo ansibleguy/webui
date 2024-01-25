@@ -7,9 +7,9 @@ from aw.config.main import init_globals
 
 init_globals()
 
+# pylint: disable=C0413,C0415
 from aw.utils.debug import log_warn
 
-# pylint: disable=C0413,C0415
 from db import install_or_migrate_db
 
 

@@ -1,3 +1,5 @@
+from aw.config.main import config
+
 FORM_LABEL = {
     'jobs': {
         'manage': {
@@ -13,6 +15,7 @@ FORM_LABEL = {
                 'become_pass': 'Become Password',
                 'cmd_args': 'Commandline Arguments',
                 'user_credentials': 'User Credentials',
+                'enabled': 'Schedule Enabled',
             }
         }
     }
@@ -22,6 +25,7 @@ FORM_HELP = {
     'jobs': {
         'manage': {
             'job': {
+                'playbook': f"Playbook to execute. Search path: '{config['path_play']}'",
                 'inventory': 'One or multiple inventory files/directories to include for the execution. '
                              'Comma-separated list. For details see: '
                              '<a href="https://docs.ansible.com/ansible/latest/inventory_guide/intro_inventory.html">'

@@ -37,6 +37,8 @@ log 'SETTING VERSION'
 bash ./scripts/update_version.sh
 version="$(cat './VERSION')"
 export AW_VERSION="$version"
+path_play="$(pwd)/test"
+export AW_PATH_PLAY="$path_play"
 
 if [[ "$TEST_QUIET" != "1" ]]
 then
