@@ -77,9 +77,9 @@ def create_dirs(path: (str, Path), desc: str):
         raise OSError(f"Unable to created {desc} directory: '{path}'").with_traceback(None) from None
 
 
-def write_stdout_stderr(config: RunnerConfig, msg: str, target: str = 'stdout'):
+def write_stdout_stderr(cfg: RunnerConfig, msg: str, target: str = 'stdout'):
     write_file_0640(
-        file=os_path.join(config.artifact_dir, target),
+        file=os_path.join(cfg.artifact_dir, target),
         content=f"{datetime_w_tz().strftime(LOG_TIME_FORMAT)} | {msg}\n"
     )
 
@@ -99,7 +99,7 @@ def write_pwd_file(src: (Job, JobExecution), attr: str, path_run: (Path, str)):
     if is_null(getattr(src, attr)):
         return None
 
-    write_file_0600(
+    return write_file_0600(
         file=get_pwd_file(path_run=path_run, attr=attr),
         content=getattr(src, attr),
     )

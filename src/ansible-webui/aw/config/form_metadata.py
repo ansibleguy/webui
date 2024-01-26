@@ -42,7 +42,8 @@ FORM_HELP = {
                                     'Comma-separated list of key-value pairs. (VAR1=TEST1,VAR2=0)',
                 'vault_file': 'Path to the file containing your vault-password',
                 'vault_id': 'For details see: '
-                            '<a href="https://docs.ansible.com/ansible/latest/vault_guide/vault_managing_passwords.html">'
+                            '<a href="https://docs.ansible.com/ansible/latest/vault_guide/'
+                            'vault_managing_passwords.html">'
                             'Ansible Docs - Managing Passwords</a>',
                 'cmd_args': "Additional commandline arguments to pass to 'ansible-playbook'. "
                             "Can be used to pass extra-vars",

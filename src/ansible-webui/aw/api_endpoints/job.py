@@ -249,4 +249,3 @@ class APIJobItem(APIView):
             pass
 
         return Response(data={'msg': f"Job with ID '{job_id}' does not exist"}, status=404)
-

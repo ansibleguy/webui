@@ -142,16 +142,16 @@ def runner_prep(job: Job, execution: JobExecution, path_run: Path) -> dict:
     return opts
 
 
-def runner_cleanup(job: Job, execution: JobExecution, path_run: Path, config: (RunnerConfig, None)):
+def runner_cleanup(job: Job, execution: JobExecution, path_run: Path, cfg: (RunnerConfig, None)):
     overwrite_and_delete_file(f"{path_run}/env/passwords")
     for attr in BaseJobCredentials.PWD_ATTRS:
         overwrite_and_delete_file(get_pwd_file(path_run=path_run, attr=attr))
 
-    if config is not None:
+    if cfg is not None:
         # move logs from artifacts to log-directory; have not found a working way of overriding the target files..
         logs_src = {
-            'stdout': os_path.join(config.artifact_dir, 'stdout'),
-            'stderr': os_path.join(config.artifact_dir, 'stderr'),
+            'stdout': os_path.join(cfg.artifact_dir, 'stdout'),
+            'stderr': os_path.join(cfg.artifact_dir, 'stderr'),
         }
         logs_dst = _job_logs(job=job, execution=execution)
 
@@ -159,7 +159,6 @@ def runner_cleanup(job: Job, execution: JobExecution, path_run: Path, config: (R
             move(logs_src[log_type], logs_dst[log_type])
 
     rmtree(path_run, ignore_errors=True)
-    pass
 
 
 def _job_logs(job: Job, execution: JobExecution) -> dict:
@@ -215,7 +214,7 @@ def parse_run_result(execution: JobExecution, time_start: datetime, runner: Runn
 
 
 def failure(
-        job: Job, execution: JobExecution, path_run: Path, config: (RunnerConfig, None),
+        job: Job, execution: JobExecution, path_run: Path, cfg: (RunnerConfig, None),
         time_start: datetime, error_s: str, error_m: str
 ):
     update_execution_status(execution, status='Failed')
@@ -233,4 +232,4 @@ def failure(
     job_result.save()
     execution.result = job_result
     execution.save()
-    runner_cleanup(job=job, execution=execution, path_run=path_run, config=config)
+    runner_cleanup(job=job, execution=execution, path_run=path_run, cfg=cfg)

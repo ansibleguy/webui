@@ -54,7 +54,7 @@ def get_form_field_value(bf: BoundField, existing: dict) -> str:
         if enc_field in existing and not is_set(existing[enc_field]):
             return ''
 
-        elif enc_field not in existing:
+        if enc_field not in existing:
             value = ''
 
         else:

@@ -1,9 +1,9 @@
 from platform import python_version
-from pkg_resources import get_distribution
 from datetime import datetime
 from time import time
 from os import open as open_file
 from pathlib import Path
+from pkg_resources import get_distribution
 
 from crontab import CronTab
 from pytz import utc

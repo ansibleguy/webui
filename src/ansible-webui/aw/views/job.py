@@ -1,7 +1,7 @@
 from django.shortcuts import redirect, render
 from django.shortcuts import HttpResponse
 from django.urls import path
-from django.forms import ModelForm, CharField, PasswordInput
+from django.forms import ModelForm, CharField
 from django.core.validators import RegexValidator
 
 from aw.utils.http import ui_endpoint_wrapper, ui_endpoint_wrapper_kwargs
