@@ -73,5 +73,5 @@ def execution_info_verbose(execution: JobExecution) -> (str, None):
         error = ''
 
     return (f"<hr><b>Start time</b>: {info['time_start']}<br><b>Finish time</b>: {info['time_fin']}<br>"
-            f"<b>Executed by</b> '{info['user']}'<br><b>Status</b>: "
+            f"<b>Executed by</b>: '{info['user']}'<br><b>Status</b>: "
             f"<span class=\"aw-job-status aw-job-status-{info['status'].lower()}\">{info['status']}</span>{error}")

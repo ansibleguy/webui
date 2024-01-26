@@ -43,13 +43,16 @@ class Workload(Thread):
         except RuntimeError:
             log(f"Got error stopping thread {self.log_name_debug}", level=6)
 
-        log(f"Stopped thread {self.log_name}", level=4)
+        log(f"Stopped thread {self.log_name_debug}", level=4)
         self.started = False
         self.stopped = True
         return True
 
     def run_playbook(self):
+        self.job.state_running = True
         ansible_playbook(job=self.job, execution=self.execution)
+        self.job.state_running = False
+        self.job.state_stop = False
 
     def run(self, error: bool = False) -> None:
         if self.once and self.started:

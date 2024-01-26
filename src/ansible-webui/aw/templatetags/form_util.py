@@ -4,6 +4,9 @@ from django.forms import BoundField
 from django.forms.widgets import Select
 from django.core.validators import RegexValidator
 
+from aw.model.job import BaseJobCredentials
+from aw.utils.util import is_set
+
 register = template.Library()
 
 
@@ -42,7 +45,25 @@ def get_form_required(bf: BoundField) -> str:
 
 
 def get_form_field_value(bf: BoundField, existing: dict) -> str:
-    return 'value="' + str(existing[bf.name]) + '"' if bf.name in existing else ''
+    # PWD_ATTRS are not exposed here
+    if bf.name not in existing and bf.name not in BaseJobCredentials.PWD_ATTRS:
+        return ''
+
+    if bf.name in BaseJobCredentials.PWD_ATTRS:
+        enc_field = '_enc_' + bf.name
+        if enc_field in existing and not is_set(existing[enc_field]):
+            return ''
+
+        elif enc_field not in existing:
+            value = ''
+
+        else:
+            value = BaseJobCredentials.PWD_HIDDEN
+
+    else:
+        value = str(existing[bf.name])
+
+    return 'value="' + value + '"'
 
 
 @register.filter
@@ -67,6 +88,10 @@ def get_form_field_select(bf: BoundField, existing: dict) -> str:
 
 @register.filter
 def get_form_field_input(bf: BoundField, existing: dict) -> str:
-    return (f'<input class="form-control" id="{bf.id_for_label}" name="{bf.name}" '
+    field_type = ''
+    if bf.name.find('pass') != -1:
+        field_type = 'type="password" '
+
+    return (f'<input class="form-control" id="{bf.id_for_label}" name="{bf.name}" {field_type}'
             f'{get_form_field_value(bf, existing)} {get_form_required(bf)}'
             f'{get_form_field_attributes(bf)} {get_form_field_validators(bf)}>')

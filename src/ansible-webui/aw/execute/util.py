@@ -2,14 +2,16 @@ from pathlib import Path
 from random import choice as random_choice
 from string import digits, ascii_letters, punctuation
 from datetime import datetime
-from os import remove
+from os import remove as remove_file
+from os import path as os_path
+
+from ansible_runner import RunnerConfig
 
 from aw.config.main import config
-from aw.config.hardcoded import FILE_TIME_FORMAT
-from aw.utils.util import get_choice_key_by_value, is_null
+from aw.config.hardcoded import FILE_TIME_FORMAT, LOG_TIME_FORMAT
+from aw.utils.util import get_choice_key_by_value, is_null, write_file_0600, write_file_0640, datetime_w_tz
 from aw.utils.handlers import AnsibleConfigError
-from aw.model.job import Job, JobExecution, CHOICES_JOB_EXEC_STATUS
-from aw.execute.config import PWD_ATTRS_ARGS
+from aw.model.job import Job, JobExecution, CHOICES_JOB_EXEC_STATUS, BaseJobCredentials
 
 
 def overwrite_and_delete_file(file: (str, Path)):
@@ -19,21 +21,13 @@ def overwrite_and_delete_file(file: (str, Path)):
     if not file.is_file():
         return
 
-    with open(file, 'w', encoding='utf-8') as _file:
-        _file.write(''.join(random_choice(ascii_letters + digits + punctuation) for _ in range(50)),)
+    for _ in range(3):
+        write_file_0600(
+            file=file,
+            content=''.join(random_choice(ascii_letters + digits + punctuation) for _ in range(50)),
+        )
 
-    remove(file)
-
-
-def write_pwd_file(job: Job, pwd_attr: str, path_run: Path) -> (str, None):
-    if is_null(getattr(job, pwd_attr)):
-        return None
-
-    file = f"{path_run}/.aw_{pwd_attr}"
-    with open(file, 'w', encoding='utf-8') as _file:
-        _file.write(getattr(job, pwd_attr))
-
-    return f"--{PWD_ATTRS_ARGS[pwd_attr]} {file}"
+    remove_file(file)
 
 
 def decode_job_env_vars(env_vars_csv: str, src: str) -> dict:
@@ -81,3 +75,31 @@ def create_dirs(path: (str, Path), desc: str):
 
     except (OSError, FileNotFoundError):
         raise OSError(f"Unable to created {desc} directory: '{path}'").with_traceback(None) from None
+
+
+def write_stdout_stderr(config: RunnerConfig, msg: str, target: str = 'stdout'):
+    write_file_0640(
+        file=os_path.join(config.artifact_dir, target),
+        content=f"{datetime_w_tz().strftime(LOG_TIME_FORMAT)} | {msg}\n"
+    )
+
+
+def get_pwd_file(path_run: (str, Path), attr: str) -> str:
+    return f"{path_run}/.aw_{attr}"
+
+
+def get_pwd_file_arg(src: (Job, JobExecution), attr: str, path_run: (Path, str)) -> (str, None):
+    if is_null(getattr(src, attr)):
+        return None
+
+    return f"--{BaseJobCredentials.PWD_ATTRS_ARGS[attr]} {get_pwd_file(path_run=path_run, attr=attr)}"
+
+
+def write_pwd_file(src: (Job, JobExecution), attr: str, path_run: (Path, str)):
+    if is_null(getattr(src, attr)):
+        return None
+
+    write_file_0600(
+        file=get_pwd_file(path_run=path_run, attr=attr),
+        content=getattr(src, attr),
+    )

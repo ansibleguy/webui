@@ -1,28 +1,28 @@
 from pathlib import Path
-from shutil import rmtree
+from shutil import rmtree, move
 from datetime import datetime
 from re import sub as regex_replace
+from os import path as os_path
 
-from ansible_runner import Runner as AnsibleRunner
+from ansible_runner import Runner, RunnerConfig
 
 from aw.config.main import config, check_config_is_true
 from aw.config.hardcoded import FILE_TIME_FORMAT
 from aw.utils.util import is_set, is_null, datetime_w_tz
 from aw.utils.handlers import AnsibleConfigError
-from aw.model.job import Job, JobExecution, JobExecutionResult, JobExecutionResultHost, \
-    JobError
-from aw.execute.util import update_execution_status, write_pwd_file, overwrite_and_delete_file, \
-    decode_job_env_vars, create_dirs
-from aw.execute.config import PWD_ATTRS
-from aw.utils.debug import log
+from aw.model.job import Job, JobExecution, JobExecutionResult, JobExecutionResultHost, JobError, \
+    BaseJobCredentials
+from aw.execute.util import update_execution_status, overwrite_and_delete_file, decode_job_env_vars, \
+    create_dirs, get_pwd_file, get_pwd_file_arg, write_pwd_file
+# from aw.utils.debug import log
 
 # see: https://ansible.readthedocs.io/projects/runner/en/latest/intro/
 
 
-def _commandline_arguments(job: Job, path_run: Path) -> str:
+def _commandline_arguments(src: (Job, JobExecution), path_run: Path) -> str:
     cmd_arguments = []
-    if is_set(job.cmd_args):
-        cmd_arguments.append(job.cmd_args)
+    if is_set(src.cmd_args):
+        cmd_arguments.append(src.cmd_args)
 
     for attr, flag in {
         'connect_user': '-u',
@@ -30,17 +30,18 @@ def _commandline_arguments(job: Job, path_run: Path) -> str:
         'vault_file': '--vault-password-file',
         'vault_id': '--vault-id',
     }.items():
-        if is_set(getattr(job, attr)):
-            cmd_arguments.append(f'{flag} {getattr(job, attr)}')
+        if is_set(getattr(src, attr)):
+            cmd_arguments.append(f'{flag} {getattr(src, attr)}')
 
-    if job.mode_check:
+    if src.mode_check:
         cmd_arguments.append('--check')
 
-    if job.mode_diff:
+    if src.mode_diff:
         cmd_arguments.append('--diff')
 
-    for attr in PWD_ATTRS:
-        pwd_arg = write_pwd_file(job=job, pwd_attr=attr, path_run=path_run)
+    # todo: allow for user-specific credentials (JobUserCredentials)
+    for attr in BaseJobCredentials.PWD_ATTRS:
+        pwd_arg = get_pwd_file_arg(src, attr=attr, path_run=path_run)
         if pwd_arg is not None:
             cmd_arguments.append(pwd_arg)
 
@@ -81,7 +82,9 @@ def _runner_options(job: Job, execution: JobExecution, path_run: Path) -> dict:
     elif job.verbosity != 0:
         verbosity = job.verbosity
 
-    cmdline_args = _commandline_arguments(job=job, path_run=path_run)
+    # todo: allow execution to override job arguments; if unset they should be inherited from job though..
+    cmdline_args = _commandline_arguments(job, path_run=path_run)
+
     opts = {
         'private_data_dir': path_run,
         'project_dir': config['path_play'],
@@ -94,9 +97,6 @@ def _runner_options(job: Job, execution: JobExecution, path_run: Path) -> dict:
         'timeout': config['run_timeout'],
         'cmdline': cmdline_args if is_set(cmdline_args) else None,
     }
-
-    if is_set(cmdline_args):
-        log(msg=f"Custom commandline arguments: '{cmdline_args}'", level=5)
 
     if check_config_is_true('run_isolate_dir'):
         opts['directory_isolation_base_path'] = path_run / 'play_base'
@@ -134,20 +134,35 @@ def runner_prep(job: Job, execution: JobExecution, path_run: Path) -> dict:
     create_dirs(path=path_run, desc='run')
     create_dirs(path=config['path_log'], desc='log')
 
+    for pwd_attr in BaseJobCredentials.PWD_ATTRS:
+        write_pwd_file(src=job, attr=pwd_attr, path_run=path_run)
+        write_pwd_file(src=execution, attr=pwd_attr, path_run=path_run)
+
     update_execution_status(execution, status='Running')
     return opts
 
 
-def runner_cleanup(path_run: Path):
+def runner_cleanup(job: Job, execution: JobExecution, path_run: Path, config: (RunnerConfig, None)):
     overwrite_and_delete_file(f"{path_run}/env/passwords")
-    for _ in range(10):
-        for attr in PWD_ATTRS:
-            overwrite_and_delete_file(f"{path_run}/.aw_{attr}")
+    for attr in BaseJobCredentials.PWD_ATTRS:
+        overwrite_and_delete_file(get_pwd_file(path_run=path_run, attr=attr))
+
+    if config is not None:
+        # move logs from artifacts to log-directory; have not found a working way of overriding the target files..
+        logs_src = {
+            'stdout': os_path.join(config.artifact_dir, 'stdout'),
+            'stderr': os_path.join(config.artifact_dir, 'stderr'),
+        }
+        logs_dst = _job_logs(job=job, execution=execution)
+
+        for log_type in ['stdout', 'stderr']:
+            move(logs_src[log_type], logs_dst[log_type])
 
     rmtree(path_run, ignore_errors=True)
+    pass
 
 
-def job_logs(job: Job, execution: JobExecution) -> dict:
+def _job_logs(job: Job, execution: JobExecution) -> dict:
     safe_job_name = regex_replace(pattern='[^0-9a-zA-Z-_]+', repl='', string=job.name)
     if is_null(execution.user):
         safe_user_name = 'scheduled'
@@ -164,7 +179,7 @@ def job_logs(job: Job, execution: JobExecution) -> dict:
     }
 
 
-def parse_run_result(execution: JobExecution, time_start: datetime, runner: AnsibleRunner):
+def parse_run_result(execution: JobExecution, time_start: datetime, runner: Runner):
     job_result = JobExecutionResult(
         time_start=time_start,
         time_fin=datetime_w_tz(),
@@ -199,7 +214,10 @@ def parse_run_result(execution: JobExecution, time_start: datetime, runner: Ansi
         update_execution_status(execution, status='Finished')
 
 
-def failure(execution: JobExecution, path_run: Path, time_start: datetime, error_s: str, error_m: str):
+def failure(
+        job: Job, execution: JobExecution, path_run: Path, config: (RunnerConfig, None),
+        time_start: datetime, error_s: str, error_m: str
+):
     update_execution_status(execution, status='Failed')
     job_error = JobError(
         short=error_s,
@@ -215,4 +233,4 @@ def failure(execution: JobExecution, path_run: Path, time_start: datetime, error
     job_result.save()
     execution.result = job_result
     execution.save()
-    runner_cleanup(path_run)
+    runner_cleanup(job=job, execution=execution, path_run=path_run, config=config)

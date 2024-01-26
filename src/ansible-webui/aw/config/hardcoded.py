@@ -8,3 +8,4 @@ LOG_TIME_FORMAT = '%Y-%m-%d %H:%M:%S %z'
 SHORT_TIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 FILE_TIME_FORMAT = '%Y-%m-%d_%H-%M-%S'
 KEY_TIME_FORMAT = '%Y-%m-%d-%H-%M-%S'
+MIN_SECRET_LEN = 30

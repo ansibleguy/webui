@@ -1,8 +1,13 @@
+from platform import python_version
+from pkg_resources import get_distribution
 from datetime import datetime
 from time import time
+from os import open as open_file
+from pathlib import Path
 
 from crontab import CronTab
 from pytz import utc
+
 
 from aw.config.main import config
 from aw.config.hardcoded import SHORT_TIME_FORMAT
@@ -53,3 +58,37 @@ def get_next_cron_execution(schedule: str, wait_sec: (int, float) = None) -> dat
 
 def get_next_cron_execution_str(schedule: str, wait_sec: (int, float) = None) -> str:
     return get_next_cron_execution(schedule, wait_sec).strftime(SHORT_TIME_FORMAT)
+
+
+def _open_file_0600(path: (str, Path), flags):
+    return open_file(path, flags, 0o600)
+
+
+def write_file_0600(file: (str, Path), content: str):
+    mode = 'w'
+    if Path(file).is_file():
+        mode = 'a'
+
+    with open(file, mode, encoding='utf-8', opener=_open_file_0600) as _file:
+        _file.write(content)
+
+
+def _open_file_0640(path: (str, Path), flags):
+    return open_file(path, flags, 0o640)
+
+
+def write_file_0640(file: (str, Path), content: str):
+    mode = 'w'
+    if Path(file).is_file():
+        mode = 'a'
+
+    with open(file, mode, encoding='utf-8', opener=_open_file_0640) as _file:
+        _file.write(content)
+
+
+def get_ansible_versions() -> str:
+    return (f"Python3: {python_version()} | "
+            f"Ansible: {get_distribution('ansible').version} | "
+            f"Ansible-Core: {get_distribution('ansible-core').version} | "
+            f"Ansible-Runner: {get_distribution('ansible-runner').version} |"
+            f"Ansible-WebUI: {config['version']}")

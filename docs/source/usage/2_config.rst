@@ -46,7 +46,7 @@ Environmental variables
    Define a secret key to use for cookie and password encryption.
    By default it will be re-generated at service restart.
    It **has to be set** for job-secrets like passwords to be loadable after restart.
-
+   It has to be **at least 30 characters** long!
 
 * **AW_ADMIN**
 

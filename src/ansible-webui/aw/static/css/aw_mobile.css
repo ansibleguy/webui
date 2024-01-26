@@ -6,6 +6,10 @@
     .aw-form-inline-right {
         float: none;
     }
+
+    form .form-control {
+        width: 35vw;
+    }
 }
 
 @media only screen and (max-width: 991px) {
@@ -41,6 +45,10 @@
         margin-top: 10px;
     }
 
+    form .form-control {
+        width: 50vw;
+    }
+
 }
 
 @media only screen and (max-width: 500px) {  /* mobile devices */
@@ -67,6 +75,10 @@
 
     .aw-btn-action {
         padding: 1px 1px !important;
+    }
+
+    form .form-control {
+        width: 70vw;
     }
 
 }

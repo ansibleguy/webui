@@ -11,5 +11,5 @@ fi
 cd "$(dirname "$0")"
 export AW_DEV=1
 export AW_ENV='dev'
-export AW_SECRET='asdfThisIsSuperSecret!'  # keep sessions on auto-reload
+export AW_SECRET='asdfThisIsSuperSecret!12345678'  # keep sessions on auto-reload
 source ./run_shared.sh

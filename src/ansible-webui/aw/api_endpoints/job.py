@@ -9,12 +9,20 @@ from aw.models import Job
 from aw.api_endpoints.base import API_PERMISSION, get_api_user, BaseResponse
 from aw.api_endpoints.job_util import get_viewable_jobs_serialized, job_action_allowed, \
     JobReadResponse
-from aw.model.job import CHOICE_JOB_PERMISSION_READ, CHOICE_JOB_PERMISSION_WRITE, CHOICE_JOB_PERMISSION_EXECUTE
+from aw.model.job import CHOICE_JOB_PERMISSION_READ, CHOICE_JOB_PERMISSION_WRITE, CHOICE_JOB_PERMISSION_EXECUTE, \
+    BaseJobCredentials
 from aw.execute.queue import queue_add
+from aw.utils.util import is_null
 
 
-class JobWriteRequest(JobReadResponse):
-    pass
+class JobWriteRequest(serializers.ModelSerializer):
+    class Meta:
+        model = Job
+        fields = Job.api_fields_write
+
+    vault_pass = serializers.CharField(max_length=100, required=False, default=None)
+    become_pass = serializers.CharField(max_length=100, required=False, default=None)
+    connect_pass = serializers.CharField(max_length=100, required=False, default=None)
 
 
 class JobWriteResponse(BaseResponse):
@@ -49,11 +57,18 @@ class APIJob(APIView):
     )
     def post(self, request):
         serializer = JobWriteRequest(data=request.data)
+
         if not serializer.is_valid():
             return Response(
                 data={'msg': f"Provided job data is not valid: '{serializer.errors}'"},
                 status=400,
             )
+
+        for field in BaseJobCredentials.PWD_ATTRS:
+            value = serializer.validated_data[field]
+            if field in BaseJobCredentials.PWD_ATTRS and \
+                    (is_null(value) or value == BaseJobCredentials.PWD_HIDDEN):
+                serializer.validated_data[field] = None
 
         try:
             serializer.save()
@@ -68,7 +83,7 @@ class APIJob(APIView):
 
 
 class APIJobItem(APIView):
-    http_method_names = ['get', 'delete', 'put', 'post']
+    http_method_names = ['get', 'delete', 'put', 'post', 'patch']
     serializer_class = JobWriteResponse
     permission_classes = API_PERMISSION
 
@@ -154,7 +169,15 @@ class APIJobItem(APIView):
 
                 # pylint: disable=E1101
                 try:
-                    Job.objects.filter(id=job_id).update(**serializer.data)
+                    # not working with password properties: 'Job.objects.filter(id=job_id).update(**serializer.data)'
+                    for field, value in serializer.data.items():
+                        if field in BaseJobCredentials.PWD_ATTRS and \
+                                (is_null(value) or value == BaseJobCredentials.PWD_HIDDEN):
+                            value = getattr(job, field)
+
+                        setattr(job, field, value)
+
+                    job.save()
 
                 except IntegrityError as err:
                     return Response(
@@ -195,3 +218,35 @@ class APIJobItem(APIView):
             pass
 
         return Response(data={'msg': f"Job with ID '{job_id}' does not exist"}, status=404)
+
+    @extend_schema(
+        request=None,
+        responses={
+            200: OpenApiResponse(JobReadResponse, description='Job execution stopped'),
+            400: OpenApiResponse(JobReadResponse, description='Job is not running'),
+            403: OpenApiResponse(JobReadResponse, description='Not privileged to stop the job'),
+            404: OpenApiResponse(JobReadResponse, description='Job does not exist'),
+        },
+        summary='Stop a running job.',
+        operation_id='job_stop'
+    )
+    def patch(self, request, job_id: int):
+        user = get_api_user(request)
+        try:
+            job = self._find_job(job_id)
+
+            if job is not None:
+                if not job_action_allowed(user=user, job=job, permission_needed=CHOICE_JOB_PERMISSION_EXECUTE):
+                    return Response(data={'msg': f"Not privileged to stop the job '{job.name}'"}, status=403)
+
+                if not job.state_running:
+                    return Response(data={'msg': f"Job '{job.name}' is not running"}, status=400)
+
+                job.state_stop = True
+                return Response(data={'msg': f"Job '{job.name}' execution stopped"}, status=200)
+
+        except ObjectDoesNotExist:
+            pass
+
+        return Response(data={'msg': f"Job with ID '{job_id}' does not exist"}, status=404)
+

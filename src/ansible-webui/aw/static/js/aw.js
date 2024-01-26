@@ -125,6 +125,7 @@ function apiActionSuccessClear() {
 
 function apiActionFullError() {
     toggleHidden("aw-api-error-full");
+    document.getElementById("aw-api-error-full").scrollIntoView();
 }
 
 const csrf_token = getCookie('csrftoken');

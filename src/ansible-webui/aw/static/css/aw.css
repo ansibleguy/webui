@@ -1,9 +1,14 @@
 /* todo: update colors (red-ish?) */
 
+html {
+    height: 100%;
+}
+
 body {
     padding: 0 0;
     margin: 0 0;
-    height: 100vh;
+    height: 100%;
+    min-height: 100%;
     background-color: var(--bg) !important;
     --whiteNormal: rgba(255, 255, 255, .9);
     --whiteNice: rgba(255, 255, 255, .7);
@@ -57,7 +62,7 @@ body.dark {
 .aw-main {
     margin: 2%;
     height: 100%;
-    margin-bottom: 150px;
+    margin-bottom: 3vh;
     color: var(--tc1);
 }
 
@@ -107,6 +112,7 @@ iframe {
     width: 40vw;
     box-sizing: border-box;
     color: var(--tc1);
+    width: 100% !important;
 }
 
 .aw-info-special-mode {
@@ -285,7 +291,7 @@ td {
 /* START footer */
 
 .aw-footer-wrapper {
-    margin-top: 10vh;
+    margin-top: 3vh;
 }
 
 .aw-footer {
@@ -332,6 +338,7 @@ form label {
 form .form-control {
     color: var(--tc1) !important;
     background-color: var(--bg) !important;
+    width: 20vw;
 }
 
 .mb-3 {

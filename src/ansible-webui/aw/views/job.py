@@ -55,9 +55,9 @@ class JobForm(ModelForm):
         labels = FORM_LABEL['jobs']['manage']['job']
         help_texts = FORM_HELP['jobs']['manage']['job']
 
-    vault_pass = CharField(widget=PasswordInput(), max_length=100, required=False)
-    become_pass = CharField(widget=PasswordInput(), max_length=100, required=False)
-    connect_pass = CharField(widget=PasswordInput(), max_length=100, required=False)
+    vault_pass = CharField(max_length=100, required=False, label=FORM_LABEL['jobs']['manage']['job']['vault_pass'])
+    become_pass = CharField(max_length=100, required=False, label=FORM_LABEL['jobs']['manage']['job']['become_pass'])
+    connect_pass = CharField(max_length=100, required=False, label=FORM_LABEL['jobs']['manage']['job']['connect_pass'])
 
     # form not picking up regex-validator
     schedule = CharField(

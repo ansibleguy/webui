@@ -25,6 +25,9 @@
         <button class="btn btn-primary aw-btn-action aw-api-click" title="Run" aw-api-endpoint="job" aw-api-item="{{ job.id }}" aw-api-method="post">
             {% include "../button/icon/run.html" %}
         </button>
+        <button class="btn btn-danger aw-btn-action aw-api-click" title="Stop" aw-api-endpoint="job" aw-api-item="{{ job.id }}" aw-api-method="patch">
+            {% include "../button/icon/stop.html" %}
+        </button>
         <button class="btn btn-info aw-btn-action aw-btn-expand" title="Expand" aw-expand="aw-spoiler-{{ job.id }}"
 {% if executions|get_value:job.id|length == 0 %}
         disabled

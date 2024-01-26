@@ -8,7 +8,7 @@ from aw.model.job import Job, JobPermissionMapping, JobPermissionMemberUser, Job
 class JobReadResponse(serializers.ModelSerializer):
     class Meta:
         model = Job
-        fields = Job.api_fields
+        fields = Job.api_fields_read
 
 
 def get_job_if_allowed(user: settings.AUTH_USER_MODEL, job: Job, permission_needed: int) -> (Job, None):

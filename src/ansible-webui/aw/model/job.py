@@ -32,6 +32,14 @@ CHOICES_JOB_VERBOSITY = (
 
 
 class BaseJobCredentials(BaseModel):
+    PWD_ATTRS = ['become_pass', 'vault_pass', 'connect_pass']
+    PWD_ATTRS_ARGS = {
+        'vault_pass': 'vault-password-file',
+        'become_pass': 'become-password-file',
+        'connect_pass': 'connection-password-file',
+    }
+    PWD_HIDDEN = '⬤' * 15
+
     connect_user = models.CharField(max_length=100, **DEFAULT_NONE)
     become_user = models.CharField(max_length=100, **DEFAULT_NONE)
     vault_file = models.CharField(max_length=300, **DEFAULT_NONE)
@@ -52,6 +60,7 @@ class BaseJobCredentials(BaseModel):
     def vault_pass(self, value: str):
         if is_null(value):
             self._enc_vault_pass = None
+            return
 
         self._enc_vault_pass = encrypt(value)
 
@@ -66,6 +75,7 @@ class BaseJobCredentials(BaseModel):
     def become_pass(self, value: str):
         if is_null(value):
             self._enc_become_pass = None
+            return
 
         self._enc_become_pass = encrypt(value)
 
@@ -80,6 +90,7 @@ class BaseJobCredentials(BaseModel):
     def connect_pass(self, value: str):
         if is_null(value):
             self._enc_connect_pass = None
+            return
 
         self._enc_connect_pass = encrypt(value)
 
@@ -144,14 +155,18 @@ def validate_cronjob(value):
 
 
 class Job(BaseJob):
+    state_running = False
+    state_stop = False
     CHANGE_FIELDS = [
-        'name', 'inventory', 'playbook', 'schedule', 'limit', 'verbosity', 'environment_vars', 'mode_diff',
-        'mode_check', 'tags', 'tags_skip', 'verbosity', 'comment', 'environment_vars', 'connect_user', 'become_user',
-        'cmd_args', 'vault_id', 'vault_file', 'enabled',
+        'name', 'inventory', 'playbook', 'schedule', 'enabled', 'limit', 'verbosity', 'mode_diff',
+        'mode_check', 'tags', 'tags_skip', 'verbosity', 'comment', 'environment_vars', 'cmd_args',
+        'vault_id', 'vault_file', 'connect_user', 'become_user',
     ]
     form_fields = CHANGE_FIELDS
-    api_fields = ['id']
-    api_fields.extend(CHANGE_FIELDS)
+    api_fields_read = ['id']
+    api_fields_read.extend(CHANGE_FIELDS)
+    api_fields_write = api_fields_read
+    api_fields_write.extend(['vault_pass', 'become_pass', 'connect_pass'])
 
     name = models.CharField(max_length=150)
     inventory = models.CharField(max_length=300)  # NOTE: one or multiple comma-separated inventories

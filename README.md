@@ -8,7 +8,7 @@
 
 The goal is to allow users to quickly install & run a WebUI for using Ansible locally.
 
-This is archived by [distributing it using pip](https://pypi.org/project/ansible-webui/).
+This is achieved by [distributing it using pip](https://pypi.org/project/ansible-webui/).
 
 Keep it simple.
 
@@ -99,6 +99,8 @@ There are multiple Ansible WebUI products - how do they compare to this product?
   - [ ] Groups & Job Permissions
 
   - [ ] [LDAP integration](https://github.com/django-auth-ldap/django-auth-ldap)
+
+  - [ ] [SAML SSO integration](https://github.com/grafana/django-saml2-auth)
 
 - [ ] Jobs
 
