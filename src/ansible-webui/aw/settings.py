@@ -29,7 +29,6 @@ INSTALLED_APPS = [
     'rest_framework_api_key',
     'drf_spectacular',
     # styles
-    'bootstrap5',
     'fontawesomefree',
 ]
 MIDDLEWARE = [

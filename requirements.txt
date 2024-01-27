@@ -16,7 +16,6 @@ djangorestframework-api-key==2.*
 drf-spectacular
 
 ## styles
-django-bootstrap-v5
 fontawesomefree
 
 # scheduling
