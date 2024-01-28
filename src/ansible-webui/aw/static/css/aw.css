@@ -1,14 +1,13 @@
 /* todo: update colors (red-ish?) */
 
 html {
-    height: 100%;
+    min-height: 100vh;
 }
 
 body {
     padding: 0 0;
     margin: 0 0;
-    height: 100%;
-    min-height: 100%;
+    min-height: 100vh;
     background-color: var(--bg) !important;
     --whiteNormal: rgba(255, 255, 255, .9);
     --whiteNice: rgba(255, 255, 255, .7);
@@ -20,6 +19,7 @@ body {
     --bgDark: #062925;
     --awLight: #ff7400; /* #B9BD19 */
     --awDark: #062925;
+    --awSoftWhite: #FBFAF5;
 }
 
 body.light {
@@ -471,38 +471,6 @@ form .form-control {
 
 /* STOP buttons */
 
-/* START external content */
-
-.aw-file-content {
-    background: var(--bgLight);
-    border-radius: var(--rad);
-    overflow: auto;
-    padding: 1% 1.5%;
-    margin: 0 0;
-    list-style-type: none;
-}
-
-.aw-file-content-line {
-    text-indent: -3vw;
-    padding-left: 3vw;
-    padding-top: 3px;
-    white-space: break-spaces;
-    counter-increment: step-counter;
-}
-
-.aw-file-content li::before {
-    content: counter(step-counter, decimal-leading-zero);
-    margin-right: 15px;
-    font-size: 80%;
-    background-color: var(--bgDawn);
-    color: var(--whiteNormal);
-    font-weight: bold;
-    padding: 3px 8px;
-    border-radius: 3px;
-}
-
-/* STOP external content */
-
 .aw-job-status {
     font-weight: bold;
 }
@@ -553,4 +521,30 @@ div .code {
 td div hr {
     padding-top: 0.5vh;
     padding-bottom: 0.5vh;
+}
+
+.aw-execution-logs {
+    white-space: pre-wrap;
+    padding: 1% 1.5%;
+    color: var(--awSoftWhite);
+    background-color: #404040;
+    letter-spacing: normal;
+    font-size: medium;
+}
+
+/* Ansible console output colors */
+.aw-log-ok {
+    color: #11D116;
+}
+
+.aw-log-skip {
+    color: #1AB899;
+}
+
+.aw-log-warn {
+    color: #8E44AD;
+}
+
+.aw-log-err {
+    color: #E11616;
 }

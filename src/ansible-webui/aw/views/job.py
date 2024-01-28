@@ -11,6 +11,7 @@ from aw.config.form_metadata import FORM_LABEL, FORM_HELP
 from aw.utils.util import get_next_cron_execution_str
 
 LIMIT_JOB_RESULTS = 10
+LIMIT_JOB_LOG_RESULTS = 50
 
 
 @ui_endpoint_wrapper
@@ -104,7 +105,20 @@ def job_edit(request, job_id: int = None) -> HttpResponse:
     )
 
 
+@ui_endpoint_wrapper_kwargs
+def job_logs(request) -> HttpResponse:
+    # pylint: disable=E1101
+    jobs_viewable = get_viewable_jobs(request.user)
+    executions = JobExecution.objects.filter().order_by('-updated')[:LIMIT_JOB_LOG_RESULTS]
+
+    return render(
+        request, status=200, template_name='jobs/logs.html',
+        context={'jobs': jobs_viewable, 'executions': executions}
+    )
+
+
 urlpatterns_jobs = [
+    path('ui/jobs/log', job_logs),
     path('ui/jobs/manage/job/<int:job_id>', job_edit),
     path('ui/jobs/manage/job', job_edit),
     path('ui/jobs/manage', manage),

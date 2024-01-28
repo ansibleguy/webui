@@ -3,7 +3,7 @@
 <tr hidden="hidden" id="aw-spoiler-{{ job.id }}">
     <td colspan="100%">
         <h2>EXECUTIONS</h2><br>
-{% for execution in executions|get_value:job.id %}
+{% for execution in job_executions %}
         <div>
             {{ execution|execution_info_verbose|safe }}
 {%   set_var execution_results_hosts|get_value:execution.id as execution_hosts %}

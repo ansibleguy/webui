@@ -10,3 +10,13 @@
     that:
       - lookup('ansible.builtin.env', 'TEST1_VAR2') == 'run2'
   when: test == 'run2'
+
+- name: TEST 1 | Sleeping
+  ansible.builtin.pause:
+    seconds: 30
+  when: test == 'run3'
+
+- name: TEST 1 | Fail
+  ansible.builtin.fail:
+    msg: 'Just failing'
+  when: test == 'run4'

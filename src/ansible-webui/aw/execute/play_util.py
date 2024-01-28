@@ -1,20 +1,21 @@
 from pathlib import Path
-from shutil import rmtree, move
+from shutil import rmtree
 from datetime import datetime
 from re import sub as regex_replace
+from os import symlink
 from os import path as os_path
+from os import remove as remove_file
 
 from ansible_runner import Runner, RunnerConfig
 
 from aw.config.main import config, check_config_is_true
 from aw.config.hardcoded import FILE_TIME_FORMAT
-from aw.utils.util import is_set, is_null, datetime_w_tz
+from aw.utils.util import is_set, is_null, datetime_w_tz, write_file_0640
 from aw.utils.handlers import AnsibleConfigError
 from aw.model.job import Job, JobExecution, JobExecutionResult, JobExecutionResultHost, JobError, \
     BaseJobCredentials
 from aw.execute.util import update_execution_status, overwrite_and_delete_file, decode_job_env_vars, \
-    create_dirs, get_pwd_file, get_pwd_file_arg, write_pwd_file
-# from aw.utils.debug import log
+    create_dirs, get_pwd_file, get_pwd_file_arg, write_pwd_file, is_execution_status
 
 # see: https://ansible.readthedocs.io/projects/runner/en/latest/intro/
 
@@ -142,26 +143,34 @@ def runner_prep(job: Job, execution: JobExecution, path_run: Path) -> dict:
     return opts
 
 
-def runner_cleanup(job: Job, execution: JobExecution, path_run: Path, cfg: (RunnerConfig, None)):
+def runner_logs(cfg: RunnerConfig, log_files: dict):
+    logs_src = {
+        'stdout': os_path.join(cfg.artifact_dir, 'stdout'),
+        'stderr': os_path.join(cfg.artifact_dir, 'stderr'),
+    }
+
+    for log_file in log_files.values():
+        write_file_0640(file=log_file, content='')
+
+    # link logs from artifacts to log-directory; have not found a working way of overriding the target files..
+    for log_type in ['stdout', 'stderr']:
+        try:
+            symlink(log_files[log_type], logs_src[log_type])
+
+        except FileExistsError:
+            remove_file(logs_src[log_type])
+            symlink(log_files[log_type], logs_src[log_type])
+
+
+def runner_cleanup(path_run: Path):
     overwrite_and_delete_file(f"{path_run}/env/passwords")
     for attr in BaseJobCredentials.PWD_ATTRS:
         overwrite_and_delete_file(get_pwd_file(path_run=path_run, attr=attr))
 
-    if cfg is not None:
-        # move logs from artifacts to log-directory; have not found a working way of overriding the target files..
-        logs_src = {
-            'stdout': os_path.join(cfg.artifact_dir, 'stdout'),
-            'stderr': os_path.join(cfg.artifact_dir, 'stderr'),
-        }
-        logs_dst = _job_logs(job=job, execution=execution)
-
-        for log_type in ['stdout', 'stderr']:
-            move(logs_src[log_type], logs_dst[log_type])
-
     rmtree(path_run, ignore_errors=True)
 
 
-def _job_logs(job: Job, execution: JobExecution) -> dict:
+def job_logs(job: Job, execution: JobExecution) -> dict:
     safe_job_name = regex_replace(pattern='[^0-9a-zA-Z-_]+', repl='', string=job.name)
     if is_null(execution.user):
         safe_user_name = 'scheduled'
@@ -178,14 +187,8 @@ def _job_logs(job: Job, execution: JobExecution) -> dict:
     }
 
 
-def parse_run_result(execution: JobExecution, time_start: datetime, runner: Runner):
-    job_result = JobExecutionResult(
-        time_start=time_start,
-        time_fin=datetime_w_tz(),
-        failed=runner.errored,
-    )
-    job_result.save()
-
+def _run_stats(runner: Runner, job_result: JobExecutionResult) -> bool:
+    any_task_failed = False
     # https://stackoverflow.com/questions/70348314/get-python-ansible-runner-module-stdout-key-value
     for host in runner.stats['processed']:
         result_host = JobExecutionResultHost(hostname=host)
@@ -199,22 +202,41 @@ def parse_run_result(execution: JobExecution, time_start: datetime, runner: Runn
         result_host.tasks_changed = runner.stats['changed'][host] if host in runner.stats['changed'] else 0
 
         if result_host.tasks_failed > 0:
+            any_task_failed = True
             # todo: create errors
-            pass
 
         result_host.result = job_result
         result_host.save()
 
+    return any_task_failed
+
+
+def parse_run_result(execution: JobExecution, time_start: datetime, runner: Runner):
+    job_result = JobExecutionResult(
+        time_start=time_start,
+        time_fin=datetime_w_tz(),
+        failed=runner.errored,
+    )
+    job_result.save()
+
+    any_task_failed = False
+    if runner.stats is not None:
+        any_task_failed = _run_stats(runner=runner, job_result=job_result)
+
     execution.result = job_result
-    if job_result.failed:
+    if job_result.failed or any_task_failed:
         update_execution_status(execution, status='Failed')
 
     else:
-        update_execution_status(execution, status='Finished')
+        status = 'Finished'
+        if is_execution_status(execution, 'Stopping'):
+            status = 'Stopped'
+
+        update_execution_status(execution, status=status)
 
 
 def failure(
-        job: Job, execution: JobExecution, path_run: Path, cfg: (RunnerConfig, None),
+        execution: JobExecution, path_run: Path,
         time_start: datetime, error_s: str, error_m: str
 ):
     update_execution_status(execution, status='Failed')
@@ -232,4 +254,4 @@ def failure(
     job_result.save()
     execution.result = job_result
     execution.save()
-    runner_cleanup(job=job, execution=execution, path_run=path_run, cfg=cfg)
+    runner_cleanup(path_run)

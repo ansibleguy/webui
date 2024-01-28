@@ -3,13 +3,10 @@ from random import choice as random_choice
 from string import digits, ascii_letters, punctuation
 from datetime import datetime
 from os import remove as remove_file
-from os import path as os_path
-
-from ansible_runner import RunnerConfig
 
 from aw.config.main import config
-from aw.config.hardcoded import FILE_TIME_FORMAT, LOG_TIME_FORMAT
-from aw.utils.util import get_choice_key_by_value, is_null, write_file_0600, write_file_0640, datetime_w_tz
+from aw.config.hardcoded import FILE_TIME_FORMAT
+from aw.utils.util import get_choice_key_by_value, is_null, write_file_0600
 from aw.utils.handlers import AnsibleConfigError
 from aw.model.job import Job, JobExecution, CHOICES_JOB_EXEC_STATUS, BaseJobCredentials
 
@@ -51,6 +48,13 @@ def update_execution_status(execution: JobExecution, status: str):
     execution.save()
 
 
+def is_execution_status(execution: JobExecution, status: str) -> bool:
+    # pylint: disable=E1101
+    is_status = JobExecution.objects.get(id=execution.id).status
+    check_status = get_choice_key_by_value(choices=CHOICES_JOB_EXEC_STATUS, value=status)
+    return is_status == check_status
+
+
 def get_path_run() -> Path:
     # build unique temporary execution directory
     path_run = config['path_run']
@@ -75,13 +79,6 @@ def create_dirs(path: (str, Path), desc: str):
 
     except (OSError, FileNotFoundError):
         raise OSError(f"Unable to created {desc} directory: '{path}'").with_traceback(None) from None
-
-
-def write_stdout_stderr(cfg: RunnerConfig, msg: str, target: str = 'stdout'):
-    write_file_0640(
-        file=os_path.join(cfg.artifact_dir, target),
-        content=f"{datetime_w_tz().strftime(LOG_TIME_FORMAT)} | {msg}\n"
-    )
 
 
 def get_pwd_file(path_run: (str, Path), attr: str) -> str:

@@ -1,6 +1,7 @@
 {% load util %}
 {% load job_util %}
 {%   for job in jobs %}
+{%   set_var executions|get_value:job.id as job_executions %}
 <tr>
     <td>{{ job.name }}</td>
     <td>{{ job.inventory }}</td>
@@ -11,7 +12,7 @@
         <br><i>(disabled)</i>
 {% endif %}
     </td>
-    <td>{{ executions|get_value:job.id|first|execution_info_brief|get_fallback:"-"|safe }}</td>
+    <td>{{ job_executions|first|execution_info_brief|get_fallback:"-"|safe }}</td>
     <td>{{ next_executions|get_value:job.id }}</td>
     <td>
         <a href="/ui/jobs/manage/job/{{ job.id }}">
@@ -25,11 +26,16 @@
         <button class="btn btn-primary aw-btn-action aw-api-click" title="Run" aw-api-endpoint="job" aw-api-item="{{ job.id }}" aw-api-method="post">
             {% include "../button/icon/run.html" %}
         </button>
-        <button class="btn btn-danger aw-btn-action aw-api-click" title="Stop" aw-api-endpoint="job" aw-api-item="{{ job.id }}" aw-api-method="patch">
+        <button class="btn btn-danger aw-btn-action aw-api-click" title="Stop" aw-api-endpoint="job"
+                aw-api-item="{{ job.id }}/{{ job_executions|first|get_value:"id" }}" aw-api-method="delete"
+{% if job_executions|length == 0 %}
+        disabled
+{% endif %}
+        >
             {% include "../button/icon/stop.html" %}
         </button>
         <button class="btn btn-info aw-btn-action aw-btn-expand" title="Expand" aw-expand="aw-spoiler-{{ job.id }}"
-{% if executions|get_value:job.id|length == 0 %}
+{% if job_executions|length == 0 %}
         disabled
 {% endif %}
         >
@@ -37,7 +43,7 @@
         </button>
     </td>
 </tr>
-{% if executions|get_value:job.id|length > 0 %}
+{% if job_executions|length > 0 %}
 {%   include "./manage_job_executions.html" %}
 {% endif %}
 {%   endfor %}

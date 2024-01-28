@@ -3,9 +3,9 @@ import traceback
 from ansible_runner import RunnerConfig, Runner
 
 from aw.model.job import Job, JobExecution
-from aw.execute.play_util import runner_cleanup, runner_prep, parse_run_result, failure
-from aw.execute.util import get_path_run, write_stdout_stderr
-from aw.utils.util import datetime_w_tz, is_null  # get_ansible_versions
+from aw.execute.play_util import runner_cleanup, runner_prep, parse_run_result, failure, runner_logs, job_logs
+from aw.execute.util import get_path_run, is_execution_status
+from aw.utils.util import datetime_w_tz, is_null, timed_lru_cache  # get_ansible_versions
 from aw.utils.handlers import AnsibleConfigError
 from aw.utils.debug import log
 
@@ -22,24 +22,26 @@ def ansible_playbook(job: Job, execution: (JobExecution, None)):
     if is_null(execution):
         execution = JobExecution(user=None, job=job, comment='Scheduled')
 
-    def _cancel_job() -> bool:
-        return job.state_stop
+    log_files = job_logs(job=job, execution=execution)
+    execution.log_stdout = log_files['stdout']
+    execution.log_stderr = log_files['stderr']
 
-    runner_cfg = None
+    @timed_lru_cache(seconds=1)  # check actual status every N seconds; lower DB queries
+    def _cancel_job() -> bool:
+        return is_execution_status(execution, 'Stopping')
+
     try:
         opts = runner_prep(job=job, execution=execution, path_run=path_run)
+        execution.save()
 
-        # todo: fix runner overwriting pre-run logs
         runner_cfg = AwRunnerConfig(**opts)
-        # write_stdout_stderr(config=config, msg=f"VERSIONS: '{get_ansible_versions()}'")
+        runner_logs(cfg=runner_cfg, log_files=log_files)
         runner_cfg.prepare()
         log(msg=f"Running job '{job.name}': '{' '.join(runner_cfg.command)}'", level=5)
-        # write_stdout_stderr(config=config, msg=f"RUNNING COMMAND: '{' '.join(config.command)}'")
 
         runner = Runner(config=runner_cfg, cancel_callback=_cancel_job)
         runner.run()
 
-        write_stdout_stderr(cfg=runner_cfg, msg='PROCESSING RESULT')
         parse_run_result(
             time_start=time_start,
             execution=execution,
@@ -47,13 +49,12 @@ def ansible_playbook(job: Job, execution: (JobExecution, None)):
         )
         del runner
 
-        write_stdout_stderr(cfg=runner_cfg, msg='CLEANUP')
-        runner_cleanup(job=job, execution=execution, path_run=path_run, cfg=runner_cfg)
+        runner_cleanup(path_run)
 
     except (OSError, AnsibleConfigError) as err:
         tb = traceback.format_exc(limit=1024)
         failure(
-            job=job, execution=execution, path_run=path_run, time_start=time_start,
-            error_s=str(err), error_m=tb, cfg=runner_cfg,
+            execution=execution, path_run=path_run, time_start=time_start,
+            error_s=str(err), error_m=tb,
         )
         raise

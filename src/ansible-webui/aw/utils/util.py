@@ -1,8 +1,9 @@
 from platform import python_version
-from datetime import datetime
+from datetime import datetime, timedelta
 from time import time
 from os import open as open_file
 from pathlib import Path
+from functools import lru_cache, wraps
 from pkg_resources import get_distribution
 
 from crontab import CronTab
@@ -92,3 +93,23 @@ def get_ansible_versions() -> str:
             f"Ansible-Core: {get_distribution('ansible-core').version} | "
             f"Ansible-Runner: {get_distribution('ansible-runner').version} |"
             f"Ansible-WebUI: {config['version']}")
+
+
+# source: https://realpython.com/lru-cache-python/
+def timed_lru_cache(seconds: int, maxsize: int = 128):
+    def wrapper_cache(func):
+        func = lru_cache(maxsize=maxsize)(func)
+        func.lifetime = timedelta(seconds=seconds)
+        func.expiration = datetime.utcnow() + func.lifetime
+
+        @wraps(func)
+        def wrapped_func(*args, **kwargs):
+            if datetime.utcnow() >= func.expiration:
+                func.cache_clear()
+                func.expiration = datetime.utcnow() + func.lifetime
+
+            return func(*args, **kwargs)
+
+        return wrapped_func
+
+    return wrapper_cache

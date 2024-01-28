@@ -14,7 +14,6 @@ from aw.utils.crypto import encrypt, decrypt
 class JobError(BareModel):
     short = models.CharField(max_length=100)
     med = models.TextField(max_length=1024, null=True)
-    logfile = models.CharField(max_length=300, **DEFAULT_NONE)
 
     def __str__(self) -> str:
         return f"Job error {self.created}: '{self.short}'"
@@ -155,8 +154,6 @@ def validate_cronjob(value):
 
 
 class Job(BaseJob):
-    state_running = False
-    state_stop = False
     CHANGE_FIELDS = [
         'name', 'inventory', 'playbook', 'schedule', 'enabled', 'limit', 'verbosity', 'mode_diff',
         'mode_check', 'tags', 'tags_skip', 'verbosity', 'comment', 'environment_vars', 'cmd_args',
@@ -314,6 +311,8 @@ CHOICES_JOB_EXEC_STATUS = [
     (2, 'Running'),
     (3, 'Failed'),
     (4, 'Finished'),
+    (5, 'Stopping'),
+    (6, 'Stopped'),
 ]
 
 
@@ -332,6 +331,8 @@ class JobExecution(BaseJob):
     user_credentials = models.ForeignKey(
         Job, on_delete=models.SET_NULL, related_name='jobexec_fk_usercreds', **DEFAULT_NONE,
     )
+    log_stdout = models.CharField(max_length=300, **DEFAULT_NONE)
+    log_stderr = models.CharField(max_length=300, **DEFAULT_NONE)
 
     def __str__(self) -> str:
         # pylint: disable=E1101

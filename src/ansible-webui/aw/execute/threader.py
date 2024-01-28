@@ -10,7 +10,7 @@ from aw.config.hardcoded import THREAD_JOIN_TIMEOUT
 from aw.model.job import Job, JobExecution
 from aw.execute.play import ansible_playbook
 from aw.utils.handlers import AnsibleConfigError
-from aw.utils.util import get_next_cron_execution_sec, get_next_cron_execution_str
+from aw.utils.util import get_next_cron_execution_sec, get_next_cron_execution_str, is_set
 
 
 class Workload(Thread):
@@ -41,7 +41,8 @@ class Workload(Thread):
                 log(f"Unable to join thread {self.log_name_debug}", level=5)
 
         except RuntimeError:
-            log(f"Got error stopping thread {self.log_name_debug}", level=6)
+            # 'cannot join current thread'
+            pass
 
         log(f"Stopped thread {self.log_name_debug}", level=4)
         self.started = False
@@ -49,10 +50,7 @@ class Workload(Thread):
         return True
 
     def run_playbook(self):
-        self.job.state_running = True
         ansible_playbook(job=self.job, execution=self.execution)
-        self.job.state_running = False
-        self.job.state_stop = False
 
     def run(self, error: bool = False) -> None:
         if self.once and self.started:
@@ -131,7 +129,8 @@ class ThreadManager:
                 thread.start()
 
     def add_thread(self, job: Job, execution: JobExecution = None, once: bool = False):
-        log(f"Adding thread for \"{job.name}\" with schedule \"{job.schedule}\"", level=7)
+        schedule = f" with schedule \"{job.schedule}\"" if is_set(job.schedule) else ''
+        log(f"Adding thread for \"{job.name}\"{schedule}", level=7)
         self.thread_nr += 1
         self.threads.add(
             Workload(

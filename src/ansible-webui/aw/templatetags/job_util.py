@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from django import template
 
 from aw.model.job import JobExecution, CHOICES_JOB_EXEC_STATUS
@@ -19,19 +21,12 @@ def _execution_info(execution: JobExecution) -> dict:
         if execution.result.error.med is not None:
             error_m = f"<br><b>Error full</b>:<div class=\"code\">{execution.result.error.med}</div>"
 
-        logfile = execution.result.error.logfile
-        if is_null(logfile):
-            logfile = ''
-        else:
-            logfile = f"<br><b>Logfile</b>: <a href=file://{logfile}>{logfile}</a>"
-
         return {
             'time_start': datetime_from_db(execution.result.time_start).strftime(SHORT_TIME_FORMAT),
             'time_fin': datetime_from_db(execution.result.time_fin).strftime(SHORT_TIME_FORMAT),
             'failed': execution.result.failed,
             'error_s': execution.result.error.short,
             'error_m': error_m,
-            'error_l': logfile,
             **base,
         }
 
@@ -68,10 +63,38 @@ def execution_info_verbose(execution: JobExecution) -> (str, None):
     info = _execution_info(execution)
 
     if execution.result is not None and execution.result.error is not None:
-        error = f"<br><br><b>Error</b>: <code>{info['error_s']}</code>{info['error_m']}{info['error_l']}"
+        error = f"<br><br><b>Error</b>: <code>{info['error_s']}</code>{info['error_m']}"
     else:
         error = ''
 
+    if not execution_logfile_exists(execution):
+        stdout = None
+    else:
+        stdout = '<a href="file://' + execution.log_stdout + '">Output</a>'
+
+    if not execution_logfile_exists(execution, 'log_stderr'):
+        stderr = None
+    else:
+        stderr = '<a href="file://' + execution.log_stderr + '">Error</a>'
+
+    logs = ''
+    if stdout is not None or stderr is not None:
+        logs = '<br><b>Logs</b>:'
+        if stdout is not None:
+            logs += f' {stdout}'
+        if stderr is not None:
+            logs += f' {stderr}'
+
     return (f"<hr><b>Start time</b>: {info['time_start']}<br><b>Finish time</b>: {info['time_fin']}<br>"
             f"<b>Executed by</b>: '{info['user']}'<br><b>Status</b>: "
-            f"<span class=\"aw-job-status aw-job-status-{info['status'].lower()}\">{info['status']}</span>{error}")
+            f"<span class=\"aw-job-status aw-job-status-{info['status'].lower()}\">{info['status']}</span>"
+            f"{logs}{error}")
+
+
+@register.filter
+def execution_logfile_exists(execution: JobExecution, attr: str = 'log_stdout') -> bool:
+    log_attr = getattr(execution, attr)
+    if is_null(log_attr):
+        return False
+
+    return Path(log_attr).is_file()

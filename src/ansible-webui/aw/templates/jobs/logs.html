@@ -1,0 +1,57 @@
+{% extends "../body.html" %}
+{% load static %}
+{% load util %}
+{% load job_util %}
+{% block content %}
+<script src="{% static 'js/jobs/logs.js' %}"></script>
+{# todo: build table using ajax to allow dynamic search #}
+<div class="table-responsive aw-data">
+    <table class="table table-striped aw-text-responsive">
+        <tr>
+            <th>Run</th>
+            <th>Job</th>
+            <th>Comment</th>
+            <th>Show Logs</th>
+        </tr>
+{%   if executions|length == 0 %}
+        <tr>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+        </tr>
+{%   endif %}
+{%   for execution in executions %}
+        <tr>
+            <td>{{ execution|execution_info_brief|get_fallback:"-"|safe }}</td>
+            <td>{{ execution.job.name }}</td>
+            <td>{{ execution.job.comment|get_fallback:"-" }}</td>
+            <td>
+                <button class="btn btn-info aw-btn-action aw-btn-expand aw-log-read" title="Show Logs"
+                        aw-expand="aw-spoiler-{{ execution.id }}" aw-log="aw-execution-logs-{{ execution.id }}"
+                        aw-job="{{ execution.job.id }}" aw-exec="{{ execution.id }}"
+{% if not execution|execution_logfile_exists %}
+                disabled
+{% endif %}
+                >
+                    {% include "../button/icon/expand.html" %}
+                </button>
+            </td>
+        </tr>
+        <tr hidden="hidden" id="aw-spoiler-{{ execution.id }}">
+            <td colspan="100%">
+                <div>
+                    <b>LOG FILES</b>:
+                    <a href="file://{{ execution.log_stdout }}">Output</a>,
+                    <a href="file://{{ execution.log_stderr }}">Error</a>
+                </div>
+                <div id="aw-execution-logs-{{ execution.id }}" class="aw-execution-logs"></div>
+                <div>
+                    <button type="submit" title="Collapse" class="btn btn-info aw-btn-action aw-btn-collapse" aw-collapse="aw-spoiler-{{ execution.id }}">
+                        {% include "../button/icon/collapse.html" %}
+                    </button>
+                </div>
+            </td>
+        </tr>
+{%   endfor %}
+{% endblock %}

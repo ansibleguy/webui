@@ -5,8 +5,8 @@ NAVIGATION = {
         # 'Dashboard': '/ui/',
         'Jobs': {
             'Manage': '/ui/jobs/manage',
+            'Logs': '/ui/jobs/log',
             # 'Queue': '/ui/jobs/queue',
-            # 'Logs': '/ui/jobs/log',
         },
         'Settings': {
             'API Keys': '/ui/settings/api_keys',
