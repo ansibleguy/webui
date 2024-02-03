@@ -28,21 +28,34 @@ function replaceLineColors(rawLines) {
     return fixedLines
 }
 
+function addLogLines($this) {
+    let logParentElement = $this.attr("aw-expand");
+    let logElement = $this.attr("aw-log");
+    let logElementEnd = document.getElementById($this.attr("aw-log-end"));
+    let job_id = $this.attr("aw-job");
+    let exec_id = $this.attr("aw-exec");
+    let hidden = document.getElementById(logParentElement).getAttribute("hidden");
+    let logLineStart = $this.attr("aw-log-line");
+    if(typeof logLineStart === "undefined") {
+        logLineStart = 0;
+    }
+    if (!hidden) {
+        $.get("/api/job/" + job_id + "/" + exec_id + "/" + logLineStart, function(data) {
+          let element = document.getElementById(logElement);
+          element.innerHTML += replaceLineColors(data.lines).join('');
+          if (data.lines.length > 0) {
+            $this.attr("aw-log-line", parseInt(logLineStart) + data.lines.length);
+            logElementEnd.scrollIntoView({ behavior: "smooth", block: "end", inline: "end" });
+          }
+        });
+    };
+}
+
 $( document ).ready(function() {
     $(".aw-main").on("click", ".aw-log-read", function(){
-        let logElement = $(this).attr("aw-log");
-        let job_id = $(this).attr("aw-job");
-        let exec_id = $(this).attr("aw-exec");
-        // let lineStart = $(this).attr("aw-line-start");
-        // if(typeof lineStart === "undefined") {
-        //     lineStart = 0;
-        // }
-        let lineStart = 0;
-        $.get("/api/job/" + job_id + "/" + exec_id + "/" + lineStart, function( data ) {
-          let element = document.getElementById(logElement);
-          // todo: change to '+=' once line counter works (add only new lines)
-          element.innerHTML = replaceLineColors(data.lines).join('');
-          // $(this).attr("aw-line-start", lineStart+data.lines.length);
-        });
+        $this = jQuery(this);
+        addLogLines($this);
+        refreshSec = 1;
+        setInterval('addLogLines($this)', (refreshSec * 1000));
     });
 });

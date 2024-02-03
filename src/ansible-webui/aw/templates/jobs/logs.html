@@ -5,6 +5,12 @@
 {% block content %}
 <script src="{% static 'js/jobs/logs.js' %}"></script>
 {# todo: build table using ajax to allow dynamic search #}
+<a href="/ui/jobs/manage">
+    <button class="btn btn-info aw-btn-action" title="Manage">
+        {% include "../button/icon/return.html" %}
+    </button>
+</a>
+{% include "../button/refresh.html" %}
 <div class="table-responsive aw-data">
     <table class="table table-striped aw-text-responsive">
         <tr>
@@ -29,7 +35,8 @@
             <td>
                 <button class="btn btn-info aw-btn-action aw-btn-expand aw-log-read" title="Show Logs"
                         aw-expand="aw-spoiler-{{ execution.id }}" aw-log="aw-execution-logs-{{ execution.id }}"
-                        aw-job="{{ execution.job.id }}" aw-exec="{{ execution.id }}"
+                        aw-job="{{ execution.job.id }}" aw-exec="{{ execution.id }}" aw-log-line="0"
+                        aw-log-end="aw-log-end-{{ execution.id }}"
 {% if not execution|execution_logfile_exists %}
                 disabled
 {% endif %}
@@ -47,7 +54,8 @@
                 </div>
                 <div id="aw-execution-logs-{{ execution.id }}" class="aw-execution-logs"></div>
                 <div>
-                    <button type="submit" title="Collapse" class="btn btn-info aw-btn-action aw-btn-collapse" aw-collapse="aw-spoiler-{{ execution.id }}">
+                    <button type="submit" title="Collapse" class="btn btn-info aw-btn-action aw-btn-collapse" aw-collapse="aw-spoiler-{{ execution.id }}"
+                    id="aw-log-end-{{ execution.id }}">
                         {% include "../button/icon/collapse.html" %}
                     </button>
                 </div>

@@ -106,10 +106,17 @@ def job_edit(request, job_id: int = None) -> HttpResponse:
 
 
 @ui_endpoint_wrapper_kwargs
-def job_logs(request) -> HttpResponse:
+def job_logs(request, job_id: int = None) -> HttpResponse:
     # pylint: disable=E1101
     jobs_viewable = get_viewable_jobs(request.user)
-    executions = JobExecution.objects.filter().order_by('-updated')[:LIMIT_JOB_LOG_RESULTS]
+    if job_id is not None:
+        jobs_viewable = [job for job in jobs_viewable if job.id == job_id]
+        executions = []
+        if len(jobs_viewable) != 0:
+            executions = JobExecution.objects.filter(job=jobs_viewable[0]).order_by('-updated')[:LIMIT_JOB_LOG_RESULTS]
+
+    else:
+        executions = JobExecution.objects.filter().order_by('-updated')[:LIMIT_JOB_LOG_RESULTS]
 
     return render(
         request, status=200, template_name='jobs/logs.html',
@@ -119,6 +126,7 @@ def job_logs(request) -> HttpResponse:
 
 urlpatterns_jobs = [
     path('ui/jobs/log', job_logs),
+    path('ui/jobs/log/<int:job_id>', job_logs),
     path('ui/jobs/manage/job/<int:job_id>', job_edit),
     path('ui/jobs/manage/job', job_edit),
     path('ui/jobs/manage', manage),

@@ -34,6 +34,11 @@
         >
             {% include "../button/icon/stop.html" %}
         </button>
+        <a href="/ui/jobs/log/{{ job.id }}">
+            <button class="btn btn-info aw-btn-action" title="Logs">
+                <i class="fas fa-magnifying-glass fa-2x aw-btn-action-icon"></i>
+            </button>
+        </a>
         <button class="btn btn-info aw-btn-action aw-btn-expand" title="Expand" aw-expand="aw-spoiler-{{ job.id }}"
 {% if job_executions|length == 0 %}
         disabled
