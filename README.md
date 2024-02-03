@@ -128,7 +128,7 @@ There are multiple Ansible WebUI products - how do they compare to this product?
 
       Status, Execute, Time of last & next execution, Last run User, Links to Warnings/Errors
 
-  - [y] Job Output
+  - [x] Job Output
 
       Follow the jobs output in realtime
 
