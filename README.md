@@ -112,15 +112,15 @@ There are multiple Ansible WebUI products - how do they compare to this product?
 
     - [ ] Support for [ad-hoc commands](https://docs.ansible.com/ansible/latest/command_guide/intro_adhoc.html)
 
-  - [ ] Job Logging
+  - [x] Job Logging
 
     - [x] Write job metadata to database
 
-    - [ ] Write full job-logs to Filesystem
+    - [x] Write full job-logs to Filesystem
 
   - [x] Secret handling (Connect, Become, Vault)
 
-    - [ ] User-specific credentials
+    - [ ] User-specific job credentials
 
 - [ ] WebUI
 
@@ -128,7 +128,7 @@ There are multiple Ansible WebUI products - how do they compare to this product?
 
       Status, Execute, Time of last & next execution, Last run User, Links to Warnings/Errors
 
-  - [ ] Job Output
+  - [y] Job Output
 
       Follow the jobs output in realtime
 
