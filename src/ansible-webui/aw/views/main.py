@@ -32,6 +32,7 @@ def api_docs(request) -> HttpResponse:
     })
 
 
+@login_required
 @ui_endpoint_wrapper
 def not_implemented(request) -> HttpResponse:
     return render(request, status=404, template_name='fallback.html', context={'content': 'Not yet implemented'})
@@ -45,6 +46,7 @@ def catchall(request) -> HttpResponse:
     return redirect(LOGIN_PATH)
 
 
+@login_required
 @ui_endpoint_wrapper
 def logout(request) -> HttpResponse:
     return logout_then_login(request)

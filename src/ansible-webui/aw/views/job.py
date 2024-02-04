@@ -3,6 +3,7 @@ from django.shortcuts import HttpResponse
 from django.urls import path
 from django.forms import ModelForm, CharField
 from django.core.validators import RegexValidator
+from django.contrib.auth.decorators import login_required
 
 from aw.utils.http import ui_endpoint_wrapper, ui_endpoint_wrapper_kwargs
 from aw.model.job import Job, JobExecution, CHOICE_JOB_PERMISSION_WRITE, JobExecutionResultHost
@@ -14,6 +15,7 @@ LIMIT_JOB_RESULTS = 10
 LIMIT_JOB_LOG_RESULTS = 50
 
 
+@login_required
 @ui_endpoint_wrapper
 def manage(request) -> HttpResponse:
     jobs_viewable = get_viewable_jobs(request.user)
@@ -74,6 +76,7 @@ class JobForm(ModelForm):
     )
 
 
+@login_required
 @ui_endpoint_wrapper_kwargs
 def job_edit(request, job_id: int = None) -> HttpResponse:
     job_form = JobForm()
@@ -105,6 +108,7 @@ def job_edit(request, job_id: int = None) -> HttpResponse:
     )
 
 
+@login_required
 @ui_endpoint_wrapper_kwargs
 def job_logs(request, job_id: int = None) -> HttpResponse:
     # pylint: disable=E1101
