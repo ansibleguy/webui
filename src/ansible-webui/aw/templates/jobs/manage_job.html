@@ -1,19 +1,19 @@
 {% load util %}
 {% load job_util %}
-{%   for job in jobs %}
+{% for job in jobs %}
 {%   set_var executions|get_value:job.id as job_executions %}
 <tr>
     <td>{{ job.name }}</td>
-    <td>{{ job.inventory }}</td>
-    <td>{{ job.playbook }}</td>
-    <td>{{ job.comment|get_fallback:"-" }}</td>
+    <td class="aw-responsive-lg">{{ job.inventory }}</td>
+    <td class="aw-responsive-lg">{{ job.playbook }}</td>
+    <td class="aw-responsive-lg">{{ job.comment|get_fallback:"-" }}</td>
     <td>{{ job.schedule|get_fallback:"-" }}
-{% if job.schedule|exists and not job.enabled %}
+{%   if job.schedule|exists and not job.enabled %}
         <br><i>(disabled)</i>
-{% endif %}
+{%   endif %}
     </td>
     <td>{{ job_executions|first|execution_info_brief|get_fallback:"-"|safe }}</td>
-    <td>{{ next_executions|get_value:job.id }}</td>
+    <td class="aw-responsive-med">{{ next_executions|get_value:job.id }}</td>
     <td>
         <a href="/ui/jobs/manage/job/{{ job.id }}">
             <button class="btn btn-warning aw-btn-action" title="Edit">
@@ -28,9 +28,9 @@
         </button>
         <button class="btn btn-danger aw-btn-action aw-api-click" title="Stop" aw-api-endpoint="job"
                 aw-api-item="{{ job.id }}/{{ job_executions|first|get_value:"id" }}" aw-api-method="delete"
-{% if job_executions|length == 0 %}
+{%   if job_executions|length == 0 %}
         disabled
-{% endif %}
+{%   endif %}
         >
             {% include "../button/icon/stop.html" %}
         </button>
@@ -40,15 +40,15 @@
             </button>
         </a>
         <button class="btn btn-info aw-btn-action aw-btn-expand" title="Expand" aw-expand="aw-spoiler-{{ job.id }}"
-{% if job_executions|length == 0 %}
+{%   if job_executions|length == 0 %}
         disabled
-{% endif %}
+{%   endif %}
         >
             {% include "../button/icon/expand.html" %}
         </button>
     </td>
 </tr>
-{% if job_executions|length > 0 %}
+{%   if job_executions|length > 0 %}
 {%   include "./manage_job_executions.html" %}
-{% endif %}
-{%   endfor %}
+{%   endif %}
+{% endfor %}

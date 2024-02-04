@@ -105,11 +105,11 @@ iframe {
 .aw-login {
     margin-left: auto;
     margin-right: auto;
-    width: 40vw;
+    width: 25vw;
 }
 
 .aw-login-fields {
-    width: 40vw;
+    width: 100%;
     box-sizing: border-box;
     color: var(--tc1);
     width: 100% !important;

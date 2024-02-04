@@ -10,6 +10,10 @@
     form .form-control {
         width: 35vw;
     }
+
+    .aw-responsive-lg {
+        display: none;
+    }
 }
 
 @media only screen and (max-width: 991px) {
@@ -49,6 +53,13 @@
         width: 50vw;
     }
 
+    .aw-responsive-lg {
+        display: none;
+    }
+
+    .aw-responsive-med {
+        display: none;
+    }
 }
 
 @media only screen and (max-width: 500px) {  /* mobile devices */
@@ -81,10 +92,26 @@
         width: 70vw;
     }
 
+    .aw-responsive-lg {
+        display: none;
+    }
+
+    .aw-responsive-med {
+        display: none;
+    }
+
 }
 
 @include media-breakpoint-between(xs,sm){
-  .btn {
-      @include button-size($btn-padding-y-sm, $btn-padding-x-sm, $font-size-sm, $btn-border-radius-sm);
-  }
+    .btn {
+        @include button-size($btn-padding-y-sm, $btn-padding-x-sm, $font-size-sm, $btn-border-radius-sm);
+    }
+
+    .aw-responsive-lg {
+        display: none;
+    }
+
+    .aw-responsive-med {
+        display: none;
+    }
 }
