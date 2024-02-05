@@ -113,3 +113,12 @@ def timed_lru_cache(seconds: int, maxsize: int = 128):
         return wrapped_func
 
     return wrapper_cache
+
+
+def get_choice_by_value(choices: (tuple, list), value: any) -> (any, None):
+    # tuple[tuple[int, any]]
+    for choice in choices:
+        if choice[0] == value:
+            return choice[1]
+
+    return None

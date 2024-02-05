@@ -7,9 +7,9 @@ from drf_spectacular.utils import extend_schema, OpenApiResponse
 
 from aw.model.job import Job, JobExecution, BaseJobCredentials, \
     CHOICE_JOB_PERMISSION_READ, CHOICE_JOB_PERMISSION_WRITE, CHOICE_JOB_PERMISSION_EXECUTE
-from aw.api_endpoints.base import API_PERMISSION, get_api_user, BaseResponse
-from aw.api_endpoints.job_util import get_viewable_jobs_serialized, job_action_allowed, \
-    JobReadResponse
+from aw.api_endpoints.base import API_PERMISSION, get_api_user, BaseResponse, GenericResponse
+from aw.api_endpoints.job_util import get_viewable_jobs_serialized, JobReadResponse
+from aw.utils.permission import job_action_allowed
 from aw.execute.queue import queue_add
 from aw.execute.util import update_execution_status, is_execution_status
 from aw.utils.util import is_null
@@ -25,10 +25,6 @@ class JobWriteRequest(serializers.ModelSerializer):
     vault_pass = serializers.CharField(max_length=100, required=False, default=None)
     become_pass = serializers.CharField(max_length=100, required=False, default=None)
     connect_pass = serializers.CharField(max_length=100, required=False, default=None)
-
-
-class JobWriteResponse(BaseResponse):
-    msg = serializers.CharField()
 
 
 def _find_job(job_id: int) -> (Job, None):
@@ -60,10 +56,10 @@ class APIJob(APIView):
         return Response(data=get_viewable_jobs_serialized(get_api_user(request)), status=200)
 
     @extend_schema(
-        request=None,
+        request=JobWriteRequest,
         responses={
-            200: OpenApiResponse(JobWriteResponse, description='Job created'),
-            400: OpenApiResponse(JobWriteResponse, description='Invalid job data provided'),
+            200: OpenApiResponse(GenericResponse, description='Job created'),
+            400: OpenApiResponse(GenericResponse, description='Invalid job data provided'),
         },
         summary='Create a new job.',
         operation_id='job_create'
@@ -97,7 +93,7 @@ class APIJob(APIView):
 
 class APIJobItem(APIView):
     http_method_names = ['get', 'delete', 'put', 'post']
-    serializer_class = JobWriteResponse
+    serializer_class = GenericResponse
     permission_classes = API_PERMISSION
 
     @extend_schema(
@@ -124,9 +120,9 @@ class APIJobItem(APIView):
     @extend_schema(
         request=None,
         responses={
-            200: OpenApiResponse(JobWriteResponse, description='Job deleted'),
-            403: OpenApiResponse(JobWriteResponse, description='Not privileged to delete the job'),
-            404: OpenApiResponse(JobWriteResponse, description='Job does not exist'),
+            200: OpenApiResponse(GenericResponse, description='Job deleted'),
+            403: OpenApiResponse(GenericResponse, description='Not privileged to delete the job'),
+            404: OpenApiResponse(GenericResponse, description='Job does not exist'),
         },
         summary='Delete an existing job.',
         operation_id='job_delete'
@@ -149,12 +145,12 @@ class APIJobItem(APIView):
         return Response(data={'msg': f"Job with ID {job_id} does not exist"}, status=404)
 
     @extend_schema(
-        request=None,
+        request=JobWriteRequest,
         responses={
-            200: OpenApiResponse(JobWriteResponse, description='Job updated'),
-            400: OpenApiResponse(JobWriteResponse, description='Invalid job data provided'),
-            403: OpenApiResponse(JobWriteResponse, description='Not privileged to modify the job'),
-            404: OpenApiResponse(JobWriteResponse, description='Job does not exist'),
+            200: OpenApiResponse(GenericResponse, description='Job updated'),
+            400: OpenApiResponse(GenericResponse, description='Invalid job data provided'),
+            403: OpenApiResponse(GenericResponse, description='Not privileged to modify the job'),
+            404: OpenApiResponse(GenericResponse, description='Job does not exist'),
         },
         summary='Modify an existing job.',
         operation_id='job_edit'
@@ -230,7 +226,7 @@ class APIJobItem(APIView):
 
 class APIJobExecutionItem(APIView):
     http_method_names = ['delete']
-    serializer_class = JobWriteResponse
+    serializer_class = GenericResponse
     permission_classes = API_PERMISSION
 
     @extend_schema(

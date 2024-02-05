@@ -7,7 +7,7 @@ from drf_spectacular.utils import extend_schema, OpenApiResponse
 from aw.utils.util import datetime_w_tz
 from aw.config.hardcoded import KEY_TIME_FORMAT
 from aw.model.api import AwAPIKey
-from aw.api_endpoints.base import API_PERMISSION, get_api_user, BaseResponse
+from aw.api_endpoints.base import API_PERMISSION, get_api_user, BaseResponse, GenericResponse
 
 
 # todo: allow user to add comment to easier identify token
@@ -50,28 +50,24 @@ class APIKey(APIView):
         return Response({'token': token, 'key': key})
 
 
-class KeyDeleteResponse(BaseResponse):
-    msg = serializers.CharField()
-
-
 class APIKeyItem(APIView):
     http_method_names = ['delete']
-    serializer_class = KeyDeleteResponse
+    serializer_class = GenericResponse
     permission_classes = API_PERMISSION
 
     @extend_schema(
         request=None,
         responses={
-            200: OpenApiResponse(response=KeyDeleteResponse, description='API key deleted'),
-            404: OpenApiResponse(response=KeyDeleteResponse, description='API key does not exist'),
+            200: OpenApiResponse(response=GenericResponse, description='API key deleted'),
+            404: OpenApiResponse(response=GenericResponse, description='API key does not exist'),
         },
         summary='Delete one of the existing API keys of the current user.',
     )
     def delete(self, request, token: str):
         try:
-            result = AwAPIKey.objects.filter(user=get_api_user(request), name=token)
+            result = AwAPIKey.objects.get(user=get_api_user(request), name=token)
 
-            if result.exists():
+            if result is not None:
                 result.delete()
                 return Response(data={'msg': 'API key deleted'}, status=200)
 

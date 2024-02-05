@@ -7,7 +7,7 @@ from django.utils import timezone
 
 from aw.model.base import BareModel, BaseModel, CHOICES_BOOL, DEFAULT_NONE
 from aw.config.hardcoded import SHORT_TIME_FORMAT
-from aw.utils.util import is_null
+from aw.utils.util import is_null, get_choice_by_value
 from aw.utils.crypto import encrypt, decrypt
 
 
@@ -196,6 +196,11 @@ CHOICES_JOB_PERMISSION = (
 
 
 class JobPermission(BaseModel):
+    form_fields = ['name', 'permission', 'jobs', 'users', 'groups']
+    api_fields_write = form_fields
+    api_fields_read = ['permission_name', 'jobs_name', 'users_name', 'groups_name']
+    api_fields_read.extend(form_fields)
+
     name = models.CharField(max_length=100)
     permission = models.PositiveSmallIntegerField(choices=CHOICES_JOB_PERMISSION, default=0)
     users = models.ManyToManyField(
@@ -208,9 +213,15 @@ class JobPermission(BaseModel):
         through='JobPermissionMemberGroup',
         through_fields=('permission', 'group'),
     )
+    jobs = models.ManyToManyField(
+        Job,
+        through='JobPermissionMapping',
+        through_fields=('permission', 'job'),
+    )
 
     def __str__(self) -> str:
-        return f"Permission '{self.name}' - {self.permission}"
+        return (f"Permission '{self.name}' - "
+                f"{get_choice_by_value(choices=CHOICES_JOB_PERMISSION, value=self.permission)}")
 
     class Meta:
         constraints = [

@@ -36,3 +36,7 @@ class BaseResponse(serializers.Serializer):
 
     def update(self, instance, validated_data):
         pass
+
+
+class GenericResponse(BaseResponse):
+    msg = serializers.CharField()

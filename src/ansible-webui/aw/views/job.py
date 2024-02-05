@@ -7,7 +7,8 @@ from django.contrib.auth.decorators import login_required
 
 from aw.utils.http import ui_endpoint_wrapper, ui_endpoint_wrapper_kwargs
 from aw.model.job import Job, JobExecution, CHOICE_JOB_PERMISSION_WRITE, JobExecutionResultHost
-from aw.api_endpoints.job_util import get_viewable_jobs, job_action_allowed
+from aw.api_endpoints.job_util import get_viewable_jobs
+from aw.utils.permission import job_action_allowed
 from aw.config.form_metadata import FORM_LABEL, FORM_HELP
 from aw.utils.util import get_next_cron_execution_str
 
@@ -101,7 +102,6 @@ def job_edit(request, job_id: int = None) -> HttpResponse:
         template_name='forms/snippet.html',
         context={'form': job_form, 'existing': job},
     )
-    # job_form_html = job_form.render(template_name='forms/snippet.html', context={'existing': job})
     return render(
         request, status=200, template_name='jobs/edit.html',
         context={'form': job_form_html, 'form_api': form_api, 'form_method': form_method}
@@ -129,8 +129,8 @@ def job_logs(request, job_id: int = None) -> HttpResponse:
 
 
 urlpatterns_jobs = [
-    path('ui/jobs/log', job_logs),
     path('ui/jobs/log/<int:job_id>', job_logs),
+    path('ui/jobs/log', job_logs),
     path('ui/jobs/manage/job/<int:job_id>', job_edit),
     path('ui/jobs/manage/job', job_edit),
     path('ui/jobs/manage', manage),
