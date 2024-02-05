@@ -89,6 +89,8 @@ Environmental variables
    If defined - the built-in static-file serving is disabled.
    Use this if in production and a `proxy like nginx <https://docs.nginx.com/nginx/admin-guide/web-server/serving-static-content/>`_ is in front of the Ansible-WebUI webservice.
 
+   Path to serve: :code:`${PATH_VENV}/lib/python${PY_VERSION}/site-packages/ansible-webui/aw/static/`
+
 
 * **AW_DB**
 
