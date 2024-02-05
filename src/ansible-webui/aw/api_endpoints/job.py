@@ -60,11 +60,15 @@ class APIJob(APIView):
         responses={
             200: OpenApiResponse(GenericResponse, description='Job created'),
             400: OpenApiResponse(GenericResponse, description='Invalid job data provided'),
+            403: OpenApiResponse(GenericResponse, description='Not privileged to create jobs'),
         },
         summary='Create a new job.',
         operation_id='job_create'
     )
     def post(self, request):
+        if not get_api_user(request).is_superuser:
+            return Response(data={'msg': 'Not privileged to create jobs'}, status=403)
+
         serializer = JobWriteRequest(data=request.data)
 
         if not serializer.is_valid():
@@ -100,9 +104,10 @@ class APIJobItem(APIView):
         request=None,
         responses={
             200: OpenApiResponse(JobReadResponse, description='Return job information'),
+            403: OpenApiResponse(GenericResponse, description='Not privileged to view the job'),
             404: OpenApiResponse(JobReadResponse, description='Job does not exist'),
         },
-        summary='Return information about an existing job.',
+        summary='Return information about a job.',
         operation_id='job_view'
     )
     def get(self, request, job_id: int):

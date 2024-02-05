@@ -184,7 +184,7 @@ class APIPermissionItem(GenericAPIView):
     @extend_schema(
         request=None,
         responses={200: PermissionReadResponse},
-        summary='Return information of permission.',
+        summary='Return information of a permission.',
     )
     def get(request, perm_id: int):
         del request

@@ -12,8 +12,8 @@ urlpatterns_api = [
     path('api/job/<int:job_id>/<int:exec_id>', APIJobExecutionItem.as_view()),
     path('api/job/<int:job_id>', APIJobItem.as_view()),
     path('api/job', APIJob.as_view()),
-    path('api/setting/permission/<int:perm_id>', APIPermissionItem.as_view()),
-    path('api/setting/permission', APIPermission.as_view()),
+    path('api/permission/<int:perm_id>', APIPermissionItem.as_view()),
+    path('api/permission', APIPermission.as_view()),
     path('api/_schema/', SpectacularAPIView.as_view(), name='_schema'),
     path('api/_docs', SpectacularSwaggerView.as_view(url_name='_schema'), name='swagger-ui'),
 ]
