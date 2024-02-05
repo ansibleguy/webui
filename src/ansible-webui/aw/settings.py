@@ -23,7 +23,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django_user_agents',
     # api
     'rest_framework',
     'rest_framework_api_key',
@@ -39,7 +38,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django_user_agents.middleware.UserAgentMiddleware',
     'django_auto_logout.middleware.auto_logout',
 ]
 CSRF_TRUSTED_ORIGINS = [
