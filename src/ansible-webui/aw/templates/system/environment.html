@@ -36,7 +36,7 @@
             </tr>
 {% for setting, attrs in env_ansible_config.items %}
             <tr>
-                <td>{{ setting }}</td>
+                <td><a href="{{ attrs.url }}">{{ setting }}</a></td>
                 <td>{{ attrs.value }}</td>
                 <td>{{ attrs.comment }}</td>
             </tr>
@@ -54,7 +54,7 @@
             </tr>
 {% for name, attrs in env_ansible_collections.items %}
             <tr>
-                <td>{{ name }}</td>
+                <td><a href="{{ attrs.url }}/">{{ name }}</a></td>
                 <td>{{ attrs.version }}</td>
                 <td>{{ attrs.path }}</td>
             </tr>
@@ -71,7 +71,7 @@
             </tr>
 {% for name, version in env_pip.items %}
             <tr>
-                <td>{{ name }}</td>
+                <td><a href="https://pypi.org/project/{{ name }}/">{{ name }}</a></td>
                 <td>{{ version }}</td>
             </tr>
 {% endfor %}

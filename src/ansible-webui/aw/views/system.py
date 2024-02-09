@@ -26,6 +26,8 @@ def _parsed_ansible_collections() -> dict:
 
         name, version = line.split(' ', 1)
         name, version = name.strip(), version.strip()
+        url = f"https://galaxy.ansible.com/ui/repo/published/{name.replace('.', '/')}"
+
         if name in collections:
             if name in col_counter:
                 col_counter[name] += 1
@@ -34,7 +36,7 @@ def _parsed_ansible_collections() -> dict:
 
             name = f'{name} ({col_counter[name]})'
 
-        collections[name] = {'version': version, 'path': collection_path}
+        collections[name] = {'version': version, 'path': collection_path, 'url': url}
 
     return dict(sorted(collections.items()))
 
@@ -58,7 +60,10 @@ def _parsed_ansible_config() -> dict:
         except ValueError:
             setting, comment = setting_comment, '-'
 
-        config[setting] = {'value': value, 'comment': comment}
+        url = ("https://docs.ansible.com/ansible/latest/reference_appendices/config.html#"
+               f"{setting.lower().replace('_', '-')}")
+
+        config[setting] = {'value': value, 'comment': comment, 'url': url}
 
     return dict(sorted(config.items()))
 

@@ -4,7 +4,6 @@ Django==4.*
 pycryptodome
 pytz
 pyyaml
-ua-parser
 django-auto-logout
 pycryptodome
 
