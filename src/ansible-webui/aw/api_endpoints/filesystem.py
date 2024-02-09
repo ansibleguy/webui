@@ -1,6 +1,7 @@
 from os import listdir
 from os import path as os_path
 from pathlib import Path
+from functools import cache
 
 from rest_framework.views import APIView
 from rest_framework import serializers
@@ -24,6 +25,11 @@ class APIFsBrowse(APIView):
         'playbook_file': config['path_play'],
         'inventory_file': config['path_play'],
     }
+
+    @staticmethod
+    @cache
+    def _listdir(path: str) -> list[str]:
+        return listdir(path)
 
     @classmethod
     @extend_schema(
@@ -58,7 +64,7 @@ class APIFsBrowse(APIView):
             return Response(data={'msg': 'Base directory does not exist'}, status=404)
 
         items = {'files': [], 'directories': []}
-        raw_items = listdir(path_check)
+        raw_items = cls._listdir(path_check)
 
         for item in raw_items:
             item_path = Path(os_path.join(path_check, item))
