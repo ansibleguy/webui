@@ -129,9 +129,9 @@ function apiActionFullError() {
 }
 
 function apiBrowseDirUpdateChoices(inputElement, choicesElement, searchType, result) {
-    console.log(result);
     choices = result[searchType];
     inputElement.attr("pattern", '(.*\\/|^)(' + choices.join('|') + ')$');
+
     let title = "";
     if (choices.length == 0) {
         title += "No available " + searchType + " found."
@@ -142,20 +142,20 @@ function apiBrowseDirUpdateChoices(inputElement, choicesElement, searchType, res
     if (searchType != 'directories' && dirs.length > 0) {
         title += " Available directories: '" + dirs.join(', ') + "'";
     }
-
     inputElement.attr("title", title);
 
-    choicesElement.innerHTML = ""
+    choicesHtml = "";
     for (i = 0, len = choices.length; i < len; i++) {
         let choice = choices[i];
-        choicesElement.innerHTML += "<li>" + choice + "</li>";
+        choicesHtml += "<li>" + choice + "</li>";
     }
     if (searchType != 'directories') {
         for (i = 0, len = dirs.length; i < len; i++) {
             let dir = dirs[i];
-            choicesElement.innerHTML += '<li><i class="fa fa-folder" aria-hidden="true"></i> ' + dir + "</li>";
+            choicesHtml += '<li><i class="fa fa-folder" aria-hidden="true"></i> ' + dir + "</li>";
         }
     }
+    choicesElement.innerHTML = choicesHtml;
 }
 
 function apiBrowseDirRemoveChoices(inputElement, choicesElement, searchType, exception) {
@@ -165,7 +165,6 @@ function apiBrowseDirRemoveChoices(inputElement, choicesElement, searchType, exc
 }
 
 function apiBrowseDir(inputElement, choicesElement, selector, base, searchType) {
-    console.log("/api/fs/browse/" + selector + "?base=" + base + ' | searching for ' + searchType);
     $.ajax({
         url: "/api/fs/browse/" + selector + "?base=" + base,
         type: "GET",
@@ -186,7 +185,6 @@ $( document ).ready(function() {
     $(".aw-main").on("click", ".aw-btn-autorefresh", function(){
         sleep(50);
         if ($(this).attr("value") == "ON") {
-            console.log("OK");
             autoReloadData(2);
         }
     });
@@ -245,23 +243,22 @@ $( document ).ready(function() {
     $(".aw-main").on("input", ".aw-fs-browse", function(){
         let searchType = $(this).attr("aw-fs-type");
         let apiSelector = $(this).attr("aw-fs-selector");
-        let apiChoices = $(this).attr("aw-fs-choices");
+        let apiChoices = document.getElementById($(this).attr("aw-fs-choices"));
 
-        // check if highest level of user-input is in choices; go to next depth
-        let userInput = $(this).val();
-        if (typeof(userInput) == 'undefined' || userInput == null) {
-            userInput = "";
-        }
-
-        userInputLevels = userInput.split('/');
-        selected = userInputLevels.pop();
-        apiBase = userInputLevels.join('/');
-
-        apiChoicesElement = document.getElementById(apiChoices);
         if (this.checkValidity() == false) {
-            apiBrowseDir(jQuery(this), apiChoicesElement, apiSelector, apiBase, searchType);
+
+            let userInput = $(this).val();
+            if (typeof(userInput) == 'undefined' || userInput == null) {
+                userInput = "";
+            }
+
+            userInputLevels = userInput.split('/');
+            userInputLevels.pop();
+            apiBase = userInputLevels.join('/');
+
+            apiBrowseDir(jQuery(this), apiChoices, apiSelector, apiBase, searchType);
         } else {
-            apiChoicesElement.innerHTML = ""
+            apiChoices.innerHTML = ""
         }
     });
 });
