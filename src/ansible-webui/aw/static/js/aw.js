@@ -81,7 +81,7 @@ function apiActionSuccess(result) {
     // todo: fix success message not showing after refresh
     reloadAwData();
 
-    resultDiv =  document.getElementById('aw-api-result');
+    resultDiv = document.getElementById('aw-api-result');
     if (result.msg) {
         resultDiv.innerHTML = 'Success: ' + result.msg;
     } else {
@@ -96,7 +96,7 @@ function apiActionError(result, exception) {
     console.log(exception);
 
     // write full/verbose error message to hidden iframe (could be full html response) that can be toggled by user
-    errorFullIframe =  document.getElementById('aw-api-error-full').contentWindow.document;
+    errorFullIframe = document.getElementById('aw-api-error-full').contentWindow.document;
     errorFullIframe.open();
     errorFullIframe.write('<h1><b>FULL ERROR:</b></h1><br>' + result.responseText);
     errorFullIframe.close();
@@ -112,7 +112,7 @@ function apiActionError(result, exception) {
 }
 
 function apiActionErrorClear() {
-    errorFullIframe =  document.getElementById('aw-api-error-full').contentWindow.document;
+    errorFullIframe = document.getElementById('aw-api-error-full').contentWindow.document;
     errorFullIframe.open();
     errorFullIframe.write('');
     errorFullIframe.close();
@@ -126,6 +126,52 @@ function apiActionSuccessClear() {
 function apiActionFullError() {
     toggleHidden("aw-api-error-full");
     document.getElementById("aw-api-error-full").scrollIntoView();
+}
+
+function apiBrowseDirUpdateChoices(inputElement, choicesElement, searchType, result) {
+    console.log(result);
+    choices = result[searchType];
+    inputElement.attr("pattern", '(.*\\/|^)(' + choices.join('|') + ')$');
+    let title = "";
+    if (choices.length == 0) {
+        title += "No available " + searchType + " found."
+    } else if (choices.length > 0) {
+        title += "You might choose one of the existing " + searchType + ": '" + choices.join(', ') + "'";
+    }
+    dirs = result['directories'];
+    if (searchType != 'directories' && dirs.length > 0) {
+        title += " Available directories: '" + dirs.join(', ') + "'";
+    }
+
+    inputElement.attr("title", title);
+
+    choicesElement.innerHTML = ""
+    for (i = 0, len = choices.length; i < len; i++) {
+        let choice = choices[i];
+        choicesElement.innerHTML += "<li>" + choice + "</li>";
+    }
+    if (searchType != 'directories') {
+        for (i = 0, len = dirs.length; i < len; i++) {
+            let dir = dirs[i];
+            choicesElement.innerHTML += '<li><i class="fa fa-folder" aria-hidden="true"></i> ' + dir + "</li>";
+        }
+    }
+}
+
+function apiBrowseDirRemoveChoices(inputElement, choicesElement, searchType, exception) {
+    console.log(exception);
+    inputElement.attr("pattern", '^\\b$');
+    inputElement.attr("title", "You need to choose one of the existing " + searchType);
+}
+
+function apiBrowseDir(inputElement, choicesElement, selector, base, searchType) {
+    console.log("/api/fs/browse/" + selector + "?base=" + base + ' | searching for ' + searchType);
+    $.ajax({
+        url: "/api/fs/browse/" + selector + "?base=" + base,
+        type: "GET",
+        success: function (result) { apiBrowseDirUpdateChoices(inputElement, choicesElement, searchType, result); },
+        error: function (exception) { apiBrowseDirRemoveChoices(inputElement, choicesElement, searchType, exception); },
+    });
 }
 
 const csrf_token = getCookie('csrftoken');
@@ -195,5 +241,27 @@ $( document ).ready(function() {
         });
 
         return false;
+    });
+    $(".aw-main").on("input", ".aw-fs-browse", function(){
+        let searchType = $(this).attr("aw-fs-type");
+        let apiSelector = $(this).attr("aw-fs-selector");
+        let apiChoices = $(this).attr("aw-fs-choices");
+
+        // check if highest level of user-input is in choices; go to next depth
+        let userInput = $(this).val();
+        if (typeof(userInput) == 'undefined' || userInput == null) {
+            userInput = "";
+        }
+
+        userInputLevels = userInput.split('/');
+        selected = userInputLevels.pop();
+        apiBase = userInputLevels.join('/');
+
+        apiChoicesElement = document.getElementById(apiChoices);
+        if (this.checkValidity() == false) {
+            apiBrowseDir(jQuery(this), apiChoicesElement, apiSelector, apiBase, searchType);
+        } else {
+            apiChoicesElement.innerHTML = ""
+        }
     });
 });

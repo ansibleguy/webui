@@ -115,8 +115,8 @@ def runner_prep(job: Job, execution: JobExecution, path_run: Path) -> dict:
     update_execution_status(execution, status='Starting')
 
     opts = _runner_options(job=job, execution=execution, path_run=path_run)
-    opts['playbook'] = job.playbook
-    opts['inventory'] = job.inventory.split(',')
+    opts['playbook'] = job.playbook_file
+    opts['inventory'] = job.inventory_file.split(',')
 
     # https://docs.ansible.com/ansible/2.8/user_guide/playbooks_best_practices.html#directory-layout
     project_dir = opts['project_dir']

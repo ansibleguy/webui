@@ -155,7 +155,7 @@ def validate_cronjob(value):
 
 class Job(BaseJob):
     CHANGE_FIELDS = [
-        'name', 'inventory', 'playbook', 'schedule', 'enabled', 'limit', 'verbosity', 'mode_diff',
+        'name', 'inventory_file', 'playbook_file', 'schedule', 'enabled', 'limit', 'verbosity', 'mode_diff',
         'mode_check', 'tags', 'tags_skip', 'verbosity', 'comment', 'environment_vars', 'cmd_args',
         'vault_id', 'vault_file', 'connect_user', 'become_user',
     ]
@@ -166,15 +166,15 @@ class Job(BaseJob):
     api_fields_write.extend(['vault_pass', 'become_pass', 'connect_pass'])
 
     name = models.CharField(max_length=150)
-    inventory = models.CharField(max_length=300)  # NOTE: one or multiple comma-separated inventories
-    playbook = models.CharField(max_length=100)
+    inventory_file = models.CharField(max_length=300)  # NOTE: one or multiple comma-separated inventories
+    playbook_file = models.CharField(max_length=100)
     schedule_max_len = 50
     schedule = models.CharField(max_length=schedule_max_len, validators=[validate_cronjob], blank=True, default=None)
     enabled = models.BooleanField(choices=CHOICES_BOOL, default=True)
 
     def __str__(self) -> str:
         limit = '' if self.limit is None else f' [{self.limit}]'
-        return f"Job '{self.name}' ({self.playbook} => {self.inventory}{limit})"
+        return f"Job '{self.name}' ({self.playbook_file} => {self.inventory_file}{limit})"
 
     class Meta:
         constraints = [

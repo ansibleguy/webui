@@ -60,6 +60,6 @@ Setup
 
     * serve static files using the proxy
 
-        :code:`${PATH_VENV}/lib/python${PY_VERSION}/site-packages/ansible-webui/aw/static/`
+        :code:`/static/ => ${PATH_VENV}/lib/python${PY_VERSION}/site-packages/ansible-webui/aw/static/`
 
 * Make sure the Account passwords and API keys are kept/used safe

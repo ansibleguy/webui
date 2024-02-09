@@ -4,8 +4,8 @@
 {%   set_var executions|get_value:job.id as job_executions %}
 <tr>
     <td>{{ job.name }}</td>
-    <td class="aw-responsive-lg">{{ job.inventory }}</td>
-    <td class="aw-responsive-lg">{{ job.playbook }}</td>
+    <td class="aw-responsive-lg">{{ job.inventory_file }}</td>
+    <td class="aw-responsive-lg">{{ job.playbook_file }}</td>
     <td class="aw-responsive-lg">{{ job.comment|get_fallback:"-" }}</td>
     <td>{{ job.schedule|get_fallback:"-" }}
 {%   if job.schedule|exists and not job.enabled %}

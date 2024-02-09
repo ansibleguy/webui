@@ -20,18 +20,22 @@ FORM_LABEL = {
                 'tags_skip': 'Skip Tags',
             }
         }
-    }
+    },
+    'settings': {
+        'permissions': {},
+    },
 }
 
 FORM_HELP = {
     'jobs': {
         'manage': {
             'job': {
-                'playbook': f"Playbook to execute. Search path: '{config['path_play']}'",
-                'inventory': 'One or multiple inventory files/directories to include for the execution. '
-                             'Comma-separated list. For details see: '
-                             '<a href="https://docs.ansible.com/ansible/latest/inventory_guide/intro_inventory.html">'
-                             'Ansible Docs - Inventory</a>',
+                'playbook_file': f"Playbook to execute. Search path: '{config['path_play']}'",
+                'inventory_file': 'One or multiple inventory files/directories to include for the execution. '
+                                  'Comma-separated list. For details see: '
+                                  '<a href="https://docs.ansible.com/ansible/latest/inventory_guide/'
+                                  'intro_inventory.html">'
+                                  'Ansible Docs - Inventory</a>',
                 'limit': 'Ansible inventory hosts or groups to limit the execution to.'
                          'For details see: '
                          '<a href="https://docs.ansible.com/ansible/latest/inventory_guide/intro_patterns.html">'
@@ -55,5 +59,8 @@ FORM_HELP = {
                               'Ansible Docs - Check Mode</a>',
             }
         }
-    }
+    },
+    'settings': {
+        'permissions': {},
+    },
 }

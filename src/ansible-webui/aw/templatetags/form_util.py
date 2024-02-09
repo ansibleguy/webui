@@ -88,10 +88,19 @@ def get_form_field_select(bf: BoundField, existing: dict) -> str:
 
 @register.filter
 def get_form_field_input(bf: BoundField, existing: dict) -> str:
-    field_type = ''
-    if bf.name.find('pass') != -1:
-        field_type = 'type="password" '
+    field_classes = 'form-control'
+    field_attrs = f'id="{bf.id_for_label}" name="{bf.name}"'
+    search_choices = ''
+    if bf.name.find('_pass') != -1:
+        field_attrs += ' type="password"'
 
-    return (f'<input class="form-control" id="{bf.id_for_label}" name="{bf.name}" {field_type}'
+    elif bf.name.find('_file') != -1:
+        field_classes += ' aw-fs-browse'
+        field_attrs += (f' type="text" aw-fs-selector="{bf.name}" aw-fs-type="files"'
+                        f' aw-fs-choices="aw-fs-choices-{bf.name}" pattern="^\\b$"')
+        search_choices = f'<ul id="aw-fs-choices-{bf.name}"></ul>'
+
+    return (f'<input class="{field_classes}" {field_attrs} '
             f'{get_form_field_value(bf, existing)} {get_form_required(bf)}'
-            f'{get_form_field_attributes(bf)} {get_form_field_validators(bf)}>')
+            f'{get_form_field_attributes(bf)} {get_form_field_validators(bf)}>'
+            f'{search_choices}')

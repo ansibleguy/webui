@@ -5,6 +5,7 @@ from django import template
 from aw.model.job import JobExecution, CHOICES_JOB_EXEC_STATUS
 from aw.config.hardcoded import SHORT_TIME_FORMAT
 from aw.utils.util import datetime_from_db, is_null
+from aw.utils.permission import get_permission_name
 
 register = template.Library()
 
@@ -98,3 +99,8 @@ def execution_logfile_exists(execution: JobExecution, attr: str = 'log_stdout') 
         return False
 
     return Path(log_attr).is_file()
+
+
+@register.filter
+def permission_name(perm: int) -> str:
+    return get_permission_name(perm)
