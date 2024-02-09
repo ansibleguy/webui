@@ -136,9 +136,9 @@ There are multiple Ansible WebUI products - how do they compare to this product?
 
       UI that allows for easy error analysis. Access to logs and provide links to possible solutions
 
-  - [ ] Show Ansible Running-Config
+  - [x] Show Ansible Running-Config
 
-  - [ ] Show Ansible Collections
+  - [x] Show Ansible Collections
 
     - [ ] Check Collections for available updates (galaxy + github releases)
 

@@ -2,6 +2,7 @@ import traceback
 
 from ansible_runner import RunnerConfig, Runner
 
+from aw.config.main import config
 from aw.model.job import Job, JobExecution
 from aw.execute.play_util import runner_cleanup, runner_prep, parse_run_result, failure, runner_logs, job_logs
 from aw.execute.util import get_path_run, is_execution_status
@@ -13,7 +14,10 @@ from aw.utils.debug import log
 class AwRunnerConfig(RunnerConfig):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.quiet = True
         self.runner_mode = 'subprocess'
+        self.project_dir = config['path_play']
+        self.timeout = config['run_timeout']
 
 
 def ansible_playbook(job: Job, execution: (JobExecution, None)):

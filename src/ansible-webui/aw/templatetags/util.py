@@ -91,3 +91,8 @@ def capitalize(data: str) -> str:
 @register.filter
 def whitespace_char(data: str, char: str) -> str:
     return data.replace(char, ' ')
+
+
+@register.filter
+def split(data: str, split_at: str) -> list:
+    return data.split(split_at)

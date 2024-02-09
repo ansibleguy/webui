@@ -9,6 +9,7 @@ from aw.config.hardcoded import LOGIN_PATH
 from aw.utils.http import ui_endpoint_wrapper
 from aw.views.settings import urlpatterns_settings
 from aw.views.job import urlpatterns_jobs
+from aw.views.system import urlpatterns_system
 
 
 def _local_iframe(_path: str, title: str) -> str:
@@ -58,6 +59,7 @@ urlpatterns_ui = [
 ]
 urlpatterns_ui += urlpatterns_jobs
 urlpatterns_ui += urlpatterns_settings
+urlpatterns_ui += urlpatterns_system
 urlpatterns_ui += [
     path('ui/', not_implemented),
     re_path(r'^ui/*', not_implemented),

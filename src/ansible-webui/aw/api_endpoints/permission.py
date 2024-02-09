@@ -197,7 +197,7 @@ class APIPermissionItem(GenericAPIView):
             403: OpenApiResponse(response=GenericResponse, description='Not privileged to edit the permission'),
             404: OpenApiResponse(response=GenericResponse, description='Permission does not exist'),
         },
-        summary='Modify an existing permission.',
+        summary='Modify a permission.',
     )
     def put(self, request, perm_id: int):
         privileged = has_permission_privileges(get_api_user(request))

@@ -88,14 +88,11 @@ def _runner_options(job: Job, execution: JobExecution, path_run: Path) -> dict:
 
     opts = {
         'private_data_dir': path_run,
-        'project_dir': config['path_play'],
-        'quiet': True,
         'limit': _execution_or_job(job, execution, 'limit'),
         'tags': _execution_or_job(job, execution, 'tags'),
         'skip_tags': _execution_or_job(job, execution, 'tags_skip'),
         'verbosity': verbosity,
         'envvars': env_vars,
-        'timeout': config['run_timeout'],
         'cmdline': cmdline_args if is_set(cmdline_args) else None,
     }
 

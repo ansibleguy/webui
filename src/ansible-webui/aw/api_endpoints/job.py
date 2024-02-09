@@ -129,7 +129,7 @@ class APIJobItem(APIView):
             403: OpenApiResponse(GenericResponse, description='Not privileged to delete the job'),
             404: OpenApiResponse(GenericResponse, description='Job does not exist'),
         },
-        summary='Delete an existing job.',
+        summary='Delete a job.',
         operation_id='job_delete'
     )
     def delete(self, request, job_id: int):
@@ -157,7 +157,7 @@ class APIJobItem(APIView):
             403: OpenApiResponse(GenericResponse, description='Not privileged to modify the job'),
             404: OpenApiResponse(GenericResponse, description='Job does not exist'),
         },
-        summary='Modify an existing job.',
+        summary='Modify a job.',
         operation_id='job_edit'
     )
     def put(self, request, job_id: int):

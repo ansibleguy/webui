@@ -10,10 +10,14 @@ NAVIGATION = {
         },
         'Settings': {
             'API Keys': '/ui/settings/api_keys',
+            # 'Permissions': '/ui/settings/permissions',
+            # 'Ansible': '/ui/settings/ansible',
         },
         'System': {
             'Admin': '/ui/admin/',
             'API Docs': '/ui/api_docs',
+            # 'Config': '/ui/settings/system',
+            'Environment': '/ui/system/environment',
         },
     },
     'right': {

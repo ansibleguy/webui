@@ -13,9 +13,6 @@
         {% include "./nav.html" %}
         {% include "./error/js_disabled.html" %}
         <main class="aw-main">
-            {% if title %}
-            <h1 class="aw-header">{{ title }}</h1>
-            {% endif %}
             <div id="aw-api-error" class="aw-error-msg aw-mark-warn"></div>
             <div id="aw-ui-error" class="aw-error-msg aw-mark-warn">{{ request.GET|get_value:"error"|ignore_none }}</div>
             <div id="aw-api-result" class="aw-success-msg aw-mark-ok"></div>
