@@ -78,6 +78,12 @@ function toggleHidden(elementID) {
     }
 }
 
+function shortExecutionStatus(execution) {
+    return execution.time_start + '<br>' + execution.user_name +
+           '<br><div class="aw-job-status aw-job-status-' + execution.status_name.toLowerCase() + '">' +
+           execution.status_name + '</div>';
+}
+
 // API CALLS
 const CSRF_TOKEN = getCookie('csrftoken');
 
@@ -174,10 +180,21 @@ function apiBrowseDir(inputElement, choicesElement, selector, base, searchType) 
     });
 }
 
-function fetchApiTableData(apiEndpoint, updateFunction, secondRow = false) {
+function fetchApiTableDataPlaceholder(dataTable, placeholderId) {
+    tableHead = dataTable.rows[0];
+    tmpRow = dataTable.insertRow(1);
+    tmpRow.setAttribute("aw-api-entry", placeholderId);
+    for (i = 0, len = tableHead.cells.length; i < len; i++) {
+        tmpRow.insertCell(i).innerText = '-';
+    }
+}
+
+function fetchApiTableData(apiEndpoint, updateFunction, secondRow = false, placeholderFunction = null) {
     // NOTE: data needs to be list of dict and include an 'id' attribute
     dataTable = document.getElementById("aw-api-data-table");
     secondRowAppendix = '_2';
+    placeholderExists = false;
+    placeholderId = 'placeholder';
 
     $.get(apiEndpoint, function(data) {
         existingEntryIds = [];
@@ -242,7 +259,12 @@ function fetchApiTableData(apiEndpoint, updateFunction, secondRow = false) {
             if (typeof(existingRowId) == 'undefined' || existingRowId == null) {
                 continue
             }
-            if (!existingEntryIds.includes(String(existingRowId))) {
+            if (existingRowId == placeholderId) {
+                placeholderExists = true;
+                if (data.length > 0) {
+                    rowsToDelete.push(rowIdx);
+                }
+            } else if (!existingEntryIds.includes(String(existingRowId))) {
                 rowsToDelete.push(rowIdx);
             }
         }
@@ -250,6 +272,14 @@ function fetchApiTableData(apiEndpoint, updateFunction, secondRow = false) {
             let rowIdx = rowsToDelete[i4];
             console.log("Removing entry row", rowIdx);
             dataTable.deleteRow(rowIdx);
+        }
+        // add placeholder row if empty
+        if (data.length == 0 && !placeholderExists) {
+            if (placeholderFunction == null) {
+                fetchApiTableDataPlaceholder(dataTable, placeholderId);
+            } else {
+                placeholderFunction(dataTable, placeholderId);
+            }
         }
     });
 }
@@ -331,7 +361,6 @@ $( document ).ready(function() {
         }
 
         if (this.checkValidity() == false) {
-
             let userInput = $(this).val();
             if (typeof(userInput) == 'undefined' || userInput == null) {
                 userInput = "";

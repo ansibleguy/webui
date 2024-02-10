@@ -42,7 +42,7 @@ def _parsed_ansible_collections() -> dict:
 
 
 def _parsed_ansible_config() -> dict:
-    config_raw = get_ansible_config(action='dump')[0].split('\n')
+    config_raw = get_ansible_config(action='dump', quiet=True)[0].split('\n')
     config = {}
 
     for line in config_raw:

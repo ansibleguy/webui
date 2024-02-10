@@ -1,10 +1,8 @@
 {% extends "../body.html" %}
 {% load static %}
 {% load util %}
-{% load job_util %}
 {% block content %}
 <script src="{% static 'js/jobs/logs.js' %}"></script>
-{# todo: build table using ajax to allow dynamic search #}
 <a href="/ui/jobs/manage">
     <button class="btn btn-info aw-btn-action" title="Manage">
         {% include "../button/icon/return.html" %}

@@ -2,9 +2,9 @@
 {% load static %}
 {% load util %}
 {% block content %}
-{# todo: build table using ajax to allow dynamic search #}
+<script src="{% static 'js/jobs/manage.js' %}"></script>
 <div class="table-responsive aw-data">
-    <table class="table table-striped aw-text-responsive">
+    <table class="table table-striped aw-text-responsive" id="aw-api-data-table">
         <tr>
             <th>Job</th>
             <th class="aw-responsive-lg">Inventory</th>
@@ -15,23 +15,9 @@
             <th class="aw-responsive-med">Next run</th>
             <th>Actions</th>
         </tr>
-{% if not jobs|exists %}
-        <tr>
-            <td>-</td>
-            <td class="aw-responsive-lg">-</td>
-            <td class="aw-responsive-lg">-</td>
-            <td class="aw-responsive-lg">-</td>
-            <td>-</td>
-            <td>-</td>
-            <td class="aw-responsive-med">-</td>
-            <td>-</td>
-        </tr>
-{% endif %}
-        {% include "./manage_job.html" %}
         <tr>
             <td colspan="100%">
                 {% include "../button/refresh.html" %}
-                {% include "../button/autoRefresh.html" %}
                 <a href="/ui/jobs/manage/job">
                     <button class="btn btn-success aw-btn-action" title="Add">
                         {% include "../button/icon/add.html" %}
@@ -45,5 +31,40 @@
             </td>
         </tr>
     </table>
+    <div id="aw-api-data-tmpl-actions" hidden="hidden">
+        <button class="btn btn-primary aw-btn-action aw-api-click" title="Run" aw-api-endpoint="job" aw-api-item="${ID}" aw-api-method="post">
+            {% include "../button/icon/run.html" %}
+        </button>
+        <a href="/ui/jobs/log/${ID}">
+            <button class="btn btn-info aw-btn-action" title="Logs">
+                <i class="fa-solid fa-scroll fa-2x aw-btn-action-icon"></i>
+            </button>
+        </a>
+        <button class="btn btn-danger aw-btn-action aw-api-click" title="Stop" aw-api-endpoint="job"
+                aw-api-item="${ID}/${EXEC_ID_1}" aw-api-method="delete">
+            {% include "../button/icon/stop.html" %}
+        </button>
+        <button class="btn btn-info aw-btn-action aw-btn-expand" title="Expand" aw-expand="aw-spoiler-${ID}">
+            {% include "../button/icon/expand.html" %}
+        </button>
+        <a href="/ui/jobs/manage/job/${ID}">
+            <button class="btn btn-warning aw-btn-action" title="Edit">
+                {% include "../button/icon/edit.html" %}
+            </button>
+        </a>
+        <button class="btn btn-danger aw-btn-action aw-api-click" title="Delete" aw-api-endpoint="job" aw-api-item="${ID}" aw-api-method="delete">
+            {% include "../button/icon/delete.html" %}
+        </button>
+    </div>
+    <div id="aw-api-data-tmpl-executions" hidden="hidden">
+        <h2><b>Last executions</b></h2><br>
+        ${EXECS}
+        <div>
+            <button type="submit" title="Collapse" class="btn btn-info aw-btn-action aw-btn-collapse" aw-collapse="aw-spoiler-${ID}">
+                {% include "../button/icon/collapse.html" %}
+            </button>
+        </div>
+    </div>
+
 </div>
 {% endblock %}

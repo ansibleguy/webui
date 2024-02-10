@@ -4,13 +4,15 @@ from rest_framework import serializers
 from aw.config.hardcoded import SHORT_TIME_FORMAT, JOB_EXECUTION_LIMIT
 from aw.model.job import Job, CHOICES_JOB_EXEC_STATUS, JobExecution
 from aw.utils.permission import get_viewable_jobs
-from aw.utils.util import datetime_from_db
+from aw.utils.util import datetime_from_db, get_next_cron_execution_str
 
 
 class JobReadResponse(serializers.ModelSerializer):
     class Meta:
         model = Job
         fields = Job.api_fields_read
+
+    next_run = serializers.CharField(required=False)
 
 
 class JobExecutionReadResponse(serializers.ModelSerializer):
@@ -40,7 +42,7 @@ def get_job_execution_serialized(execution: JobExecution) -> dict:
         'job': execution.job.id,
         'job_name': execution.job.name,
         'job_comment': execution.job.comment,
-        'user': execution.user.id,
+        'user': execution.user.id if execution.user is not None else None,
         'user_name': execution.user.username if execution.user is not None else 'Scheduled',
         'status': execution.status,
         'status_name': CHOICES_JOB_EXEC_STATUS[execution.status][1],
@@ -81,6 +83,13 @@ def get_viewable_jobs_serialized(
 
     for job in get_viewable_jobs(user):
         job_serialized = JobReadResponse(instance=job).data
+
+        try:
+            job_serialized['next_run'] = get_next_cron_execution_str(job.schedule)
+
+        except ValueError:
+            job_serialized['next_run'] = None
+
         if executions:
             job_serialized['executions'] = get_job_executions_serialized(job=job, execution_count=execution_count)
 

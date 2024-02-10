@@ -27,23 +27,25 @@ class PermissionReadResponse(serializers.ModelSerializer):
     jobs_name = serializers.ListSerializer(child=serializers.CharField(), required=False)
 
 
+class JobSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Job
+
+
 class PermissionWriteRequest(serializers.ModelSerializer):
     class Meta:
         model = JobPermission
         fields = JobPermission.api_fields_write
 
-    jobs = serializers.MultipleChoiceField(
-        choices=[job.id for job in Job.objects.all()],
-        allow_blank=True,
-    )
-    users = serializers.MultipleChoiceField(
-        choices=[user.id for user in User.objects.all()],
-        allow_blank=True,
-    )
-    groups = serializers.MultipleChoiceField(
-        choices=[group.id for group in Group.objects.all()],
-        allow_blank=True,
-    )
+    jobs = serializers.MultipleChoiceField(allow_blank=True, choices=[])
+    users = serializers.MultipleChoiceField(allow_blank=True, choices=[])
+    groups = serializers.MultipleChoiceField(allow_blank=True, choices=[])
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['jobs'] = serializers.MultipleChoiceField(choices=[job.id for job in Job.objects.all()])
+        self.fields['users'] = serializers.MultipleChoiceField(choices=[user.id for user in User.objects.all()])
+        self.fields['groups'] = serializers.MultipleChoiceField(choices=[group.id for group in Group.objects.all()])
 
     @staticmethod
     def create_or_update(validated_data: dict, perm: JobPermission = None):

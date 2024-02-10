@@ -446,7 +446,6 @@ class APIJobExecution(APIView):
         request=None,
         responses={
             200: OpenApiResponse(JobExecutionReadResponse, description='Return job-execution information'),
-            404: OpenApiResponse(JobExecutionReadResponse, description='No viewable jobs or executions found'),
         },
         summary='Return list of job-executions the current user is privileged to view.',
         operation_id='job_exec_list',
@@ -461,9 +460,6 @@ class APIJobExecution(APIView):
     def get(self, request):
         # pylint: disable=E1101
         jobs = get_viewable_jobs(get_api_user(request))
-        if len(jobs) == 0:
-            return Response(data={'msg': 'No viewable jobs found'}, status=404)
-
         exec_count = _job_execution_count(request)
         if exec_count is None:
             exec_count = JOB_EXECUTION_LIMIT
@@ -471,8 +467,5 @@ class APIJobExecution(APIView):
         serialized = []
         for execution in JobExecution.objects.filter(job__in=jobs).order_by('updated')[:exec_count]:
             serialized.append(get_job_execution_serialized(execution))
-
-        if len(serialized) == 0:
-            return Response(data={'msg': 'No viewable job-executions found'}, status=404)
 
         return Response(data=serialized, status=200)

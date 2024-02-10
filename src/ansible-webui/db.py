@@ -61,7 +61,6 @@ def _clean_old_db_backups():
         if file.startswith(DB_FILE.name) and file.endswith(DB_BACKUP_EXT):
             backup_file = DB_FILE.parent / file
             backup_age = time() - backup_file.stat().st_mtime
-            print(backup_file, backup_age, DB_BACKUP_RETENTION)
             if backup_age > DB_BACKUP_RETENTION:
                 log(msg=f"Cleaning old backup file: '{backup_file}'", level=4)
                 remove(backup_file)

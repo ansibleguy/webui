@@ -52,10 +52,7 @@ function addLogLines($this) {
 }
 
 function updateApiTableDataJobLogs(row, row2, entry) {
-    console.log(entry);
-    row.insertCell(0).innerHTML = entry.time_start + '<br>' + entry.user_name +
-    '<br><div class="aw-job-status aw-job-status-' + entry.status_name.toLowerCase() + '">' +
-    entry.status_name + '</div>';
+    row.insertCell(0).innerHTML = shortExecutionStatus(entry);
     row.insertCell(1).innerText = entry.job_name;
     if (entry.job_comment == "") {
         row.insertCell(2).innerText = "-";

@@ -1,10 +1,9 @@
 from django.urls import path
 from django.contrib.auth.models import User, Group
-from django.db.utils import OperationalError
 from django.shortcuts import HttpResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from django.forms import ModelForm, MultipleChoiceField, SelectMultiple
+from django.forms import ModelForm, SelectMultiple, MultipleChoiceField
 
 from aw.utils.http import ui_endpoint_wrapper, ui_endpoint_wrapper_kwargs
 from aw.model.job import Job, JobPermission
@@ -23,6 +22,19 @@ def setting_permission(request) -> HttpResponse:
     return render(request, status=200, template_name='settings/permission.html')
 
 
+def _job_choices() -> list[tuple]:
+    # pylint: disable=E1101
+    return [(job.id, job.name) for job in Job.objects.all()]
+
+
+def _user_choices() -> list[tuple]:
+    return [(user.id, user.username) for user in User.objects.all()]
+
+
+def _group_choices() -> list[tuple]:
+    return [(group.id, group.name) for group in Group.objects.all()]
+
+
 class SettingPermissionForm(ModelForm):
     class Meta:
         model = JobPermission
@@ -31,27 +43,21 @@ class SettingPermissionForm(ModelForm):
         labels = FORM_LABEL['settings']['permissions']
         help_texts = FORM_HELP['settings']['permissions']
 
-    # pylint: disable=E1101
-    try:
-        jobs = MultipleChoiceField(
-            required=False,
-            widget=SelectMultiple,
-            choices=((job.id, job.name) for job in Job.objects.all()),
-        )
-        users = MultipleChoiceField(
-            required=False,
-            widget=SelectMultiple,
-            choices=((user.id, user.username) for user in User.objects.all())
-        )
-        groups = MultipleChoiceField(
-            required=False,
-            widget=SelectMultiple,
-            choices=((group.id, group.name) for group in Group.objects.all())
-        )
-
-    except OperationalError:
-        # before db migration/initialization
-        pass
+    jobs = MultipleChoiceField(
+        required=False,
+        widget=SelectMultiple,
+        choices=_job_choices,
+    )
+    users = MultipleChoiceField(
+        required=False,
+        widget=SelectMultiple,
+        choices=_user_choices,
+    )
+    groups = MultipleChoiceField(
+        required=False,
+        widget=SelectMultiple,
+        choices=_group_choices,
+    )
 
 
 @login_required
