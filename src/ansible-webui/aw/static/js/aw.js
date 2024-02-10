@@ -1,5 +1,7 @@
 // https://docs.djangoproject.com/en/5.0/howto/csrf/#using-csrf-protection-with-ajax
 
+// CONSTANTS
+const DATA_REFRESH_SEC = 1;
 
 // UTIL FUNCTIONS
 function getCookie(name) {
@@ -77,10 +79,9 @@ function toggleHidden(elementID) {
 }
 
 // API CALLS
-function apiActionSuccess(result) {
-    // todo: fix success message not showing after refresh
-    reloadAwData();
+const CSRF_TOKEN = getCookie('csrftoken');
 
+function apiActionSuccess(result) {
     resultDiv = document.getElementById('aw-api-result');
     if (result.msg) {
         resultDiv.innerHTML = 'Success: ' + result.msg;
@@ -173,7 +174,61 @@ function apiBrowseDir(inputElement, choicesElement, selector, base, searchType) 
     });
 }
 
-const csrf_token = getCookie('csrftoken');
+function fetchApiTableData(dataTable, apiEndpoint, updateFunction) {
+    $.get(apiEndpoint, function(data) {
+        existingEntryIds = [];
+        // for each existing entry
+        for (i = 0, len = data.length; i < len; i++) {
+            let entry = data[i];
+            existingEntryIds.push(String(entry.id));
+            entryChanged = false;
+            entryRow = null;
+            lastData = null;
+            // check if the entry existed before
+            for (i2 = 0, len2 = dataTable.rows.length; i2 < len2; i2++) {
+                let existingRow = dataTable.rows[i2];
+                let existingRowId = existingRow.getAttribute("aw-api-entry");
+                if (String(existingRowId) == String(entry.id)) {
+                    entryRow = existingRow;
+                    lastData = entryRow.getAttribute("aw-api-last");
+                    break
+                }
+            }
+            // if new entry - insert new row
+            if (entryRow == null) {
+                entryRow = dataTable.insertRow(1);
+                entryRow.setAttribute("aw-api-entry", entry.id);
+                entryChanged = true;
+            }
+            // if new entry or data changed - update the row-content
+            newData = JSON.stringify(data);
+            if (entryChanged || lastData != newData) {
+                console.log("Data entry changed:", entry);
+                entryRow.innerHTML = "";
+                entryRow.setAttribute("aw-api-last", newData);
+                updateFunction(entryRow, entry);
+            }
+        }
+        // remove rows of deleted entries
+        rowsToDelete = [];
+        for (i3 = 0, len3 = dataTable.rows.length; i3 < len3; i3++) {
+            let rowIdx = i3;
+            let existingRow = dataTable.rows[rowIdx];
+            let existingRowId = existingRow.getAttribute("aw-api-entry");
+            if (typeof(existingRowId) == 'undefined' || existingRowId == null) {
+                continue
+            }
+            if (!existingEntryIds.includes(String(existingRowId))) {
+                rowsToDelete.push(rowIdx);
+            }
+        }
+        for (i4 = 0, len4 = rowsToDelete.length; i4 < len4; i4++) {
+            let rowIdx = rowsToDelete[i4];
+            console.log("Removing entry row", rowIdx);
+            dataTable.deleteRow(rowIdx);
+        }
+    });
+}
 
 // EVENTHANDLER
 $( document ).ready(function() {
@@ -199,7 +254,7 @@ $( document ).ready(function() {
 
     // API
     $.ajaxSetup({
-        headers: {'X-CSRFToken': csrf_token},
+        headers: {'X-CSRFToken': CSRF_TOKEN},
     });
     $(".aw-main").on("click", ".aw-api-click", function(){
         let endpoint = $(this).attr("aw-api-endpoint");

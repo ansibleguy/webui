@@ -1,0 +1,38 @@
+{% extends "../body.html" %}
+{% load util %}
+{% load static %}
+{% block content %}
+<script src="{% static 'js/settings/permission.js' %}"></script>
+<div class="table-responsive aw-data">
+    <table class="table table-striped aw-text-responsive" id="aw-api-data-table">
+        <tr>
+            <th>Name</th>
+            <th>Permission</th>
+            <th>Jobs</th>
+            <th>Users</th>
+            <th>Groups</th>
+            <th>Actions</th>
+        </tr>
+        <tr>
+            <td colspan="100%">
+                {% include "../button/refresh.html" %}
+                <a href="/ui/settings/permissions/0">
+                    <button class="btn btn-success aw-btn-action" title="Add">
+                        {% include "../button/icon/add.html" %}
+                    </button>
+                </a>
+            </td>
+        </tr>
+    </table>
+    <div id="aw-api-data-tmpl-actions" hidden="hidden">
+        <a href="/ui/settings/permissions/${ID}">
+            <button class="btn btn-warning aw-btn-action" title="Edit">
+                {% include "../button/icon/edit.html" %}
+            </button>
+        </a>
+        <button class="btn btn-danger aw-btn-action aw-api-click" title="Delete" aw-api-endpoint="permission" aw-api-item="${ID}" aw-api-method="delete">
+            {% include "../button/icon/delete.html" %}
+        </button>
+    </div>
+</div>
+{% endblock %}

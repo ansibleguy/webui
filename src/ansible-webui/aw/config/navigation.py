@@ -10,7 +10,7 @@ NAVIGATION = {
         },
         'Settings': {
             'API Keys': '/ui/settings/api_keys',
-            # 'Permissions': '/ui/settings/permissions',
+            'Permissions': '/ui/settings/permissions',
             # 'Ansible': '/ui/settings/ansible',
         },
         'System': {

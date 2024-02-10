@@ -1,6 +1,6 @@
 from django import template
 
-from django.forms import BoundField
+from django.forms import BoundField, MultipleChoiceField
 from django.forms.widgets import Select
 from django.core.validators import RegexValidator
 
@@ -69,12 +69,17 @@ def get_form_field_value(bf: BoundField, existing: dict) -> (str, None):
 @register.filter
 def get_form_field_select(bf: BoundField, existing: dict) -> str:
     selected = None
-    if bf.field.initial is not None:
-        selected = bf.field.initial
-    elif bf.name in existing:
+    if bf.name in existing:
         selected = str(existing[bf.name])
+    elif bf.field.initial is not None:
+        selected = bf.field.initial
 
-    options_str = f'<select class="form-control" id="{bf.id_for_label}" name="{bf.name}">'
+    options_str = f'<select class="form-control" id="{bf.id_for_label}" name="{bf.name}"'
+    if isinstance(bf.field, MultipleChoiceField):
+        options_str += ' multiple'
+        selected = None  # not implemented
+
+    options_str += '>'
 
     # pylint: disable=W0212
     for option in bf.field._choices:
@@ -107,7 +112,7 @@ def get_form_field_input(bf: BoundField, existing: dict) -> str:
             field_attrs += 'pattern="^\\b$"'
 
         else:
-            field_attrs += f'pattern=".*"'
+            field_attrs += 'pattern=".*"'
 
         search_choices = f'<ul id="aw-fs-choices-{bf.name}"></ul>'
 

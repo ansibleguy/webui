@@ -145,3 +145,13 @@ There are multiple Ansible WebUI products - how do they compare to this product?
 - [ ] API
 
   - [x] Manage and execute Jobs
+
+- [ ] Testing
+
+  - [ ] Unit Tests
+
+  - [ ] Integration Tests
+
+    - [ ] API Endpoints
+
+    - [ ] Permission system

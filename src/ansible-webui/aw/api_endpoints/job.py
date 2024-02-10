@@ -6,10 +6,10 @@ from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema, OpenApiResponse
 
 from aw.model.job import Job, JobExecution, BaseJobCredentials, \
-    CHOICE_JOB_PERMISSION_READ, CHOICE_JOB_PERMISSION_WRITE, CHOICE_JOB_PERMISSION_EXECUTE
+    CHOICE_JOB_PERMISSION_READ, CHOICE_JOB_PERMISSION_WRITE, CHOICE_JOB_PERMISSION_EXECUTE, CHOICE_JOB_PERMISSION_FULL
 from aw.api_endpoints.base import API_PERMISSION, get_api_user, BaseResponse, GenericResponse
 from aw.api_endpoints.job_util import get_viewable_jobs_serialized, JobReadResponse
-from aw.utils.permission import job_action_allowed
+from aw.utils.permission import has_job_permission
 from aw.execute.queue import queue_add
 from aw.execute.util import update_execution_status, is_execution_status
 from aw.utils.util import is_null
@@ -29,13 +29,21 @@ class JobWriteRequest(serializers.ModelSerializer):
 
 def _find_job(job_id: int) -> (Job, None):
     # pylint: disable=E1101
-    return Job.objects.get(id=job_id)
+    try:
+        return Job.objects.get(id=job_id)
+
+    except ObjectDoesNotExist:
+        return None
 
 
-def _find_job_and_execution(job_id: int, exec_id: int) -> tuple[Job, JobExecution]:
+def _find_job_and_execution(job_id: int, exec_id: int) -> tuple[Job, (JobExecution, None)]:
     # pylint: disable=E1101
     job = _find_job(job_id)
-    return job, JobExecution.objects.get(id=exec_id, job=job)
+    try:
+        return job, JobExecution.objects.get(id=exec_id, job=job)
+
+    except ObjectDoesNotExist:
+        return job, None
 
 
 class APIJob(APIView):
@@ -66,7 +74,7 @@ class APIJob(APIView):
         operation_id='job_create'
     )
     def post(self, request):
-        if not get_api_user(request).is_superuser:
+        if not get_api_user(request).is_staff:
             return Response(data={'msg': 'Not privileged to create jobs'}, status=403)
 
         serializer = JobWriteRequest(data=request.data)
@@ -117,7 +125,7 @@ class APIJobItem(APIView):
         if job is None:
             return Response(data={'msg': f"Job with ID {job_id} does not exist"}, status=404)
 
-        if not job_action_allowed(user=user, job=job, permission_needed=CHOICE_JOB_PERMISSION_READ):
+        if not has_job_permission(user=user, job=job, permission_needed=CHOICE_JOB_PERMISSION_READ):
             return Response(data={'msg': f"Job '{job.name}' is not viewable"}, status=403)
 
         return Response(data=JobReadResponse(instance=job).data, status=200)
@@ -138,7 +146,7 @@ class APIJobItem(APIView):
             job = _find_job(job_id)
 
             if job is not None:
-                if not job_action_allowed(user=user, job=job, permission_needed=CHOICE_JOB_PERMISSION_WRITE):
+                if not has_job_permission(user=user, job=job, permission_needed=CHOICE_JOB_PERMISSION_FULL):
                     return Response(data={'msg': f"Not privileged to delete the job '{job.name}'"}, status=403)
 
                 job.delete()
@@ -166,7 +174,7 @@ class APIJobItem(APIView):
             job = _find_job(job_id)
 
             if job is not None:
-                if not job_action_allowed(user=user, job=job, permission_needed=CHOICE_JOB_PERMISSION_WRITE):
+                if not has_job_permission(user=user, job=job, permission_needed=CHOICE_JOB_PERMISSION_WRITE):
                     return Response(data={'msg': f"Not privileged to modify the job '{job.name}'"}, status=403)
 
                 serializer = JobWriteRequest(data=request.data)
@@ -217,7 +225,7 @@ class APIJobItem(APIView):
             job = _find_job(job_id)
 
             if job is not None:
-                if not job_action_allowed(user=user, job=job, permission_needed=CHOICE_JOB_PERMISSION_EXECUTE):
+                if not has_job_permission(user=user, job=job, permission_needed=CHOICE_JOB_PERMISSION_EXECUTE):
                     return Response(data={'msg': f"Not privileged to execute the job '{job.name}'"}, status=403)
 
                 queue_add(job=job, user=user)
@@ -251,7 +259,7 @@ class APIJobExecutionItem(APIView):
             job, execution = _find_job_and_execution(job_id, exec_id)
 
             if job is not None and execution is not None:
-                if not job_action_allowed(user=user, job=job, permission_needed=CHOICE_JOB_PERMISSION_EXECUTE):
+                if not has_job_permission(user=user, job=job, permission_needed=CHOICE_JOB_PERMISSION_EXECUTE):
                     return Response(data={'msg': f"Not privileged to stop the job '{job.name}'"}, status=403)
 
                 if not is_execution_status(execution, 'Running'):
@@ -291,7 +299,7 @@ class APIJobExecutionLogs(APIView):
             job, execution = _find_job_and_execution(job_id, exec_id)
 
             if job is not None and execution is not None:
-                if not job_action_allowed(user=user, job=job, permission_needed=CHOICE_JOB_PERMISSION_READ):
+                if not has_job_permission(user=user, job=job, permission_needed=CHOICE_JOB_PERMISSION_READ):
                     return Response(data={'msg': f"Not privileged to view logs of the job '{job.name}'"}, status=403)
 
                 if execution.log_stdout is None:
@@ -328,7 +336,7 @@ class APIJobExecutionLogFile(APIView):
             job, execution = _find_job_and_execution(job_id, exec_id)
 
             if job is not None and execution is not None:
-                if not job_action_allowed(user=user, job=job, permission_needed=CHOICE_JOB_PERMISSION_READ):
+                if not has_job_permission(user=user, job=job, permission_needed=CHOICE_JOB_PERMISSION_READ):
                     return Response(data={'msg': f"Not privileged to view logs of the job '{job.name}'"}, status=403)
 
                 if execution.log_stdout is None:

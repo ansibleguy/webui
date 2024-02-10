@@ -55,7 +55,6 @@ $( document ).ready(function() {
     $(".aw-main").on("click", ".aw-log-read", function(){
         $this = jQuery(this);
         addLogLines($this);
-        refreshSec = 1;
-        setInterval('addLogLines($this)', (refreshSec * 1000));
+        setInterval('addLogLines($this)', (DATA_REFRESH_SEC * 1000));
     });
 });

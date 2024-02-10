@@ -31,7 +31,13 @@ Jobs can be managed at the :code:`Jobs - Manage` page.
 Permissions, Users, Groups
 ==========================
 
-As this project is still in its early stages, there are no fancy forms to manage those 'good-to-have' settings yet.
+See: :ref:`Usage - Permissions <usage_permission>`
+
+
+Administration
+==============
+
+As this project is still in its early stages, there are no fancy forms to manage some 'good-to-have' settings yet.
 
 You can use the :code:`System - Admin` page to administer those using the Django administration tool:
 

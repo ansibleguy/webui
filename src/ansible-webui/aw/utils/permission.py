@@ -13,10 +13,21 @@ def get_job_if_allowed(user: settings.AUTH_USER_MODEL, job: Job, permission_need
     if not isinstance(job, Job):
         raise ValueError(f"Provided job is invalid: '{job}'")
 
+    if has_job_permission(user=user, job=job, permission_needed=permission_needed):
+        return job
+
+    return None
+
+
+def has_job_permission(user: settings.AUTH_USER_MODEL, job: Job, permission_needed: int) -> bool:
+    # pylint: disable=E1101
+    if user.is_superuser:
+        return True
+
     # if job has no permissions set
     permission_links = JobPermissionMapping.objects.filter(job=job)
     if not permission_links.exists():
-        return job
+        return True
 
     for link in permission_links:
         # ignore permission if access-level is too low
@@ -25,20 +36,16 @@ def get_job_if_allowed(user: settings.AUTH_USER_MODEL, job: Job, permission_need
 
         # if one of the permissions allows the user
         if JobPermissionMemberUser.objects.filter(user=user, permission=link.permission).exists():
-            return job
+            return True
 
         # if one of the permissions allows a group that the user is a member of
         groups = JobPermissionMemberGroup.objects.filter(permission=link.permission)
         if groups.exists() and user.groups.filter(name__in=[
             group.name for group in groups
         ]).exists():
-            return job
+            return True
 
-    return None
-
-
-def job_action_allowed(user: settings.AUTH_USER_MODEL, job: Job, permission_needed: int) -> bool:
-    return get_job_if_allowed(user=user, job=job, permission_needed=permission_needed) is not None
+    return False
 
 
 def get_viewable_jobs(user: settings.AUTH_USER_MODEL) -> list[Job]:

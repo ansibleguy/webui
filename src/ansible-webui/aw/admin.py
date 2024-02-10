@@ -1,8 +1,11 @@
 from django.contrib import admin
+from rest_framework_api_key.admin import APIKey
 
 from aw.models import Job, JobExecution, \
     JobPermission, JobPermissionMemberUser, JobPermissionMemberGroup, JobPermissionMapping, \
     JobExecutionResult, JobError, AwAPIKey, JobUserCredentials, JobExecutionResultHost
+
+admin.site.unregister(APIKey)
 
 admin.site.register(Job)
 admin.site.register(JobExecution)

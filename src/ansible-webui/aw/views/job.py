@@ -8,7 +8,7 @@ from django.contrib.auth.decorators import login_required
 from aw.utils.http import ui_endpoint_wrapper, ui_endpoint_wrapper_kwargs
 from aw.model.job import Job, JobExecution, CHOICE_JOB_PERMISSION_WRITE, JobExecutionResultHost
 from aw.api_endpoints.job_util import get_viewable_jobs
-from aw.utils.permission import job_action_allowed
+from aw.utils.permission import has_job_permission
 from aw.config.form_metadata import FORM_LABEL, FORM_HELP
 from aw.utils.util import get_next_cron_execution_str
 
@@ -91,7 +91,7 @@ def job_edit(request, job_id: int = None) -> HttpResponse:
         if job is None:
             return redirect(f"/ui/jobs/manage?error=Job with ID {job_id} does not exist")
 
-        if not job_action_allowed(user=request.user, job=job, permission_needed=CHOICE_JOB_PERMISSION_WRITE):
+        if not has_job_permission(user=request.user, job=job, permission_needed=CHOICE_JOB_PERMISSION_WRITE):
             return redirect(f"/ui/jobs/manage?error=Not privileged to modify the job '{job.name}'")
 
         job = job.__dict__

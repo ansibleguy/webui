@@ -32,7 +32,18 @@ class PermissionWriteRequest(serializers.ModelSerializer):
         model = JobPermission
         fields = JobPermission.api_fields_write
 
-    jobs = serializers.ListSerializer(child=serializers.IntegerField(), required=False)
+    jobs = serializers.MultipleChoiceField(
+        choices=[job.id for job in Job.objects.all()],
+        allow_blank=True,
+    )
+    users = serializers.MultipleChoiceField(
+        choices=[user.id for user in settings.AUTH_USER_MODEL.objects.all()],
+        allow_blank=True,
+    )
+    groups = serializers.MultipleChoiceField(
+        choices=[group.id for group in Group.objects.all()],
+        allow_blank=True,
+    )
 
     @staticmethod
     def create_or_update(validated_data: dict, perm: JobPermission = None):
@@ -43,6 +54,7 @@ class PermissionWriteRequest(serializers.ModelSerializer):
             )
 
         else:
+            perm.name = validated_data['name']
             perm.permission = validated_data['permission']
 
         perm.save()
@@ -50,21 +62,33 @@ class PermissionWriteRequest(serializers.ModelSerializer):
         if 'jobs' in validated_data and is_set(validated_data['jobs']):
             jobs = []
             for job_id in validated_data['jobs']:
-                jobs.append(Job.objects.get(id=job_id))
+                try:
+                    jobs.append(Job.objects.get(id=job_id))
+
+                except ObjectDoesNotExist:
+                    continue
 
             perm.jobs.set(jobs)
 
         if 'users' in validated_data and is_set(validated_data['users']):
             users = []
             for user_id in validated_data['users']:
-                users.append(settings.AUTH_USER_MODEL.objects.get(id=user_id))
+                try:
+                    users.append(settings.AUTH_USER_MODEL.objects.get(id=user_id))
+
+                except ObjectDoesNotExist:
+                    continue
 
             perm.users.set(users)
 
         if 'groups' in validated_data and is_set(validated_data['groups']):
             groups = []
             for group_id in validated_data['groups']:
-                groups.append(Group.objects.get(id=group_id))
+                try:
+                    groups.append(Group.objects.get(id=group_id))
+
+                except ObjectDoesNotExist:
+                    continue
 
             perm.groups.set(groups)
 
@@ -112,15 +136,19 @@ def build_permissions(perm_id_filter: int = None) -> (list, dict):
             'groups_name': permission_groups_name[permission.id],
         })
 
-    if perm_id_filter is not None:
-        return permissions[0]
+    try:
+        if perm_id_filter is not None:
+            return permissions[0]
+
+    except IndexError:
+        return {}
 
     return permissions
 
 
 def has_permission_privileges(user: settings.AUTH_USER_MODEL) -> bool:
     # todo: create explicit privilege
-    return user.is_superuser
+    return user.is_staff
 
 
 class APIPermission(GenericAPIView):
@@ -133,6 +161,7 @@ class APIPermission(GenericAPIView):
         request=None,
         responses={200: PermissionReadResponse},
         summary='Return list of permissions',
+        operation_id='permission_list',
     )
     def get(request):
         del request
@@ -146,6 +175,7 @@ class APIPermission(GenericAPIView):
             403: OpenApiResponse(response=GenericResponse, description='Not privileged to create a permission'),
         },
         summary='Create a new Permission.',
+        operation_id='permission_create',
     )
     def post(self, request):
         privileged = has_permission_privileges(get_api_user(request))
@@ -185,6 +215,7 @@ class APIPermissionItem(GenericAPIView):
         request=None,
         responses={200: PermissionReadResponse},
         summary='Return information of a permission.',
+        operation_id='permission_get'
     )
     def get(request, perm_id: int):
         del request
@@ -198,6 +229,7 @@ class APIPermissionItem(GenericAPIView):
             404: OpenApiResponse(response=GenericResponse, description='Permission does not exist'),
         },
         summary='Modify a permission.',
+        operation_id='permission_edit',
     )
     def put(self, request, perm_id: int):
         privileged = has_permission_privileges(get_api_user(request))
@@ -215,7 +247,12 @@ class APIPermissionItem(GenericAPIView):
                 status=400,
             )
 
-        permission = JobPermission.objects.get(id=perm_id)
+        try:
+            permission = JobPermission.objects.get(id=perm_id)
+
+        except ObjectDoesNotExist:
+            permission = None
+
         if permission is None:
             return Response(
                 data={'msg': f"Permission with ID {perm_id} does not exist"},
@@ -238,6 +275,7 @@ class APIPermissionItem(GenericAPIView):
             404: OpenApiResponse(response=GenericResponse, description='Permission does not exist'),
         },
         summary='Delete a permission.',
+        operation_id='permission_delete'
     )
     def delete(self, request, perm_id: int):
         privileged = has_permission_privileges(get_api_user(request))
@@ -247,9 +285,8 @@ class APIPermissionItem(GenericAPIView):
                 status=403,
             )
 
-        permission = JobPermission.objects.get(id=perm_id)
-
         try:
+            permission = JobPermission.objects.get(id=perm_id)
             if permission is not None:
                 permission.delete()
                 return Response(data={'msg': f"Permission '{permission.name}' deleted"}, status=200)
