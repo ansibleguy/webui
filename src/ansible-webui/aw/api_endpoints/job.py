@@ -305,3 +305,41 @@ class APIJobExecutionLogs(APIView):
             pass
 
         return Response(data={'msg': f"Job with ID '{job_id}' or execution does not exist"}, status=404)
+
+
+class APIJobExecutionLogFile(APIView):
+    http_method_names = ['get']
+    serializer_class = JobExecutionLogReadResponse
+    permission_classes = API_PERMISSION
+
+    @extend_schema(
+        request=None,
+        responses={
+            200: OpenApiResponse(JobReadResponse, description='Download job log-file'),
+            403: OpenApiResponse(JobReadResponse, description='Not privileged to view the job logs'),
+            404: OpenApiResponse(JobReadResponse, description='Job, execution or logs do not exist'),
+        },
+        summary='Download log-file of a job execution.',
+        operation_id='job_exec_logfile'
+    )
+    def get(self, request, job_id: int, exec_id: int):
+        user = get_api_user(request)
+        try:
+            job, execution = _find_job_and_execution(job_id, exec_id)
+
+            if job is not None and execution is not None:
+                if not job_action_allowed(user=user, job=job, permission_needed=CHOICE_JOB_PERMISSION_READ):
+                    return Response(data={'msg': f"Not privileged to view logs of the job '{job.name}'"}, status=403)
+
+                if execution.log_stdout is None:
+                    return Response(data={'msg': f"No logs found for job '{job.name}'"}, status=404)
+
+                with open(execution.log_stdout, 'rb') as logfile:
+                    response = Response(logfile.read(), content_type='text/plain', status=200)
+                    response['Content-Disposition'] = f"inline; filename={execution.log_stdout.rsplit('/', 1)[1]}"
+                    return response
+
+        except ObjectDoesNotExist:
+            pass
+
+        return Response(data={'msg': f"Job with ID '{job_id}' or execution does not exist"}, status=404)

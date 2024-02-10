@@ -2,7 +2,7 @@
 {% load job_util %}
 <tr hidden="hidden" id="aw-spoiler-{{ job.id }}">
     <td colspan="100%">
-        <h2>EXECUTIONS</h2><br>
+        <h2><b>Last executions</b></h2><br>
 {% for execution in job_executions %}
         <div>
             {{ execution|execution_info_verbose|safe }}

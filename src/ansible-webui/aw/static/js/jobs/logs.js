@@ -40,7 +40,7 @@ function addLogLines($this) {
         logLineStart = 0;
     }
     if (!hidden) {
-        $.get("/api/job/" + job_id + "/" + exec_id + "/" + logLineStart, function(data) {
+        $.get("/api/job/" + job_id + "/" + exec_id + "/log/" + logLineStart, function(data) {
           let element = document.getElementById(logElement);
           element.innerHTML += replaceLineColors(data.lines).join('');
           if (data.lines.length > 0) {

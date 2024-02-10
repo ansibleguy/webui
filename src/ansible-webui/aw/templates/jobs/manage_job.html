@@ -15,17 +15,14 @@
     <td>{{ job_executions|first|execution_info_brief|get_fallback:"-"|safe }}</td>
     <td class="aw-responsive-med">{{ next_executions|get_value:job.id }}</td>
     <td>
-        <a href="/ui/jobs/manage/job/{{ job.id }}">
-            <button class="btn btn-warning aw-btn-action" title="Edit">
-                {% include "../button/icon/edit.html" %}
-            </button>
-        </a>
-        <button class="btn btn-danger aw-btn-action aw-api-click" title="Delete" aw-api-endpoint="job" aw-api-item="{{ job.id }}" aw-api-method="delete">
-            {% include "../button/icon/delete.html" %}
-        </button>
         <button class="btn btn-primary aw-btn-action aw-api-click" title="Run" aw-api-endpoint="job" aw-api-item="{{ job.id }}" aw-api-method="post">
             {% include "../button/icon/run.html" %}
         </button>
+        <a href="/ui/jobs/log/{{ job.id }}">
+            <button class="btn btn-info aw-btn-action" title="Logs">
+                <i class="fa-solid fa-scroll fa-2x aw-btn-action-icon"></i>
+            </button>
+        </a>
         <button class="btn btn-danger aw-btn-action aw-api-click" title="Stop" aw-api-endpoint="job"
                 aw-api-item="{{ job.id }}/{{ job_executions|first|get_value:"id" }}" aw-api-method="delete"
 {%   if job_executions|length == 0 %}
@@ -34,17 +31,20 @@
         >
             {% include "../button/icon/stop.html" %}
         </button>
-        <a href="/ui/jobs/log/{{ job.id }}">
-            <button class="btn btn-info aw-btn-action" title="Logs">
-                <i class="fas fa-magnifying-glass fa-2x aw-btn-action-icon"></i>
-            </button>
-        </a>
         <button class="btn btn-info aw-btn-action aw-btn-expand" title="Expand" aw-expand="aw-spoiler-{{ job.id }}"
 {%   if job_executions|length == 0 %}
         disabled
 {%   endif %}
         >
             {% include "../button/icon/expand.html" %}
+        </button>
+        <a href="/ui/jobs/manage/job/{{ job.id }}">
+            <button class="btn btn-warning aw-btn-action" title="Edit">
+                {% include "../button/icon/edit.html" %}
+            </button>
+        </a>
+        <button class="btn btn-danger aw-btn-action aw-api-click" title="Delete" aw-api-endpoint="job" aw-api-item="{{ job.id }}" aw-api-method="delete">
+            {% include "../button/icon/delete.html" %}
         </button>
     </td>
 </tr>

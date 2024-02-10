@@ -3,6 +3,7 @@
 <div class="aw-error-msg">
     {{ form.non_field_errors }}
 </div>
+<button type="submit" class="btn btn-primary" title="Save">Save</button>
 {% for bf in form.visible_fields %}
     <div class="mb-3 row">
         <label for="{{ bf.id_for_label }}" class="form-label col-sm-2 col-form-label">{{ bf.label }}</label>

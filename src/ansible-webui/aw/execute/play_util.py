@@ -116,7 +116,7 @@ def runner_prep(job: Job, execution: JobExecution, path_run: Path) -> dict:
     opts['inventory'] = job.inventory_file.split(',')
 
     # https://docs.ansible.com/ansible/2.8/user_guide/playbooks_best_practices.html#directory-layout
-    project_dir = opts['project_dir']
+    project_dir = config['path_play']
     if not project_dir.endswith('/'):
         project_dir += '/'
 

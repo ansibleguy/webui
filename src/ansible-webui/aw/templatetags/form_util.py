@@ -44,18 +44,18 @@ def get_form_required(bf: BoundField) -> str:
     return ' required' if bf.field.required else ''
 
 
-def get_form_field_value(bf: BoundField, existing: dict) -> str:
+def get_form_field_value(bf: BoundField, existing: dict) -> (str, None):
     # PWD_ATTRS are not exposed here
     if bf.name not in existing and bf.name not in BaseJobCredentials.PWD_ATTRS:
-        return ''
+        return None
 
     if bf.name in BaseJobCredentials.PWD_ATTRS:
         enc_field = '_enc_' + bf.name
         if enc_field in existing and not is_set(existing[enc_field]):
-            return ''
+            return None
 
         if enc_field not in existing:
-            value = ''
+            value = None
 
         else:
             value = BaseJobCredentials.PWD_HIDDEN
@@ -63,7 +63,7 @@ def get_form_field_value(bf: BoundField, existing: dict) -> str:
     else:
         value = str(existing[bf.name])
 
-    return 'value="' + value + '"'
+    return str(value)
 
 
 @register.filter
@@ -74,7 +74,6 @@ def get_form_field_select(bf: BoundField, existing: dict) -> str:
     elif bf.name in existing:
         selected = str(existing[bf.name])
 
-    get_form_field_value(bf, existing)
     options_str = f'<select class="form-control" id="{bf.id_for_label}" name="{bf.name}">'
 
     # pylint: disable=W0212
@@ -91,16 +90,28 @@ def get_form_field_input(bf: BoundField, existing: dict) -> str:
     field_classes = 'form-control'
     field_attrs = f'id="{bf.id_for_label}" name="{bf.name}"'
     search_choices = ''
+
+    field_value = ''
+    value = get_form_field_value(bf, existing)
+    if value is not None:
+        field_value = f'value="{value}"'
+
     if bf.name.find('_pass') != -1:
         field_attrs += ' type="password"'
 
     elif bf.name.find('_file') != -1:
         field_classes += ' aw-fs-browse'
         field_attrs += (f' type="text" aw-fs-selector="{bf.name}" aw-fs-type="files"'
-                        f' aw-fs-choices="aw-fs-choices-{bf.name}" pattern="^\\b$"')
+                        f' aw-fs-choices="aw-fs-choices-{bf.name}"')
+        if value is None:
+            field_attrs += 'pattern="^\\b$"'
+
+        else:
+            field_attrs += f'pattern=".*"'
+
         search_choices = f'<ul id="aw-fs-choices-{bf.name}"></ul>'
 
     return (f'<input class="{field_classes}" {field_attrs} '
-            f'{get_form_field_value(bf, existing)} {get_form_required(bf)}'
+            f'{field_value} {get_form_required(bf)}'
             f'{get_form_field_attributes(bf)} {get_form_field_validators(bf)}>'
             f'{search_choices}')

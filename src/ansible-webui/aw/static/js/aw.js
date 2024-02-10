@@ -245,6 +245,12 @@ $( document ).ready(function() {
         let apiSelector = $(this).attr("aw-fs-selector");
         let apiChoices = document.getElementById($(this).attr("aw-fs-choices"));
 
+        $(this).attr("value", "");
+        let pattern = $(this).attr("pattern");
+        if (pattern == ".*") {
+            $(this).attr("pattern", '^\\b$');
+        }
+
         if (this.checkValidity() == false) {
 
             let userInput = $(this).val();
