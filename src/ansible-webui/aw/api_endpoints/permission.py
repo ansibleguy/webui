@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import User, Group
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.utils import IntegrityError
 from rest_framework.generics import GenericAPIView
@@ -37,7 +37,7 @@ class PermissionWriteRequest(serializers.ModelSerializer):
         allow_blank=True,
     )
     users = serializers.MultipleChoiceField(
-        choices=[user.id for user in settings.AUTH_USER_MODEL.objects.all()],
+        choices=[user.id for user in User.objects.all()],
         allow_blank=True,
     )
     groups = serializers.MultipleChoiceField(
@@ -74,7 +74,7 @@ class PermissionWriteRequest(serializers.ModelSerializer):
             users = []
             for user_id in validated_data['users']:
                 try:
-                    users.append(settings.AUTH_USER_MODEL.objects.get(id=user_id))
+                    users.append(User.objects.get(id=user_id))
 
                 except ObjectDoesNotExist:
                     continue

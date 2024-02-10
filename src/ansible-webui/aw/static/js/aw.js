@@ -174,7 +174,10 @@ function apiBrowseDir(inputElement, choicesElement, selector, base, searchType) 
     });
 }
 
-function fetchApiTableData(dataTable, apiEndpoint, updateFunction) {
+function fetchApiTableData(apiEndpoint, updateFunction) {
+    // NOTE: data needs to be list of dict and include an 'id' attribute
+    dataTable = document.getElementById("aw-api-data-table");
+
     $.get(apiEndpoint, function(data) {
         existingEntryIds = [];
         // for each existing entry

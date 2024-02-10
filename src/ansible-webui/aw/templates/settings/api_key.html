@@ -3,22 +3,11 @@
 {% block content %}
 <script src="{% static 'js/settings/api_key.js' %}"></script>
 <div class="table-responsive aw-data">
-    <table class="table table-striped aw-text-responsive">
+    <table class="table table-striped aw-text-responsive" id="aw-api-data-table">
         <tr>
             <th>API Token</th>
             <th>Actions</th>
         </tr>
-{# todo: build table using ajax to allow for clean refresh #}
-{%   for token in api_key_tokens %}
-        <tr>
-            <td>{{ token }}</td>
-            <td>
-                <button class="btn btn-danger aw-btn-action aw-api-click" title="Delete" aw-api-endpoint="key" aw-api-item="{{ token }}" aw-api-method="delete">
-                    {% include "../button/icon/delete.html" %}
-                </button>
-            </td>
-        </tr>
-{%   endfor %}
         <tr>
             <td colspan="100%">
                 {% include "../button/refresh.html" %}
@@ -28,5 +17,10 @@
             </td>
         </tr>
     </table>
+    <div id="aw-api-data-tmpl-actions" hidden="hidden">
+        <button class="btn btn-danger aw-btn-action aw-api-click" title="Delete" aw-api-endpoint="key" aw-api-item="${TOKEN}" aw-api-method="delete">
+            {% include "../button/icon/delete.html" %}
+        </button>
+    </div>
 </div>
 {% endblock %}

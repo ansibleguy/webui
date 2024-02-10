@@ -1,6 +1,5 @@
 from django.urls import path
-from django.conf import settings
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import User, Group
 from django.db.utils import OperationalError
 from django.shortcuts import HttpResponse
 from django.shortcuts import render, redirect
@@ -47,7 +46,7 @@ class SettingPermissionForm(ModelForm):
         users = MultipleChoiceField(
             required=False,
             widget=SelectMultiple,
-            choices=((user.id, user.username) for user in settings.AUTH_USER_MODEL.objects.all())
+            choices=((user.id, user.username) for user in User.objects.all())
         )
         groups = MultipleChoiceField(
             required=False,

@@ -22,8 +22,7 @@ function updateApiTableDataPermission(row, entry) {
 }
 
 $( document ).ready(function() {
-    dataTable = document.getElementById("aw-api-data-table");
     apiEndpoint = "/api/permission";
-    fetchApiTableData(dataTable, apiEndpoint, updateApiTableDataPermission);
-    setInterval('fetchApiTableData(dataTable, apiEndpoint, updateApiTableDataPermission)', (DATA_REFRESH_SEC * 1000));
+    fetchApiTableData(apiEndpoint, updateApiTableDataPermission);
+    setInterval('fetchApiTableData(apiEndpoint, updateApiTableDataPermission)', (DATA_REFRESH_SEC * 1000));
 });

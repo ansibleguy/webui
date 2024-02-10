@@ -1,3 +1,5 @@
+from hashlib import md5
+
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.views import APIView
 from rest_framework import serializers
@@ -10,9 +12,9 @@ from aw.model.api import AwAPIKey
 from aw.api_endpoints.base import API_PERMISSION, get_api_user, BaseResponse, GenericResponse
 
 
-# todo: allow user to add comment to easier identify token
 class KeyReadResponse(BaseResponse):
-    tokens = serializers.ListSerializer(child=serializers.CharField())
+    token = serializers.CharField()
+    id = serializers.CharField()
 
 
 class KeyWriteResponse(BaseResponse):
@@ -32,7 +34,11 @@ class APIKey(APIView):
         summary='Return a list of all existing API keys of the current user.',
     )
     def get(request):
-        return Response({'tokens': [key.name for key in AwAPIKey.objects.filter(user=get_api_user(request))]})
+        tokens = []
+        for key in AwAPIKey.objects.filter(user=get_api_user(request)):
+            tokens.append({'token': key.name, 'id': md5(key.name.encode('utf-8')).hexdigest()})
+
+        return Response(tokens)
 
     @extend_schema(
         request=None,
