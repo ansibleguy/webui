@@ -51,10 +51,44 @@ function addLogLines($this) {
     };
 }
 
+function updateApiTableDataJobLogs(row, row2, entry) {
+    console.log(entry);
+    row.insertCell(0).innerHTML = entry.time_start + '<br>' + entry.user_name +
+    '<br><div class="aw-job-status aw-job-status-' + entry.status_name.toLowerCase() + '">' +
+    entry.status_name + '</div>';
+    row.insertCell(1).innerText = entry.job_name;
+    if (entry.job_comment == "") {
+        row.insertCell(2).innerText = "-";
+    } else {
+        row.insertCell(2).innerText = entry.job_comment;
+    }
+
+    actionsTemplate = document.getElementById("aw-api-data-tmpl-actions").innerHTML;
+    actionsTemplate = actionsTemplate.replaceAll('${ID}', entry.id);
+    actionsTemplate = actionsTemplate.replaceAll('${JOB_ID}', entry.job);
+    row.insertCell(3).innerHTML = actionsTemplate;
+
+    logsTemplates = document.getElementById("aw-api-data-tmpl-logs").innerHTML;
+    logsTemplates = logsTemplates.replaceAll('${ID}', entry.id);
+    logsTemplates = logsTemplates.replaceAll('${JOB_ID}', entry.job);
+    logsTemplates = logsTemplates.replaceAll('${LOG_STDOUT_URL}', entry.log_stdout_url);
+    logsTemplates = logsTemplates.replaceAll('${LOG_STDERR_URL}', entry.log_stderr_url);
+    logsTemplates = logsTemplates.replaceAll('${LOG_STDERR}', entry.log_stderr);
+    logsTemplates = logsTemplates.replaceAll('${LOG_STDOUT}', entry.log_stdout);
+    row2.setAttribute("hidden", "hidden");
+    row2.setAttribute("id", "aw-spoiler-" + entry.id);
+    row2Col = row2.insertCell(0);
+    row2Col.setAttribute("colspan", "100%");
+    row2Col.innerHTML = logsTemplates;
+}
+
 $( document ).ready(function() {
     $(".aw-main").on("click", ".aw-log-read", function(){
         $this = jQuery(this);
         addLogLines($this);
         setInterval('addLogLines($this)', (DATA_REFRESH_SEC * 1000));
     });
+    apiEndpoint = "/api/job_exec";
+    fetchApiTableData(apiEndpoint, updateApiTableDataJobLogs, true);
+    setInterval('fetchApiTableData(apiEndpoint, updateApiTableDataJobLogs, true)', (DATA_REFRESH_SEC * 1000));
 });

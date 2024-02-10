@@ -174,33 +174,49 @@ function apiBrowseDir(inputElement, choicesElement, selector, base, searchType) 
     });
 }
 
-function fetchApiTableData(apiEndpoint, updateFunction) {
+function fetchApiTableData(apiEndpoint, updateFunction, secondRow = false) {
     // NOTE: data needs to be list of dict and include an 'id' attribute
     dataTable = document.getElementById("aw-api-data-table");
+    secondRowAppendix = '_2';
 
     $.get(apiEndpoint, function(data) {
         existingEntryIds = [];
         // for each existing entry
         for (i = 0, len = data.length; i < len; i++) {
             let entry = data[i];
-            existingEntryIds.push(String(entry.id));
+            entryId = String(entry.id);
+            entryId2 = String(entry.id) + secondRowAppendix;
+            existingEntryIds.push(entryId);
+            if (secondRow) {
+                existingEntryIds.push(entryId2);
+            }
             entryChanged = false;
             entryRow = null;
+            entryRow2 = null;
             lastData = null;
+            lastData2 = null;
             // check if the entry existed before
             for (i2 = 0, len2 = dataTable.rows.length; i2 < len2; i2++) {
                 let existingRow = dataTable.rows[i2];
                 let existingRowId = existingRow.getAttribute("aw-api-entry");
-                if (String(existingRowId) == String(entry.id)) {
+                if (String(existingRowId) == entryId) {
                     entryRow = existingRow;
                     lastData = entryRow.getAttribute("aw-api-last");
-                    break
                 }
+                if (String(existingRowId) == entryId2) {
+                    entryRow2 = existingRow;
+                }
+                if (entryRow != null && !secondRow) {break}
+                if (entryRow != null && entryRow2 != null) {break}
             }
             // if new entry - insert new row
             if (entryRow == null) {
+                if (secondRow && entryRow2 == null) {
+                    entryRow2 = dataTable.insertRow(1);
+                    entryRow2.setAttribute("aw-api-entry", entryId2);
+                }
                 entryRow = dataTable.insertRow(1);
-                entryRow.setAttribute("aw-api-entry", entry.id);
+                entryRow.setAttribute("aw-api-entry", entryId);
                 entryChanged = true;
             }
             // if new entry or data changed - update the row-content
@@ -209,7 +225,12 @@ function fetchApiTableData(apiEndpoint, updateFunction) {
                 console.log("Data entry changed:", entry);
                 entryRow.innerHTML = "";
                 entryRow.setAttribute("aw-api-last", newData);
-                updateFunction(entryRow, entry);
+                if (secondRow) {
+                    entryRow2.innerHTML = "";
+                    updateFunction(entryRow, entryRow2, entry);
+                } else {
+                    updateFunction(entryRow, entry);
+                }
             }
         }
         // remove rows of deleted entries

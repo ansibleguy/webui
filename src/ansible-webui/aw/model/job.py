@@ -162,7 +162,7 @@ class Job(BaseJob):
     form_fields = CHANGE_FIELDS
     api_fields_read = ['id']
     api_fields_read.extend(CHANGE_FIELDS)
-    api_fields_write = api_fields_read
+    api_fields_write = api_fields_read.copy()
     api_fields_write.extend(['vault_pass', 'become_pass', 'connect_pass'])
 
     name = models.CharField(max_length=150)
@@ -328,6 +328,11 @@ CHOICES_JOB_EXEC_STATUS = [
 
 
 class JobExecution(BaseJob):
+    api_fields_read = [
+        'id', 'job', 'job_name', 'user', 'user_name', 'result', 'status', 'status_name', 'time_start', 'time_fin',
+        'failed', 'error_s', 'error_m', 'log_stdout', 'log_stdout_url', 'log_stderr', 'log_stderr_url',
+    ]
+
     # NOTE: scheduled execution will have no user
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True,

@@ -12,54 +12,35 @@
 </a>
 {% include "../button/refresh.html" %}
 <div class="table-responsive aw-data">
-    <table class="table table-striped aw-text-responsive">
+    <table class="table table-striped aw-text-responsive" id="aw-api-data-table">
         <tr>
             <th>Run</th>
             <th>Job</th>
             <th>Comment</th>
             <th>Show Logs</th>
         </tr>
-{%   if executions|length == 0 %}
-        <tr>
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
-        </tr>
-{%   endif %}
-{%   for execution in executions %}
-        <tr>
-            <td>{{ execution|execution_info_brief|get_fallback:"-"|safe }}</td>
-            <td>{{ execution.job.name }}</td>
-            <td>{{ execution.job.comment|get_fallback:"-" }}</td>
-            <td>
-                <button class="btn btn-info aw-btn-action aw-btn-expand aw-log-read" title="Show Logs"
-                        aw-expand="aw-spoiler-{{ execution.id }}" aw-log="aw-execution-logs-{{ execution.id }}"
-                        aw-job="{{ execution.job.id }}" aw-exec="{{ execution.id }}" aw-log-line="0"
-                        aw-log-end="aw-log-end-{{ execution.id }}"
-{% if not execution|execution_logfile_exists %}
-                disabled
-{% endif %}
-                >
-                    {% include "../button/icon/expand.html" %}
-                </button>
-            </td>
-        </tr>
-        <tr hidden="hidden" id="aw-spoiler-{{ execution.id }}">
-            <td colspan="100%">
-                <div>
-                    <b>LOG FILES</b>:
-                    <a href="/api/job/{{ execution.job.id }}/{{ execution.id }}/log" title="{{ execution.log_stdout }}" download>Output</a>,
-                    <a href="file://{{ execution.log_stderr }}" title="{{ execution.log_stderr }}" download>Error</a>
-                </div>
-                <div id="aw-execution-logs-{{ execution.id }}" class="aw-execution-logs"></div>
-                <div>
-                    <button type="submit" title="Collapse" class="btn btn-info aw-btn-action aw-btn-collapse" aw-collapse="aw-spoiler-{{ execution.id }}"
-                    id="aw-log-end-{{ execution.id }}">
-                        {% include "../button/icon/collapse.html" %}
-                    </button>
-                </div>
-            </td>
-        </tr>
-{%   endfor %}
+    </table>
+    <div id="aw-api-data-tmpl-actions" hidden="hidden">
+        <button class="btn btn-info aw-btn-action aw-btn-expand aw-log-read" title="Show Logs"
+                aw-expand="aw-spoiler-${ID}" aw-log="aw-execution-logs-${ID}"
+                aw-job="${JOB_ID}" aw-exec="${ID}" aw-log-line="0"
+                aw-log-end="aw-log-end-${ID}">
+            {% include "../button/icon/expand.html" %}
+        </button>
+    </div>
+    <div id="aw-api-data-tmpl-logs" hidden="hidden">
+        <div>
+            <b>LOG FILES</b>:
+            <a href="${LOG_STDOUT_URL}" title="${LOG_STDOUT}" download>Output</a>,
+            <a href="${LOG_STDERR_URL}" title="${LOG_STDERR}" download>Error</a>
+        </div>
+        <div id="aw-execution-logs-${ID}" class="aw-execution-logs"></div>
+        <div>
+            <button type="submit" title="Collapse" class="btn btn-info aw-btn-action aw-btn-collapse" aw-collapse="aw-spoiler-${ID}"
+            id="aw-log-end-${ID}">
+                {% include "../button/icon/collapse.html" %}
+            </button>
+        </div>
+    </div>
+</div>
 {% endblock %}

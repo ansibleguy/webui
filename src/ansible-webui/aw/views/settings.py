@@ -7,7 +7,6 @@ from django.contrib.auth.decorators import login_required
 from django.forms import ModelForm, MultipleChoiceField, SelectMultiple
 
 from aw.utils.http import ui_endpoint_wrapper, ui_endpoint_wrapper_kwargs
-from aw.model.api import AwAPIKey
 from aw.model.job import Job, JobPermission
 from aw.config.form_metadata import FORM_LABEL, FORM_HELP
 
@@ -15,11 +14,7 @@ from aw.config.form_metadata import FORM_LABEL, FORM_HELP
 @login_required
 @ui_endpoint_wrapper
 def setting_api_key(request) -> HttpResponse:
-    api_key_tokens = [key.name for key in AwAPIKey.objects.filter(user=request.user)]
-    return render(
-        request, status=200, template_name='settings/api_key.html',
-        context={'api_key_tokens': api_key_tokens}
-    )
+    return render(request, status=200, template_name='settings/api_key.html')
 
 
 @login_required
