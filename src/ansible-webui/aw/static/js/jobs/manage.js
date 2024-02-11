@@ -1,48 +1,37 @@
 function updateApiTableDataJob(row, row2, entry) {
     // job
-    row.insertCell(0).innerText = entry.name;
-    c2 = row.insertCell(1);
-    c2.setAttribute("class", "aw-responsive-lg");
-    c2.innerText = entry.inventory_file;
-    c3 = row.insertCell(2);
-    c3.setAttribute("class", "aw-responsive-lg");
-    c3.innerText = entry.playbook_file;
+    row.innerHTML = document.getElementById('aw-api-data-tmpl-row').innerHTML;
+    row.cells[0].innerText = entry.name;
+    row.cells[1].innerText = entry.inventory_file;
+    row.cells[2].innerText = entry.playbook_file;
 
-    c4 = row.insertCell(3);
-    c4.setAttribute("class", "aw-responsive-lg");
     if (entry.comment == "") {
-        c4.innerText = '-';
+        row.cells[3].innerText = '-';
     } else {
-        c4.innerText = entry.comment;
+        row.cells[3].innerText = entry.comment;
     }
     if (entry.schedule == "") {
-        row.insertCell(4).innerText = '-';
+        row.cells[4].innerText = '-';
     } else {
         scheduleHtml = entry.schedule;
         if (!entry.enabled) {
             scheduleHtml += '<br><i>(disabled)</i>';
         }
-        row.insertCell(4).innerHTML = scheduleHtml;
+        row.cells[4].innerHTML = scheduleHtml;
     }
 
     if (entry.executions.length == 0) {
         lastExecution = null;
-        row.insertCell(5).innerText = '-';
-
-        c7 = row.insertCell(6);
-        c7.setAttribute("class", "aw-responsive-med");
-        c7.innerHTML = '-';
+        row.cells[5].innerText = '-';
+        row.cells[6].innerText = '-';
     } else {
         lastExecution = entry.executions[0];
-        c6 = row.insertCell(5);
-        c6.innerHTML = shortExecutionStatus(lastExecution);
+        row.cells[5].innerHTML = shortExecutionStatus(lastExecution);
 
-        c7 = row.insertCell(6);
-        c7.setAttribute("class", "aw-responsive-med");
         if (entry.next_run == null) {
-            c7.innerText = '-';
+            row.cells[6].innerText = '-';
         } else {
-            c7.innerText = entry.next_run;
+            row.cells[6].innerText = entry.next_run;
         }
     }
 
@@ -51,15 +40,13 @@ function updateApiTableDataJob(row, row2, entry) {
     if (lastExecution != null) {
         actionsTemplate = actionsTemplate.replaceAll('${EXEC_ID_1}', lastExecution.id);
     }
-    row.insertCell(7).innerHTML = actionsTemplate;
+    row.cells[7].innerHTML = actionsTemplate;
 
     // execution stati
-    executionsTemplate = document.getElementById("aw-api-data-tmpl-executions").innerHTML;
-    executionsTemplate = executionsTemplate.replaceAll('${ID}', entry.id);
-    row2.setAttribute("hidden", "hidden");
+    row2.innerHTML = document.getElementById('aw-api-data-tmpl-row2').innerHTML;
     row2.setAttribute("id", "aw-spoiler-" + entry.id);
-    row2Col = row2.insertCell(0);
-    row2Col.setAttribute("colspan", "100%");
+    row2.setAttribute("hidden", "hidden");
+    row2.innerHTML = row2.innerHTML.replaceAll('${ID}', entry.id);
     execs = '<div>';
     for (i = 0, len = entry.executions.length; i < len; i++) {
         exec = entry.executions[i];
@@ -77,29 +64,19 @@ function updateApiTableDataJob(row, row2, entry) {
         }
     }
     execs += '</div>';
-    executionsTemplate = executionsTemplate.replaceAll('${EXECS}', execs);
-    row2Col.innerHTML = executionsTemplate;
+    row2.innerHTML = row2.innerHTML.replaceAll('${EXECS}', execs);
 }
 
 function updateApiTableDataJobPlaceholder(dataTable, placeholderId) {
-    tableHead = dataTable.rows[0];
     tmpRow = dataTable.insertRow(1);
+    tmpRow.innerHTML = document.getElementById('aw-api-data-tmpl-row').innerHTML;
+    tmpRow.removeAttribute("hidden");
     tmpRow.setAttribute("aw-api-entry", placeholderId);
-    tmpRow.insertCell(0).innerText = '-';
-    c2 = tmpRow.insertCell(1);
-    c2.innerText = '-';
-    c2.setAttribute("class", "aw-responsive-lg");
-    c3 = tmpRow.insertCell(2);
-    c3.innerText = '-';
-    c3.setAttribute("class", "aw-responsive-lg");
-    c4 = tmpRow.insertCell(3);
-    c4.innerText = '-';
-    c4.setAttribute("class", "aw-responsive-lg");
-    tmpRow.insertCell(4).innerText = '-';
-    c6 = tmpRow.insertCell(5);
-    c6.innerText = '-';
-    c6.setAttribute("class", "aw-responsive-med");
-    tmpRow.insertCell(6).innerText = '-';
+
+    tableHead = dataTable.rows[0];
+    for (i = 0, len = tableHead.cells.length; i < len; i++) {
+        tmpRow.cells[i].innerText = '-';
+    }
 }
 
 

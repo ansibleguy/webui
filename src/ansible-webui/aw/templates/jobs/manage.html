@@ -30,6 +30,27 @@
                 </a>
             </td>
         </tr>
+        <tr id="aw-api-data-tmpl-row" hidden="hidden">
+            <td></td>
+            <td class="aw-responsive-lg"></td>
+            <td class="aw-responsive-lg"></td>
+            <td class="aw-responsive-lg"></td>
+            <td></td>
+            <td></td>
+            <td class="aw-responsive-med"></td>
+            <td></td>
+        </tr>
+        <tr id="aw-api-data-tmpl-row2" hidden="hidden">
+            <td colspan="100%">
+                <h2><b>Last executions</b></h2><br>
+                ${EXECS}
+                <div>
+                    <button type="submit" title="Collapse" class="btn btn-info aw-btn-action aw-btn-collapse" aw-collapse="aw-spoiler-${ID}">
+                        {% include "../button/icon/collapse.html" %}
+                    </button>
+                </div>
+            </td>
+        </tr>
     </table>
     <div id="aw-api-data-tmpl-actions" hidden="hidden">
         <button class="btn btn-primary aw-btn-action aw-api-click" title="Run" aw-api-endpoint="job" aw-api-item="${ID}" aw-api-method="post">
@@ -56,15 +77,5 @@
             {% include "../button/icon/delete.html" %}
         </button>
     </div>
-    <div id="aw-api-data-tmpl-executions" hidden="hidden">
-        <h2><b>Last executions</b></h2><br>
-        ${EXECS}
-        <div>
-            <button type="submit" title="Collapse" class="btn btn-info aw-btn-action aw-btn-collapse" aw-collapse="aw-spoiler-${ID}">
-                {% include "../button/icon/collapse.html" %}
-            </button>
-        </div>
-    </div>
-
 </div>
 {% endblock %}

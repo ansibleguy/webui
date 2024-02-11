@@ -1,24 +1,30 @@
 function updateApiTableDataPermission(row, entry) {
-    row.insertCell(0).innerText = entry.name;
-    row.insertCell(1).innerText = entry.permission_name;
+    row.innerHTML = document.getElementById('aw-api-data-tmpl-row').innerHTML;
+    row.cells[0].innerText = entry.name;
+    row.cells[1].innerText = entry.permission_name;
     if (entry.jobs_name.length == 0) {
-        row.insertCell(2).innerText = '-';
+        row.cells[2].innerText = '-';
     } else {
-        row.insertCell(2).innerText = entry.jobs_name.join(', ');
+        row.cells[2].innerText = entry.jobs_name.join(', ');
+    }
+    if (entry.credentials_name.length == 0) {
+        row.cells[3].innerText = '-';
+    } else {
+        row.cells[3].innerText = entry.credentials_name.join(', ');
     }
     if (entry.users_name.length == 0) {
-        row.insertCell(3).innerText = '-';
+        row.cells[4].innerText = '-';
     } else {
-        row.insertCell(3).innerText = entry.users_name.join(', ');
+        row.cells[4].innerText = entry.users_name.join(', ');
     }
     if (entry.groups_name.length == 0) {
-        row.insertCell(4).innerText = '-';
+        row.cells[5].innerText = '-';
     } else {
-        row.insertCell(4).innerText = entry.groups_name.join(', ');
+        row.cells[5].innerText = entry.groups_name.join(', ');
     }
 
     actionsTemplate = document.getElementById("aw-api-data-tmpl-actions").innerHTML;
-    row.insertCell(5).innerHTML = actionsTemplate.replaceAll('${ID}', entry.id);
+    row.cells[6].innerHTML = actionsTemplate.replaceAll('${ID}', entry.id);
 }
 
 $( document ).ready(function() {
