@@ -13,7 +13,7 @@ function updateApiTableDataJob(row, row2, entry) {
     if (entry.schedule == "") {
         row.cells[4].innerText = '-';
     } else {
-        scheduleHtml = entry.schedule;
+        let scheduleHtml = entry.schedule;
         if (!entry.enabled) {
             scheduleHtml += '<br><i>(disabled)</i>';
         }
@@ -21,11 +21,11 @@ function updateApiTableDataJob(row, row2, entry) {
     }
 
     if (entry.executions.length == 0) {
-        lastExecution = null;
+        var lastExecution = null;
         row.cells[5].innerText = '-';
         row.cells[6].innerText = '-';
     } else {
-        lastExecution = entry.executions[0];
+        var lastExecution = entry.executions[0];
         row.cells[5].innerHTML = shortExecutionStatus(lastExecution);
 
         if (entry.next_run == null) {
@@ -35,7 +35,7 @@ function updateApiTableDataJob(row, row2, entry) {
         }
     }
 
-    actionsTemplate = document.getElementById("aw-api-data-tmpl-actions").innerHTML;
+    let actionsTemplate = document.getElementById("aw-api-data-tmpl-actions").innerHTML;
     actionsTemplate = actionsTemplate.replaceAll('${ID}', entry.id);
     if (lastExecution != null) {
         actionsTemplate = actionsTemplate.replaceAll('${EXEC_ID_1}', lastExecution.id);
@@ -47,7 +47,7 @@ function updateApiTableDataJob(row, row2, entry) {
     row2.setAttribute("id", "aw-spoiler-" + entry.id);
     row2.setAttribute("hidden", "hidden");
     row2.innerHTML = row2.innerHTML.replaceAll('${ID}', entry.id);
-    execs = '<div>';
+    let execs = '<div>';
     for (i = 0, len = entry.executions.length; i < len; i++) {
         exec = entry.executions[i];
         execs += ('<hr><b>Start time</b>: ' + exec.time_start)
@@ -70,7 +70,6 @@ function updateApiTableDataJob(row, row2, entry) {
 function updateApiTableDataJobPlaceholder(dataTable, placeholderId) {
     tmpRow = dataTable.insertRow(1);
     tmpRow.innerHTML = document.getElementById('aw-api-data-tmpl-row').innerHTML;
-    tmpRow.removeAttribute("hidden");
     tmpRow.setAttribute("aw-api-entry", placeholderId);
 
     tableHead = dataTable.rows[0];
@@ -78,7 +77,6 @@ function updateApiTableDataJobPlaceholder(dataTable, placeholderId) {
         tmpRow.cells[i].innerText = '-';
     }
 }
-
 
 $( document ).ready(function() {
     apiEndpoint = "/api/job?executions=true";

@@ -13,8 +13,7 @@ from aw.views.system import urlpatterns_system
 
 
 def _local_iframe(_path: str, title: str) -> str:
-    return ('<iframe width="100%" height="100%" marginheight="0" marginwidth="0" frameborder="0" '
-            f'scrolling="auto" src="{_path}" title="{title}"></iframe>')
+    return f'<iframe src="{_path}" title="{title}"></iframe>'
 
 
 @login_required

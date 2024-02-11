@@ -61,7 +61,13 @@ def get_form_field_value(bf: BoundField, existing: dict) -> (str, None):
             value = BaseJobCredentials.SECRET_HIDDEN
 
     else:
+        if existing[bf.name] is None:
+            return None
+
         value = str(existing[bf.name])
+
+    if value is None:
+        return None
 
     return str(value)
 
@@ -80,6 +86,8 @@ def get_form_field_select(bf: BoundField, existing: dict) -> str:
         selected = None  # not implemented
 
     options_str += '>'
+    if selected is None:
+        options_str += '<option disabled selected value>Choose an option</option>'
 
     if not hasattr(bf.field, '_choices'):
         raise AttributeError(f"Field '{bf.name}' is of an invalid type: {type(bf.field)} - {bf.field.__dict__}")
@@ -104,7 +112,7 @@ def get_form_field_input(bf: BoundField, existing: dict) -> str:
     if value is not None:
         field_value = f'value="{value}"'
 
-    if bf.name.find('_pass') != -1:
+    if bf.name.find('_pass') != -1 or bf.name.find('_key') != -1:
         field_attrs += ' type="password"'
 
     elif bf.name.find('_file') != -1:

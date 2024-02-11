@@ -20,6 +20,13 @@ function getCookie(name) {
     return cookieValue;
 }
 
+function is_set(data) {
+    if (typeof(data) != 'undefined' && data != null && data != "") {
+        return true;
+    }
+    return false;
+}
+
 function sleep(ms = 0) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -82,6 +89,19 @@ function shortExecutionStatus(execution) {
     return execution.time_start + '<br>' + execution.user_name +
            '<br><div class="aw-job-status aw-job-status-' + execution.status_name.toLowerCase() + '">' +
            execution.status_name + '</div>';
+}
+
+// source: https://stackoverflow.com/questions/7616461/generate-a-hash-from-string-in-javascript
+function hashString(data) {
+    var hash = 0,
+        i, chr;
+    if (data.length === 0) return hash;
+    for (i = 0; i < data.length; i++) {
+        chr = data.charCodeAt(i);
+        hash = ((hash << 5) - hash) + chr;
+        hash |= 0; // Convert to 32bit integer
+    }
+    return hash;
 }
 
 // API CALLS
@@ -189,36 +209,47 @@ function fetchApiTableDataPlaceholder(dataTable, placeholderId) {
     }
 }
 
-function fetchApiTableData(apiEndpoint, updateFunction, secondRow = false, placeholderFunction = null) {
+// for example with second (hidden) child-row - see: 'job-manage'
+// for example with two tables - see: 'job-credentials'
+function fetchApiTableData(apiEndpoint, updateFunction, secondRow = false, placeholderFunction = null, targetTable = null, dataSubKey = null) {
     // NOTE: data needs to be list of dict and include an 'id' attribute
-    dataTable = document.getElementById("aw-api-data-table");
-    secondRowAppendix = '_2';
-    placeholderExists = false;
-    placeholderId = 'placeholder';
+    if (targetTable == null) {
+        targetTable = "aw-api-data-table";
+    }
+    let dataTable = document.getElementById(targetTable);
+    let secondRowAppendix = '_2';
+    let placeholderExists = false;
+    let placeholderId = 'placeholder';
 
     $.get(apiEndpoint, function(data) {
+        if (dataSubKey != null) {
+            var data = data[dataSubKey];
+        }
         existingEntryIds = [];
         // for each existing entry
         for (i = 0, len = data.length; i < len; i++) {
             let entry = data[i];
-            entryId = String(entry.id);
-            entryId2 = String(entry.id) + secondRowAppendix;
+            let entryId = String(entry.id);
+            let entryId2 = String(entry.id) + secondRowAppendix;
+            if (dataSubKey != null) {
+                entryId += dataSubKey;
+                entryId2 += dataSubKey;
+            }
             existingEntryIds.push(entryId);
             if (secondRow) {
                 existingEntryIds.push(entryId2);
             }
-            entryChanged = false;
-            entryRow = null;
-            entryRow2 = null;
-            lastData = null;
-            lastData2 = null;
+            let entryChanged = false;
+            let entryRow = null;
+            let entryRow2 = null;
+            let lastDataHash = null;
             // check if the entry existed before
             for (i2 = 0, len2 = dataTable.rows.length; i2 < len2; i2++) {
                 let existingRow = dataTable.rows[i2];
                 let existingRowId = existingRow.getAttribute("aw-api-entry");
                 if (String(existingRowId) == entryId) {
                     entryRow = existingRow;
-                    lastData = entryRow.getAttribute("aw-api-last");
+                    lastDataHash = entryRow.getAttribute("aw-api-last");
                 }
                 if (String(existingRowId) == entryId2) {
                     entryRow2 = existingRow;
@@ -237,11 +268,11 @@ function fetchApiTableData(apiEndpoint, updateFunction, secondRow = false, place
                 entryChanged = true;
             }
             // if new entry or data changed - update the row-content
-            newData = JSON.stringify(data);
-            if (entryChanged || lastData != newData) {
+            newDataHash = hashString(JSON.stringify(entry));
+            if (entryChanged || lastDataHash != newDataHash) {
                 console.log("Data entry changed:", entry);
                 entryRow.innerHTML = "";
-                entryRow.setAttribute("aw-api-last", newData);
+                entryRow.setAttribute("aw-api-last", newDataHash);
                 if (secondRow) {
                     entryRow2.innerHTML = "";
                     updateFunction(entryRow, entryRow2, entry);
@@ -251,7 +282,7 @@ function fetchApiTableData(apiEndpoint, updateFunction, secondRow = false, place
             }
         }
         // remove rows of deleted entries
-        rowsToDelete = [];
+        let rowsToDelete = [];
         for (i3 = 0, len3 = dataTable.rows.length; i3 < len3; i3++) {
             let rowIdx = i3;
             let existingRow = dataTable.rows[rowIdx];

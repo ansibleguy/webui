@@ -14,6 +14,12 @@ class BaseJobCredentials(BaseModel):
         'connect_pass': 'connection-password-file',
         'ssh_key': 'key-file',
     }
+    PUBLIC_ATTRS_ARGS = {
+        'connect_user': '-u',
+        'become_user': '--become-user',
+        'vault_file': '--vault-password-file',
+        'vault_id': '--vault-id',
+    }
     SECRET_HIDDEN = '⬤' * 15
 
     name = models.CharField(max_length=100)
@@ -25,7 +31,7 @@ class BaseJobCredentials(BaseModel):
     _enc_vault_pass = models.CharField(max_length=500, **DEFAULT_NONE)
     _enc_become_pass = models.CharField(max_length=500, **DEFAULT_NONE)
     _enc_connect_pass = models.CharField(max_length=500, **DEFAULT_NONE)
-    _enc_ssh_key = models.CharField(max_length=500, **DEFAULT_NONE)
+    _enc_ssh_key = models.CharField(max_length=5000, **DEFAULT_NONE)
 
     @property
     def vault_pass(self) -> str:
@@ -43,6 +49,10 @@ class BaseJobCredentials(BaseModel):
         self._enc_vault_pass = encrypt(value)
 
     @property
+    def vault_pass_is_set(self) -> bool:
+        return is_set(self._enc_vault_pass)
+
+    @property
     def become_pass(self) -> str:
         if is_null(self._enc_become_pass):
             return ''
@@ -56,6 +66,10 @@ class BaseJobCredentials(BaseModel):
             return
 
         self._enc_become_pass = encrypt(value)
+
+    @property
+    def become_pass_is_set(self) -> bool:
+        return is_set(self._enc_become_pass)
 
     @property
     def connect_pass(self) -> str:
@@ -73,6 +87,10 @@ class BaseJobCredentials(BaseModel):
         self._enc_connect_pass = encrypt(value)
 
     @property
+    def connect_pass_is_set(self) -> bool:
+        return is_set(self._enc_connect_pass)
+
+    @property
     def ssh_key(self) -> str:
         if is_null(self._enc_ssh_key):
             return ''
@@ -87,6 +105,10 @@ class BaseJobCredentials(BaseModel):
 
         self._enc_ssh_key = encrypt(value)
 
+    @property
+    def ssh_key_is_set(self) -> bool:
+        return is_set(self._enc_ssh_key)
+
     def _get_set_creds_str(self) -> str:
         creds_set = [attr for attr in self.SECRET_ATTRS if is_set(getattr(self, attr))]
         creds_set_str = ''
@@ -100,6 +122,15 @@ class BaseJobCredentials(BaseModel):
 
 
 class JobGlobalCredentials(BaseJobCredentials):
+    api_fields_read = [
+        'id', 'name', 'become_user', 'connect_user', 'vault_file', 'vault_id'
+    ]
+    api_fields_write = api_fields_read.copy()
+    api_fields_write.extend(BaseJobCredentials.SECRET_ATTRS)
+    for secret_attr in BaseJobCredentials.SECRET_ATTRS:
+        api_fields_read.append(f'{secret_attr}_is_set')
+    form_fields = api_fields_write
+
     def __str__(self) -> str:
         return f"Global credentials '{self.name}'{self._get_set_creds_str()}"
 
@@ -110,6 +141,12 @@ class JobGlobalCredentials(BaseJobCredentials):
 
 
 class JobUserCredentials(BaseJobCredentials):
+    api_fields_read = JobGlobalCredentials.api_fields_read.copy()
+    api_fields_read.append('user')
+    api_fields_write = JobGlobalCredentials.api_fields_write.copy()
+    api_fields_write.append('user')
+    form_fields = JobGlobalCredentials.api_fields_write.copy()
+
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     def __str__(self) -> str:

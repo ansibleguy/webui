@@ -74,7 +74,7 @@ class Job(BaseJob):
     CHANGE_FIELDS = [
         'name', 'inventory_file', 'playbook_file', 'schedule', 'enabled', 'limit', 'verbosity', 'mode_diff',
         'mode_check', 'tags', 'tags_skip', 'verbosity', 'comment', 'environment_vars', 'cmd_args',
-        'credentials_default',
+        'credentials_default', 'credentials_needed',
     ]
     form_fields = CHANGE_FIELDS
     api_fields_read = ['id']
@@ -89,8 +89,9 @@ class Job(BaseJob):
     schedule = models.CharField(max_length=schedule_max_len, validators=[validate_cronjob], blank=True, default=None)
     enabled = models.BooleanField(choices=CHOICES_BOOL, default=True)
 
+    credentials_needed = models.BooleanField(choices=CHOICES_BOOL, default=True)
     credentials_default = models.ForeignKey(
-        JobGlobalCredentials, on_delete=models.SET_NULL, related_name='job_fk_creddflt', null=True,
+        JobGlobalCredentials, on_delete=models.SET_NULL, related_name='job_fk_creddflt', null=True, blank=True,
     )
 
     def __str__(self) -> str:

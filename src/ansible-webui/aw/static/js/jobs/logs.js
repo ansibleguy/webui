@@ -15,7 +15,7 @@ function replaceAll(str, search, replace) {
 }
 
 function replaceLineColors(rawLines) {
-    fixedLines = [];
+    var fixedLines = [];
 
     for (i = 0, len = rawLines.length; i < len; i++) {
         let line = rawLines[i];
@@ -60,12 +60,12 @@ function updateApiTableDataJobLogs(row, row2, entry) {
         row.insertCell(2).innerText = entry.job_comment;
     }
 
-    actionsTemplate = document.getElementById("aw-api-data-tmpl-actions").innerHTML;
+    let actionsTemplate = document.getElementById("aw-api-data-tmpl-actions").innerHTML;
     actionsTemplate = actionsTemplate.replaceAll('${ID}', entry.id);
     actionsTemplate = actionsTemplate.replaceAll('${JOB_ID}', entry.job);
     row.insertCell(3).innerHTML = actionsTemplate;
 
-    logsTemplates = document.getElementById("aw-api-data-tmpl-logs").innerHTML;
+    let logsTemplates = document.getElementById("aw-api-data-tmpl-logs").innerHTML;
     logsTemplates = logsTemplates.replaceAll('${ID}', entry.id);
     logsTemplates = logsTemplates.replaceAll('${JOB_ID}', entry.job);
     logsTemplates = logsTemplates.replaceAll('${LOG_STDOUT_URL}', entry.log_stdout_url);
@@ -74,7 +74,7 @@ function updateApiTableDataJobLogs(row, row2, entry) {
     logsTemplates = logsTemplates.replaceAll('${LOG_STDOUT}', entry.log_stdout);
     row2.setAttribute("hidden", "hidden");
     row2.setAttribute("id", "aw-spoiler-" + entry.id);
-    row2Col = row2.insertCell(0);
+    let row2Col = row2.insertCell(0);
     row2Col.setAttribute("colspan", "100%");
     row2Col.innerHTML = logsTemplates;
 }

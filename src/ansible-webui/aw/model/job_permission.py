@@ -7,16 +7,16 @@ from aw.utils.util import get_choice_by_value
 from aw.model.job import Job
 from aw.model.job_credential import JobGlobalCredentials
 
-CHOICE_JOB_PERMISSION_READ = 5
-CHOICE_JOB_PERMISSION_EXECUTE = 10
-CHOICE_JOB_PERMISSION_WRITE = 15
-CHOICE_JOB_PERMISSION_FULL = 20
-CHOICES_JOB_PERMISSION = (
+CHOICE_PERMISSION_READ = 5
+CHOICE_PERMISSION_EXECUTE = 10
+CHOICE_PERMISSION_WRITE = 15
+CHOICE_PERMISSION_FULL = 20
+CHOICES_PERMISSION = (
     (0, 'None'),
-    (CHOICE_JOB_PERMISSION_READ, 'Read'),
-    (CHOICE_JOB_PERMISSION_EXECUTE, 'Execute'),
-    (CHOICE_JOB_PERMISSION_WRITE, 'Write'),
-    (CHOICE_JOB_PERMISSION_FULL, 'Full'),
+    (CHOICE_PERMISSION_READ, 'Read'),
+    (CHOICE_PERMISSION_EXECUTE, 'Execute'),
+    (CHOICE_PERMISSION_WRITE, 'Write'),
+    (CHOICE_PERMISSION_FULL, 'Full'),
 )
 
 
@@ -27,7 +27,7 @@ class JobPermission(BaseModel):
     api_fields_read.extend(form_fields)
 
     name = models.CharField(max_length=100)
-    permission = models.PositiveSmallIntegerField(choices=CHOICES_JOB_PERMISSION, default=0)
+    permission = models.PositiveSmallIntegerField(choices=CHOICES_PERMISSION, default=0)
     users = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
         through='JobPermissionMemberUser',
@@ -51,7 +51,7 @@ class JobPermission(BaseModel):
 
     def __str__(self) -> str:
         return (f"Permission '{self.name}' - "
-                f"{get_choice_by_value(choices=CHOICES_JOB_PERMISSION, value=self.permission)}")
+                f"{get_choice_by_value(choices=CHOICES_PERMISSION, value=self.permission)}")
 
     class Meta:
         constraints = [

@@ -59,6 +59,7 @@ class PermissionWriteRequest(serializers.ModelSerializer):
 
     @staticmethod
     def create_or_update(validated_data: dict, perm: JobPermission = None):
+        # pylint: disable=R0912
         if perm is None:
             perm = JobPermission(
                 name=validated_data['name'],

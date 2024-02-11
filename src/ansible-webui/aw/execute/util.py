@@ -8,7 +8,7 @@ from aw.config.main import config
 from aw.config.hardcoded import FILE_TIME_FORMAT
 from aw.utils.util import get_choice_key_by_value, is_null, write_file_0600
 from aw.utils.handlers import AnsibleConfigError
-from aw.model.job import Job, JobExecution, CHOICES_JOB_EXEC_STATUS
+from aw.model.job import JobExecution, CHOICES_JOB_EXEC_STATUS
 from aw.model.job_credential import BaseJobCredentials
 
 
@@ -86,18 +86,18 @@ def get_pwd_file(path_run: (str, Path), attr: str) -> str:
     return f"{path_run}/.aw_{attr}"
 
 
-def get_pwd_file_arg(src: (Job, JobExecution), attr: str, path_run: (Path, str)) -> (str, None):
-    if is_null(getattr(src, attr)):
+def get_pwd_file_arg(credentials: BaseJobCredentials, attr: str, path_run: (Path, str)) -> (str, None):
+    if is_null(getattr(credentials, attr)):
         return None
 
     return f"--{BaseJobCredentials.SECRET_ATTRS_ARGS[attr]} {get_pwd_file(path_run=path_run, attr=attr)}"
 
 
-def write_pwd_file(src: (Job, JobExecution), attr: str, path_run: (Path, str)):
-    if is_null(getattr(src, attr)):
+def write_pwd_file(credentials: BaseJobCredentials, attr: str, path_run: (Path, str)):
+    if is_null(getattr(credentials, attr)):
         return None
 
     return write_file_0600(
         file=get_pwd_file(path_run=path_run, attr=attr),
-        content=getattr(src, attr),
+        content=getattr(credentials, attr),
     )

@@ -7,44 +7,99 @@ from os import path as os_path
 from os import remove as remove_file
 
 from ansible_runner import Runner, RunnerConfig
+from django.core.exceptions import ObjectDoesNotExist
+from django.conf import settings
 
 from aw.config.main import config, check_config_is_true
 from aw.config.hardcoded import FILE_TIME_FORMAT
 from aw.utils.util import is_set, is_null, datetime_w_tz, write_file_0640
 from aw.utils.handlers import AnsibleConfigError
 from aw.model.job import Job, JobExecution, JobExecutionResult, JobExecutionResultHost, JobError
-from aw.model.job_credential import BaseJobCredentials
+from aw.model.job_credential import BaseJobCredentials, JobUserCredentials
 from aw.execute.util import update_execution_status, overwrite_and_delete_file, decode_job_env_vars, \
     create_dirs, get_pwd_file, get_pwd_file_arg, write_pwd_file, is_execution_status
+from aw.utils.permission import has_credentials_permission, CHOICE_PERMISSION_READ
+# from aw.utils.debug import log_warn
 
 # see: https://ansible.readthedocs.io/projects/runner/en/latest/intro/
 
 
-def _commandline_arguments(src: (Job, JobExecution), path_run: Path) -> str:
+def _commandline_arguments_credentials(credentials: BaseJobCredentials, path_run: Path) -> list:
     cmd_arguments = []
-    if is_set(src.cmd_args):
-        cmd_arguments.append(src.cmd_args)
 
-    for attr, flag in {
-        'connect_user': '-u',
-        'become_user': '--become-user',
-        'vault_file': '--vault-password-file',
-        'vault_id': '--vault-id',
-    }.items():
-        if is_set(getattr(src, attr)):
-            cmd_arguments.append(f'{flag} {getattr(src, attr)}')
+    for attr, flag in BaseJobCredentials.PUBLIC_ATTRS_ARGS.items():
+        if is_set(getattr(credentials, attr)):
+            cmd_arguments.append(f'{flag} {getattr(credentials, attr)}')
 
-    if src.mode_check:
-        cmd_arguments.append('--check')
-
-    if src.mode_diff:
-        cmd_arguments.append('--diff')
-
-    # todo: allow for user-specific credentials (JobUserCredentials)
     for attr in BaseJobCredentials.SECRET_ATTRS:
-        pwd_arg = get_pwd_file_arg(src, attr=attr, path_run=path_run)
+        pwd_arg = get_pwd_file_arg(credentials, attr=attr, path_run=path_run)
         if pwd_arg is not None:
             cmd_arguments.append(pwd_arg)
+
+    return cmd_arguments
+
+
+def _scheduled_or_has_credentials_access(user: settings.AUTH_USER_MODEL, credentials: BaseJobCredentials) -> bool:
+    if user is None:
+        # scheduled execution
+        return True
+
+    return has_credentials_permission(
+        user=user,
+        credentials=credentials,
+        permission_needed=CHOICE_PERMISSION_READ,
+    )
+
+
+def _get_credentials_to_use(job: Job, execution: JobExecution) -> (BaseJobCredentials, None):
+    credentials = None
+
+    # todo: write warn log if user tried to execute job using non-permitted credentials (if execution.cred*)
+    if execution.user is not None and is_set(execution.credential_user) and \
+            execution.credential_user.user.id == execution.user.id:
+        credentials = execution.credential_user
+
+    elif is_set(execution.credential_global) and _scheduled_or_has_credentials_access(
+        user=execution.user, credentials=execution.credential_global,
+    ):
+        credentials = execution.credential_global
+
+    elif is_set(job.credentials_default) and _scheduled_or_has_credentials_access(
+        user=execution.user, credentials=job.credentials_default,
+    ):
+        credentials = job.credentials_default
+
+    elif job.credentials_needed and is_set(execution.user):
+        # pylint: disable=E1101
+        # try to get default user-credentials as a last-resort if the job needs some credentials
+        try:
+            credentials = JobUserCredentials.objects.filter(user=execution.user).first()
+
+        except ObjectDoesNotExist:
+            pass
+
+    return credentials
+
+
+def _commandline_arguments(job: Job, execution: JobExecution, path_run: Path) -> str:
+    cmd_arguments = []
+    if is_set(job.cmd_args):
+        cmd_arguments.append(job.cmd_args)
+
+    if is_set(execution.cmd_args):
+        cmd_arguments.append(execution.cmd_args)
+
+    if execution.mode_check:
+        cmd_arguments.append('--check')
+
+    if execution.mode_diff:
+        cmd_arguments.append('--diff')
+
+    credentials = _get_credentials_to_use(job=job, execution=execution)
+    if credentials is not None:
+        cmd_arguments.extend(
+            _commandline_arguments_credentials(credentials=credentials, path_run=path_run)
+        )
 
     return ' '.join(cmd_arguments)
 
@@ -83,8 +138,7 @@ def _runner_options(job: Job, execution: JobExecution, path_run: Path) -> dict:
     elif job.verbosity != 0:
         verbosity = job.verbosity
 
-    # todo: allow execution to override job arguments; if unset they should be inherited from job though..
-    cmdline_args = _commandline_arguments(job, path_run=path_run)
+    cmdline_args = _commandline_arguments(job=job, execution=execution, path_run=path_run)
 
     opts = {
         'private_data_dir': path_run,
@@ -132,9 +186,9 @@ def runner_prep(job: Job, execution: JobExecution, path_run: Path) -> dict:
     create_dirs(path=path_run, desc='run')
     create_dirs(path=config['path_log'], desc='log')
 
-    for pwd_attr in BaseJobCredentials.SECRET_ATTRS:
-        write_pwd_file(src=job, attr=pwd_attr, path_run=path_run)
-        write_pwd_file(src=execution, attr=pwd_attr, path_run=path_run)
+    credentials = _get_credentials_to_use(job=job, execution=execution)
+    for secret_attr in BaseJobCredentials.SECRET_ATTRS:
+        write_pwd_file(credentials, attr=secret_attr, path_run=path_run)
 
     update_execution_status(execution, status='Running')
     return opts

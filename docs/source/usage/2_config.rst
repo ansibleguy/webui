@@ -7,9 +7,6 @@
 .. |cnf_admin| image:: ../_static/img/config_admin.png
    :class: wiki-img
 
-.. |cnf_jobs| image:: ../_static/img/config_jobs.png
-   :class: wiki-img
-
 
 ==========
 2 - Config
