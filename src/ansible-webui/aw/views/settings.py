@@ -1,13 +1,13 @@
+from django import forms
 from django.urls import path
-from django.contrib.auth.models import User, Group
 from django.shortcuts import HttpResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from django.forms import ModelForm, SelectMultiple, MultipleChoiceField
 
 from aw.utils.http import ui_endpoint_wrapper, ui_endpoint_wrapper_kwargs
-from aw.model.job import Job, JobPermission
+from aw.model.job_permission import JobPermission
 from aw.config.form_metadata import FORM_LABEL, FORM_HELP
+from aw.views.base import choices_job, choices_user, choices_credentials, choices_group
 
 
 @login_required
@@ -22,20 +22,7 @@ def setting_permission(request) -> HttpResponse:
     return render(request, status=200, template_name='settings/permission.html')
 
 
-def _job_choices() -> list[tuple]:
-    # pylint: disable=E1101
-    return [(job.id, job.name) for job in Job.objects.all()]
-
-
-def _user_choices() -> list[tuple]:
-    return [(user.id, user.username) for user in User.objects.all()]
-
-
-def _group_choices() -> list[tuple]:
-    return [(group.id, group.name) for group in Group.objects.all()]
-
-
-class SettingPermissionForm(ModelForm):
+class SettingPermissionForm(forms.ModelForm):
     class Meta:
         model = JobPermission
         fields = JobPermission.form_fields
@@ -43,20 +30,25 @@ class SettingPermissionForm(ModelForm):
         labels = FORM_LABEL['settings']['permissions']
         help_texts = FORM_HELP['settings']['permissions']
 
-    jobs = MultipleChoiceField(
+    jobs = forms.MultipleChoiceField(
         required=False,
-        widget=SelectMultiple,
-        choices=_job_choices,
+        widget=forms.SelectMultiple,
+        choices=choices_job,
     )
-    users = MultipleChoiceField(
+    credentials = forms.MultipleChoiceField(
         required=False,
-        widget=SelectMultiple,
-        choices=_user_choices,
+        widget=forms.SelectMultiple,
+        choices=choices_credentials,
     )
-    groups = MultipleChoiceField(
+    users = forms.MultipleChoiceField(
         required=False,
-        widget=SelectMultiple,
-        choices=_group_choices,
+        widget=forms.SelectMultiple,
+        choices=choices_user,
+    )
+    groups = forms.MultipleChoiceField(
+        required=False,
+        widget=forms.SelectMultiple,
+        choices=choices_group,
     )
 
 

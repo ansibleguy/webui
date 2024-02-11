@@ -7,7 +7,10 @@ from rest_framework import serializers
 from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema, OpenApiResponse
 
-from aw.model.job import Job, JobPermission, JobPermissionMapping, JobPermissionMemberUser, JobPermissionMemberGroup
+from aw.model.job import Job
+from aw.model.job_credential import JobGlobalCredentials
+from aw.model.job_permission import JobPermission, JobPermissionMapping, JobPermissionMemberUser, \
+    JobPermissionMemberGroup, JobCredentialsPermissionMapping
 from aw.api_endpoints.base import API_PERMISSION, GenericResponse, get_api_user
 from aw.utils.permission import get_permission_name
 from aw.utils.util import is_set
@@ -22,9 +25,11 @@ class PermissionReadResponse(serializers.ModelSerializer):
 
     permission_name = serializers.CharField(required=False)
     jobs = serializers.ListSerializer(child=serializers.IntegerField(), required=False)
+    credentials = serializers.ListSerializer(child=serializers.IntegerField(), required=False)
     users_name = serializers.ListSerializer(child=serializers.CharField(), required=False)
     groups_name = serializers.ListSerializer(child=serializers.CharField(), required=False)
     jobs_name = serializers.ListSerializer(child=serializers.CharField(), required=False)
+    credentials_name = serializers.ListSerializer(child=serializers.CharField(), required=False)
 
 
 class JobSerializer(serializers.ModelSerializer):
@@ -38,12 +43,17 @@ class PermissionWriteRequest(serializers.ModelSerializer):
         fields = JobPermission.api_fields_write
 
     jobs = serializers.MultipleChoiceField(allow_blank=True, choices=[])
+    credentials = serializers.MultipleChoiceField(allow_blank=True, choices=[])
     users = serializers.MultipleChoiceField(allow_blank=True, choices=[])
     groups = serializers.MultipleChoiceField(allow_blank=True, choices=[])
 
     def __init__(self, *args, **kwargs):
+        # pylint: disable=E1101
         super().__init__(*args, **kwargs)
         self.fields['jobs'] = serializers.MultipleChoiceField(choices=[job.id for job in Job.objects.all()])
+        self.fields['credentials'] = serializers.MultipleChoiceField(
+            choices=[creds.id for creds in JobGlobalCredentials.objects.all()]
+        )
         self.fields['users'] = serializers.MultipleChoiceField(choices=[user.id for user in User.objects.all()])
         self.fields['groups'] = serializers.MultipleChoiceField(choices=[group.id for group in Group.objects.all()])
 
@@ -71,6 +81,17 @@ class PermissionWriteRequest(serializers.ModelSerializer):
                     continue
 
             perm.jobs.set(jobs)
+
+        if 'credentials' in validated_data and is_set(validated_data['credentials']):
+            credentials = []
+            for creds_id in validated_data['credentials']:
+                try:
+                    credentials.append(JobGlobalCredentials.objects.get(id=creds_id))
+
+                except ObjectDoesNotExist:
+                    continue
+
+            perm.credentials.set(credentials)
 
         if 'users' in validated_data and is_set(validated_data['users']):
             users = []
@@ -101,6 +122,8 @@ def build_permissions(perm_id_filter: int = None) -> (list, dict):
     permissions_raw = JobPermission.objects.all()
     permission_jobs_id = {permission.id: [] for permission in permissions_raw}
     permission_jobs_name = {permission.id: [] for permission in permissions_raw}
+    permission_credentials_id = {permission.id: [] for permission in permissions_raw}
+    permission_credentials_name = {permission.id: [] for permission in permissions_raw}
     permission_users_id = {permission.id: [] for permission in permissions_raw}
     permission_users_name = {permission.id: [] for permission in permissions_raw}
     permission_groups_id = {permission.id: [] for permission in permissions_raw}
@@ -109,6 +132,10 @@ def build_permissions(perm_id_filter: int = None) -> (list, dict):
     for mapping in JobPermissionMapping.objects.all():
         permission_jobs_id[mapping.permission.id].append(mapping.job.id)
         permission_jobs_name[mapping.permission.id].append(mapping.job.name)
+
+    for mapping in JobCredentialsPermissionMapping.objects.all():
+        permission_credentials_id[mapping.permission.id].append(mapping.credentials.id)
+        permission_credentials_name[mapping.permission.id].append(mapping.credentials.name)
 
     for mapping in JobPermissionMemberUser.objects.all():
         permission_users_id[mapping.permission.id].append(mapping.user.id)
@@ -131,9 +158,11 @@ def build_permissions(perm_id_filter: int = None) -> (list, dict):
             'permission': permission.permission,
             'permission_name': get_permission_name(permission.permission),
             'jobs': permission_jobs_id[permission.id],
+            'credentials': permission_credentials_id[permission.id],
             'users': permission_users_id[permission.id],
             'groups': permission_groups_id[permission.id],
             'jobs_name': permission_jobs_name[permission.id],
+            'credentials_name': permission_credentials_name[permission.id],
             'users_name': permission_users_name[permission.id],
             'groups_name': permission_groups_name[permission.id],
         })

@@ -1,16 +1,19 @@
+from django import forms
 from django.shortcuts import redirect, render
 from django.shortcuts import HttpResponse
 from django.urls import path
-from django.forms import ModelForm, CharField
 from django.core.validators import RegexValidator
 from django.contrib.auth.decorators import login_required
 
 from aw.utils.http import ui_endpoint_wrapper, ui_endpoint_wrapper_kwargs
-from aw.model.job import Job, JobExecution, CHOICE_JOB_PERMISSION_WRITE, JobExecutionResultHost
+from aw.model.job import Job, JobExecution, JobExecutionResultHost
+from aw.model.job_permission import CHOICE_JOB_PERMISSION_WRITE
+from aw.model.job_credential import JobGlobalCredentials
 from aw.api_endpoints.job_util import get_viewable_jobs
 from aw.utils.permission import has_job_permission
 from aw.config.form_metadata import FORM_LABEL, FORM_HELP
 from aw.utils.util import get_next_cron_execution_str
+from aw.views.base import choices_credentials
 
 LIMIT_JOB_RESULTS = 10
 LIMIT_JOB_LOG_RESULTS = 50
@@ -51,7 +54,7 @@ def manage(request) -> HttpResponse:
     )
 
 
-class JobForm(ModelForm):
+class JobForm(forms.ModelForm):
     class Meta:
         model = Job
         fields = Job.form_fields
@@ -59,12 +62,19 @@ class JobForm(ModelForm):
         labels = FORM_LABEL['jobs']['manage']['job']
         help_texts = FORM_HELP['jobs']['manage']['job']
 
-    vault_pass = CharField(max_length=100, required=False, label=FORM_LABEL['jobs']['manage']['job']['vault_pass'])
-    become_pass = CharField(max_length=100, required=False, label=FORM_LABEL['jobs']['manage']['job']['become_pass'])
-    connect_pass = CharField(max_length=100, required=False, label=FORM_LABEL['jobs']['manage']['job']['connect_pass'])
+    # vault_pass = CharField(max_length=100, required=False, label=FORM_LABEL['jobs']['manage']['job']['vault_pass'])
+    # become_pass = CharField(max_length=100, required=False, label=FORM_LABEL['jobs']['manage']['job']['become_pass'])
+    # connect_pass = CharField(max_length=100, required=False, label=FORM_LABEL['jobs']['manage']['job']['connect_pass'])
+
+    credentials_default = forms.ChoiceField(
+        required=False,
+        widget=forms.Select,
+        choices=choices_credentials,
+        label=FORM_LABEL['jobs']['manage']['job']['credentials_default'],
+    )
 
     # form not picking up regex-validator
-    schedule = CharField(
+    schedule = forms.CharField(
         max_length=Job.schedule_max_len,
         validators=[RegexValidator(
             regex=r'^(@(annually|yearly|monthly|weekly|daily|hourly))|'

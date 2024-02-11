@@ -14,10 +14,14 @@ FORM_LABEL = {
                 'cmd_args': 'Commandline Arguments',
                 'user_credentials': 'User Credentials',
                 'enabled': 'Schedule Enabled',
+                'tags_skip': 'Skip Tags',
+                'credentials_default': 'Default Job Credentials',
+            },
+            'credentials': {
                 'vault_file': 'Vault Password File',
                 'vault_pass': 'Vault Password',
                 'vault_id': 'Vault ID',
-                'tags_skip': 'Skip Tags',
+                'ssh_key': 'SSH Private Key',
             }
         }
     },
@@ -44,11 +48,6 @@ FORM_HELP = {
                             '<a href="https://crontab.guru/">crontab.guru</a>',
                 'environment_vars': 'Environmental variables to be passed to the Ansible execution. '
                                     'Comma-separated list of key-value pairs. (VAR1=TEST1,VAR2=0)',
-                'vault_file': 'Path to the file containing your vault-password',
-                'vault_id': 'For details see: '
-                            '<a href="https://docs.ansible.com/ansible/latest/vault_guide/'
-                            'vault_managing_passwords.html">'
-                            'Ansible Docs - Managing Passwords</a>',
                 'cmd_args': "Additional commandline arguments to pass to 'ansible-playbook'. "
                             "Can be used to pass extra-vars",
                 'tags': 'For details see: '
@@ -57,6 +56,13 @@ FORM_HELP = {
                 'mode_check': 'For details see: '
                               '<a href="https://docs.ansible.com/ansible/2.8/user_guide/playbooks_checkmode.html">'
                               'Ansible Docs - Check Mode</a>',
+            },
+            'credentials': {
+                'vault_file': 'Path to the file containing your vault-password',
+                'vault_id': 'For details see: '
+                            '<a href="https://docs.ansible.com/ansible/latest/vault_guide/'
+                            'vault_managing_passwords.html">'
+                            'Ansible Docs - Managing Passwords</a>',
             }
         }
     },

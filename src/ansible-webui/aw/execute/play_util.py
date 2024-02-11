@@ -12,8 +12,8 @@ from aw.config.main import config, check_config_is_true
 from aw.config.hardcoded import FILE_TIME_FORMAT
 from aw.utils.util import is_set, is_null, datetime_w_tz, write_file_0640
 from aw.utils.handlers import AnsibleConfigError
-from aw.model.job import Job, JobExecution, JobExecutionResult, JobExecutionResultHost, JobError, \
-    BaseJobCredentials
+from aw.model.job import Job, JobExecution, JobExecutionResult, JobExecutionResultHost, JobError
+from aw.model.job_credential import BaseJobCredentials
 from aw.execute.util import update_execution_status, overwrite_and_delete_file, decode_job_env_vars, \
     create_dirs, get_pwd_file, get_pwd_file_arg, write_pwd_file, is_execution_status
 
@@ -41,7 +41,7 @@ def _commandline_arguments(src: (Job, JobExecution), path_run: Path) -> str:
         cmd_arguments.append('--diff')
 
     # todo: allow for user-specific credentials (JobUserCredentials)
-    for attr in BaseJobCredentials.PWD_ATTRS:
+    for attr in BaseJobCredentials.SECRET_ATTRS:
         pwd_arg = get_pwd_file_arg(src, attr=attr, path_run=path_run)
         if pwd_arg is not None:
             cmd_arguments.append(pwd_arg)
@@ -132,7 +132,7 @@ def runner_prep(job: Job, execution: JobExecution, path_run: Path) -> dict:
     create_dirs(path=path_run, desc='run')
     create_dirs(path=config['path_log'], desc='log')
 
-    for pwd_attr in BaseJobCredentials.PWD_ATTRS:
+    for pwd_attr in BaseJobCredentials.SECRET_ATTRS:
         write_pwd_file(src=job, attr=pwd_attr, path_run=path_run)
         write_pwd_file(src=execution, attr=pwd_attr, path_run=path_run)
 
@@ -161,7 +161,7 @@ def runner_logs(cfg: RunnerConfig, log_files: dict):
 
 def runner_cleanup(path_run: Path):
     overwrite_and_delete_file(f"{path_run}/env/passwords")
-    for attr in BaseJobCredentials.PWD_ATTRS:
+    for attr in BaseJobCredentials.SECRET_ATTRS:
         overwrite_and_delete_file(get_pwd_file(path_run=path_run, attr=attr))
 
     rmtree(path_run, ignore_errors=True)

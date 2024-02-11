@@ -1,6 +1,7 @@
 from django.conf import settings
 
-from aw.model.job import Job, JobPermissionMapping, JobPermissionMemberUser, JobPermissionMemberGroup, \
+from aw.model.job import Job
+from aw.model.job_permission import JobPermissionMapping, JobPermissionMemberUser, JobPermissionMemberGroup, \
     CHOICE_JOB_PERMISSION_READ, CHOICES_JOB_PERMISSION
 from aw.utils.util import get_choice_by_value
 

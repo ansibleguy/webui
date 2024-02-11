@@ -4,7 +4,7 @@ from django.forms import BoundField, MultipleChoiceField
 from django.forms.widgets import Select
 from django.core.validators import RegexValidator
 
-from aw.model.job import BaseJobCredentials
+from aw.model.job_credential import BaseJobCredentials
 from aw.utils.util import is_set
 
 register = template.Library()
@@ -45,11 +45,11 @@ def get_form_required(bf: BoundField) -> str:
 
 
 def get_form_field_value(bf: BoundField, existing: dict) -> (str, None):
-    # PWD_ATTRS are not exposed here
-    if bf.name not in existing and bf.name not in BaseJobCredentials.PWD_ATTRS:
+    # SECRET_ATTRS are not exposed here
+    if bf.name not in existing and bf.name not in BaseJobCredentials.SECRET_ATTRS:
         return None
 
-    if bf.name in BaseJobCredentials.PWD_ATTRS:
+    if bf.name in BaseJobCredentials.SECRET_ATTRS:
         enc_field = '_enc_' + bf.name
         if enc_field in existing and not is_set(existing[enc_field]):
             return None
@@ -58,7 +58,7 @@ def get_form_field_value(bf: BoundField, existing: dict) -> (str, None):
             value = None
 
         else:
-            value = BaseJobCredentials.PWD_HIDDEN
+            value = BaseJobCredentials.SECRET_HIDDEN
 
     else:
         value = str(existing[bf.name])
@@ -80,6 +80,9 @@ def get_form_field_select(bf: BoundField, existing: dict) -> str:
         selected = None  # not implemented
 
     options_str += '>'
+
+    if not hasattr(bf.field, '_choices'):
+        raise AttributeError(f"Field '{bf.name}' is of an invalid type: {type(bf.field)} - {bf.field.__dict__}")
 
     # pylint: disable=W0212
     for option in bf.field._choices:

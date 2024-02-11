@@ -1,14 +1,12 @@
 from crontab import CronTab
 from django.db import models
 from django.conf import settings
-from django.contrib.auth.models import Group
 from django.core.validators import ValidationError
 from django.utils import timezone
 
 from aw.model.base import BareModel, BaseModel, CHOICES_BOOL, DEFAULT_NONE
 from aw.config.hardcoded import SHORT_TIME_FORMAT
-from aw.utils.util import is_null, get_choice_by_value
-from aw.utils.crypto import encrypt, decrypt
+from aw.model.job_credential import JobGlobalCredentials, JobUserCredentials
 
 
 class JobError(BareModel):
@@ -30,88 +28,7 @@ CHOICES_JOB_VERBOSITY = (
 )
 
 
-class BaseJobCredentials(BaseModel):
-    PWD_ATTRS = ['become_pass', 'vault_pass', 'connect_pass']
-    PWD_ATTRS_ARGS = {
-        'vault_pass': 'vault-password-file',
-        'become_pass': 'become-password-file',
-        'connect_pass': 'connection-password-file',
-    }
-    PWD_HIDDEN = '⬤' * 15
-
-    connect_user = models.CharField(max_length=100, **DEFAULT_NONE)
-    become_user = models.CharField(max_length=100, **DEFAULT_NONE)
-    vault_file = models.CharField(max_length=300, **DEFAULT_NONE)
-    vault_id = models.CharField(max_length=50, **DEFAULT_NONE)
-
-    _enc_vault_pass = models.CharField(max_length=500, **DEFAULT_NONE)
-    _enc_become_pass = models.CharField(max_length=500, **DEFAULT_NONE)
-    _enc_connect_pass = models.CharField(max_length=500, **DEFAULT_NONE)
-
-    @property
-    def vault_pass(self) -> str:
-        if is_null(self._enc_vault_pass):
-            return ''
-
-        return decrypt(self._enc_vault_pass)
-
-    @vault_pass.setter
-    def vault_pass(self, value: str):
-        if is_null(value):
-            self._enc_vault_pass = None
-            return
-
-        self._enc_vault_pass = encrypt(value)
-
-    @property
-    def become_pass(self) -> str:
-        if is_null(self._enc_become_pass):
-            return ''
-
-        return decrypt(self._enc_become_pass)
-
-    @become_pass.setter
-    def become_pass(self, value: str):
-        if is_null(value):
-            self._enc_become_pass = None
-            return
-
-        self._enc_become_pass = encrypt(value)
-
-    @property
-    def connect_pass(self) -> str:
-        if is_null(self._enc_connect_pass):
-            return ''
-
-        return decrypt(self._enc_connect_pass)
-
-    @connect_pass.setter
-    def connect_pass(self, value: str):
-        if is_null(value):
-            self._enc_connect_pass = None
-            return
-
-        self._enc_connect_pass = encrypt(value)
-
-    class Meta:
-        abstract = True
-
-
-class JobUserCredentials(BaseJobCredentials):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    name = models.CharField(max_length=100)
-
-    def __str__(self) -> str:
-        # pylint: disable=E1101
-        return f"Credentials '{self.name}' of user '{self.user.username}'"
-
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(fields=['user', 'name'], name='jobusercreds_user_name')
-        ]
-
-
-class BaseJob(BaseJobCredentials):
+class BaseJob(BaseModel):
     BAD_ANSIBLE_FLAGS = [
         'step', 'ask-vault-password', 'ask-vault-pass', 'k', 'ask-pass',
     ]
@@ -157,14 +74,13 @@ class Job(BaseJob):
     CHANGE_FIELDS = [
         'name', 'inventory_file', 'playbook_file', 'schedule', 'enabled', 'limit', 'verbosity', 'mode_diff',
         'mode_check', 'tags', 'tags_skip', 'verbosity', 'comment', 'environment_vars', 'cmd_args',
-        'vault_id', 'vault_file', 'connect_user', 'become_user',
+        'credentials_default',
     ]
     form_fields = CHANGE_FIELDS
     api_fields_read = ['id']
     api_fields_read.extend(CHANGE_FIELDS)
     api_fields_write = api_fields_read.copy()
     api_fields_read.append('next_run')
-    api_fields_write.extend(['vault_pass', 'become_pass', 'connect_pass'])
 
     name = models.CharField(max_length=150)
     inventory_file = models.CharField(max_length=300)  # NOTE: one or multiple comma-separated inventories
@@ -173,6 +89,10 @@ class Job(BaseJob):
     schedule = models.CharField(max_length=schedule_max_len, validators=[validate_cronjob], blank=True, default=None)
     enabled = models.BooleanField(choices=CHOICES_BOOL, default=True)
 
+    credentials_default = models.ForeignKey(
+        JobGlobalCredentials, on_delete=models.SET_NULL, related_name='job_fk_creddflt', null=True,
+    )
+
     def __str__(self) -> str:
         limit = '' if self.limit is None else f' [{self.limit}]'
         return f"Job '{self.name}' ({self.playbook_file} => {self.inventory_file}{limit})"
@@ -180,93 +100,6 @@ class Job(BaseJob):
     class Meta:
         constraints = [
             models.UniqueConstraint(fields=['name'], name='job_name_unique')
-        ]
-
-
-CHOICE_JOB_PERMISSION_READ = 5
-CHOICE_JOB_PERMISSION_EXECUTE = 10
-CHOICE_JOB_PERMISSION_WRITE = 15
-CHOICE_JOB_PERMISSION_FULL = 20
-CHOICES_JOB_PERMISSION = (
-    (0, 'None'),
-    (CHOICE_JOB_PERMISSION_READ, 'Read'),
-    (CHOICE_JOB_PERMISSION_EXECUTE, 'Execute'),
-    (CHOICE_JOB_PERMISSION_WRITE, 'Write'),
-    (CHOICE_JOB_PERMISSION_FULL, 'Full'),
-)
-
-
-class JobPermission(BaseModel):
-    form_fields = ['name', 'permission', 'jobs', 'users', 'groups']
-    api_fields_write = form_fields
-    api_fields_read = ['permission_name', 'jobs_name', 'users_name', 'groups_name']
-    api_fields_read.extend(form_fields)
-
-    name = models.CharField(max_length=100)
-    permission = models.PositiveSmallIntegerField(choices=CHOICES_JOB_PERMISSION, default=0)
-    users = models.ManyToManyField(
-        settings.AUTH_USER_MODEL,
-        through='JobPermissionMemberUser',
-        through_fields=('permission', 'user'),
-    )
-    groups = models.ManyToManyField(
-        Group,
-        through='JobPermissionMemberGroup',
-        through_fields=('permission', 'group'),
-    )
-    jobs = models.ManyToManyField(
-        Job,
-        through='JobPermissionMapping',
-        through_fields=('permission', 'job'),
-    )
-
-    def __str__(self) -> str:
-        return (f"Permission '{self.name}' - "
-                f"{get_choice_by_value(choices=CHOICES_JOB_PERMISSION, value=self.permission)}")
-
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(fields=['name'], name='jobperm_name_unique')
-        ]
-
-
-class JobPermissionMapping(BareModel):
-    job = models.ForeignKey(Job, on_delete=models.CASCADE)
-    permission = models.ForeignKey(JobPermission, on_delete=models.CASCADE)
-
-    def __str__(self) -> str:
-        return f"Permission '{self.permission.name}' linked to job '{self.job.name}'"
-
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(fields=['job', 'permission'], name='jobpermmap_unique')
-        ]
-
-
-class JobPermissionMemberUser(BareModel):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    permission = models.ForeignKey(JobPermission, on_delete=models.CASCADE)
-
-    def __str__(self) -> str:
-        # pylint: disable=E1101
-        return f"Permission '{self.permission.name}' member user '{self.user.username}'"
-
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(fields=['user', 'permission'], name='jobpermmemberuser_unique')
-        ]
-
-
-class JobPermissionMemberGroup(BareModel):
-    group = models.ForeignKey(Group, on_delete=models.CASCADE)
-    permission = models.ForeignKey(JobPermission, on_delete=models.CASCADE)
-
-    def __str__(self) -> str:
-        return f"Permission '{self.permission.name}' member group '{self.group.name}'"
-
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(fields=['group', 'permission'], name='jobpermmembergrp_unique')
         ]
 
 
@@ -332,6 +165,7 @@ class JobExecution(BaseJob):
     api_fields_read = [
         'id', 'job', 'job_name', 'user', 'user_name', 'result', 'status', 'status_name', 'time_start', 'time_fin',
         'failed', 'error_s', 'error_m', 'log_stdout', 'log_stdout_url', 'log_stderr', 'log_stderr_url', 'job_comment',
+        'credential_global', 'credential_user',
     ]
 
     # NOTE: scheduled execution will have no user
@@ -350,6 +184,13 @@ class JobExecution(BaseJob):
     )
     log_stdout = models.CharField(max_length=300, **DEFAULT_NONE)
     log_stderr = models.CharField(max_length=300, **DEFAULT_NONE)
+
+    credential_global = models.ForeignKey(
+        JobGlobalCredentials, on_delete=models.SET_NULL, related_name='jobexec_fk_credglob', null=True,
+    )
+    credential_user = models.ForeignKey(
+        JobUserCredentials, on_delete=models.SET_NULL, related_name='jobexec_fk_credusr', null=True,
+    )
 
     def __str__(self) -> str:
         # pylint: disable=E1101

@@ -61,7 +61,7 @@ body.dark {
 /* START basic */
 .aw-main {
     margin: 2%;
-    height: 100vh;
+    min-height: 100vh;
     margin-bottom: 3vh;
     color: var(--tc1);
 }

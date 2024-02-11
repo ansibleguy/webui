@@ -7,9 +7,10 @@ from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiParameter
 
 from aw.config.hardcoded import JOB_EXECUTION_LIMIT
-from aw.model.job import Job, JobExecution, BaseJobCredentials, \
-    CHOICE_JOB_PERMISSION_READ, CHOICE_JOB_PERMISSION_WRITE, CHOICE_JOB_PERMISSION_EXECUTE, \
-    CHOICE_JOB_PERMISSION_FULL
+from aw.model.job import Job, JobExecution
+from aw.model.job_credential import BaseJobCredentials
+from aw.model.job_permission import CHOICE_JOB_PERMISSION_READ, CHOICE_JOB_PERMISSION_EXECUTE, \
+    CHOICE_JOB_PERMISSION_WRITE, CHOICE_JOB_PERMISSION_FULL
 from aw.api_endpoints.base import API_PERMISSION, get_api_user, BaseResponse, GenericResponse
 from aw.api_endpoints.job_util import get_viewable_jobs_serialized, JobReadResponse, get_job_executions_serialized, \
     JobExecutionReadResponse, get_viewable_jobs, get_job_execution_serialized
@@ -24,9 +25,9 @@ class JobWriteRequest(serializers.ModelSerializer):
         model = Job
         fields = Job.api_fields_write
 
-    vault_pass = serializers.CharField(max_length=100, required=False, default=None)
-    become_pass = serializers.CharField(max_length=100, required=False, default=None)
-    connect_pass = serializers.CharField(max_length=100, required=False, default=None)
+    # vault_pass = serializers.CharField(max_length=100, required=False, default=None)
+    # become_pass = serializers.CharField(max_length=100, required=False, default=None)
+    # connect_pass = serializers.CharField(max_length=100, required=False, default=None)
 
 
 def _find_job(job_id: int) -> (Job, None):
@@ -130,11 +131,11 @@ class APIJob(APIView):
                 status=400,
             )
 
-        for field in BaseJobCredentials.PWD_ATTRS:
-            value = serializer.validated_data[field]
-            if field in BaseJobCredentials.PWD_ATTRS and \
-                    (is_null(value) or value == BaseJobCredentials.PWD_HIDDEN):
-                serializer.validated_data[field] = None
+        # for field in BaseJobCredentials.SECRET_ATTRS:
+        #     value = serializer.validated_data[field]
+        #     if field in BaseJobCredentials.SECRET_ATTRS and \
+        #             (is_null(value) or value == BaseJobCredentials.SECRET_HIDDEN):
+        #         serializer.validated_data[field] = None
 
         try:
             serializer.save()
@@ -251,9 +252,9 @@ class APIJobItem(APIView):
                 try:
                     # not working with password properties: 'Job.objects.filter(id=job_id).update(**serializer.data)'
                     for field, value in serializer.data.items():
-                        if field in BaseJobCredentials.PWD_ATTRS and \
-                                (is_null(value) or value == BaseJobCredentials.PWD_HIDDEN):
-                            value = getattr(job, field)
+                    #     if field in BaseJobCredentials.SECRET_ATTRS and \
+                    #             (is_null(value) or value == BaseJobCredentials.SECRET_HIDDEN):
+                    #         value = getattr(job, field)
 
                         setattr(job, field, value)
 
