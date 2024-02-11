@@ -27,6 +27,8 @@ Security considerations this project does take into account:
 
 * Job secrets like passwords are stored encrypted (*AES256-CBC*)
 
+* Job secrets like passwords are never returned to the user/Web-UI
+
 * Job secrets are not passed as commandline-arguments but written to files:
 
     Example:

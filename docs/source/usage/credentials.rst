@@ -19,7 +19,7 @@ Credentials
 
 You can define :code:`global` and :code:`user` credentials.
 
-The saved credential secrets are returned to the user/Web-UI! They are saved encrypted to the database!
+The saved credential secrets are never returned to the user/Web-UI! They are saved encrypted to the database!
 
 The UI at :code:`Jobs - Credentials` allows you to manage them.
 
