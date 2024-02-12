@@ -96,7 +96,7 @@ There are multiple Ansible WebUI products - how do they compare to this product?
 
   - [x] Management interface (Django built-in)
 
-  - [ ] Groups & Job Permissions
+  - [x] Groups & Job Permissions
 
   - [ ] [LDAP integration](https://github.com/django-auth-ldap/django-auth-ldap)
 
@@ -120,7 +120,9 @@ There are multiple Ansible WebUI products - how do they compare to this product?
 
   - [x] Secret handling (Connect, Become, Vault)
 
-    - [ ] User-specific job credentials
+    - [x] User-specific job credentials
+
+  - [ ] Alerting on Failure
 
 - [ ] WebUI
 
