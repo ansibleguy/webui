@@ -67,19 +67,8 @@ function updateApiTableDataJob(row, row2, entry) {
     row2.innerHTML = row2.innerHTML.replaceAll('${EXECS}', execs);
 }
 
-function updateApiTableDataJobPlaceholder(dataTable, placeholderId) {
-    tmpRow = dataTable.insertRow(1);
-    tmpRow.innerHTML = document.getElementById('aw-api-data-tmpl-row').innerHTML;
-    tmpRow.setAttribute("aw-api-entry", placeholderId);
-
-    tableHead = dataTable.rows[0];
-    for (i = 0, len = tableHead.cells.length; i < len; i++) {
-        tmpRow.cells[i].innerText = '-';
-    }
-}
-
 $( document ).ready(function() {
     apiEndpoint = "/api/job?executions=true";
-    fetchApiTableData(apiEndpoint, updateApiTableDataJob, true, updateApiTableDataJobPlaceholder);
-    setInterval('fetchApiTableData(apiEndpoint, updateApiTableDataJob, true, updateApiTableDataJobPlaceholder)', (DATA_REFRESH_SEC * 1000));
+    fetchApiTableData(apiEndpoint, updateApiTableDataJob, true);
+    setInterval('fetchApiTableData(apiEndpoint, updateApiTableDataJob, true)', (DATA_REFRESH_SEC * 1000));
 });

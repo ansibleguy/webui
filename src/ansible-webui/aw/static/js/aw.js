@@ -201,11 +201,20 @@ function apiBrowseDir(inputElement, choicesElement, selector, base, searchType) 
 }
 
 function fetchApiTableDataPlaceholder(dataTable, placeholderId) {
-    tableHead = dataTable.rows[0];
     tmpRow = dataTable.insertRow(1);
     tmpRow.setAttribute("aw-api-entry", placeholderId);
+    tmplRow = document.getElementById('aw-api-data-tmpl-row');
+    if (is_set(tmplRow)) {
+        tmpRow.innerHTML = tmplRow.innerHTML;
+    }
+
+    tableHead = dataTable.rows[0];
     for (i = 0, len = tableHead.cells.length; i < len; i++) {
-        tmpRow.insertCell(i).innerText = '-';
+        if (is_set(tmplRow)) {
+            tmpRow.cells[i].innerText = '-';
+        } else {
+            tmpRow.insertCell(i).innerText = '-';
+        }
     }
 }
 

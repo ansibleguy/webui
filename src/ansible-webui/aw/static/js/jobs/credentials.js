@@ -60,29 +60,18 @@ function updateApiTableDataGlobalCreds(row, entry) {
     row.cells[4].innerHTML = actionsTemplate.replaceAll('${ID}', entry.id);
 }
 
-function updateApiTableDataCredsPlaceholder(dataTable, placeholderId) {
-    tmpRow = dataTable.insertRow(1);
-    tmpRow.innerHTML = document.getElementById('aw-api-data-tmpl-row').innerHTML;
-    tmpRow.setAttribute("aw-api-entry", placeholderId);
-
-    tableHead = dataTable.rows[0];
-    for (i = 0, len = tableHead.cells.length; i < len; i++) {
-        tmpRow.cells[i].innerText = '-';
-    }
-}
-
 function updateUserCreds() {
     let apiEndpoint = "/api/credentials?global=false";
     let targetTable = "aw-api-data1-table";
     let dataSubkey = "user";
-    fetchApiTableData(apiEndpoint, updateApiTableDataUserCreds, false, updateApiTableDataCredsPlaceholder, targetTable, dataSubkey);
+    fetchApiTableData(apiEndpoint, updateApiTableDataUserCreds, false, null, targetTable, dataSubkey);
 }
 
 function updateGlobalCreds() {
     let apiEndpoint = "/api/credentials?global=true";
     let targetTable = "aw-api-data2-table";
     let dataSubkey = "shared";
-    fetchApiTableData(apiEndpoint, updateApiTableDataGlobalCreds, false, updateApiTableDataCredsPlaceholder, targetTable, dataSubkey);
+    fetchApiTableData(apiEndpoint, updateApiTableDataGlobalCreds, false, null, targetTable, dataSubkey);
 }
 
 $( document ).ready(function() {
