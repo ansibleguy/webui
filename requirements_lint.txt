@@ -1,2 +1,3 @@
 pylint
+pylint-django
 yamllint

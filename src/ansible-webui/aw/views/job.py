@@ -15,7 +15,7 @@ from aw.api_endpoints.credentials import are_global_credentials
 from aw.utils.permission import has_job_permission, has_credentials_permission
 from aw.config.form_metadata import FORM_LABEL, FORM_HELP
 from aw.utils.util import get_next_cron_execution_str
-from aw.views.base import choices_credentials
+from aw.views.base import choices_global_credentials
 
 LIMIT_JOB_RESULTS = 10
 LIMIT_JOB_LOG_RESULTS = 50
@@ -30,7 +30,6 @@ def manage(request) -> HttpResponse:
     execution_results_hosts = {}
 
     for job in jobs_viewable:
-        # pylint: disable=E1101
         executions[job.id] = JobExecution.objects.filter(job=job).order_by('-updated')[:LIMIT_JOB_RESULTS]
 
         try:
@@ -67,7 +66,7 @@ class JobForm(forms.ModelForm):
     credentials_default = forms.ChoiceField(
         required=False,
         widget=forms.Select,
-        choices=choices_credentials,
+        choices=choices_global_credentials,
         label=FORM_LABEL['jobs']['manage']['credentials_default'],
     )
 
@@ -94,7 +93,6 @@ def job_edit(request, job_id: int = None) -> HttpResponse:
     job = {}
 
     if job_id is not None:
-        # pylint: disable=E1101
         try:
             job = Job.objects.get(id=job_id)
 
@@ -177,7 +175,6 @@ def job_credentials_edit(request, credentials_id: int = None) -> HttpResponse:
     credentials = {}
 
     if credentials_id is not None and credentials_id != 0:
-        # pylint: disable=E1101
         try:
             if are_global:
                 credentials = JobGlobalCredentials.objects.get(id=credentials_id)

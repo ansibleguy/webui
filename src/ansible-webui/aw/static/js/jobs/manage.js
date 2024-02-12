@@ -50,17 +50,14 @@ function updateApiTableDataJob(row, row2, entry) {
     let execs = '<div>';
     for (i = 0, len = entry.executions.length; i < len; i++) {
         exec = entry.executions[i];
-        execs += ('<hr><b>Start time</b>: ' + exec.time_start)
-        execs += ('<br><b>Finish time</b>: ' + exec.time_fin)
-        execs += ('<br><b>Executed by</b>: ' + exec.user_name)
-        execs += ('<br><b>Status</b>: <span class="aw-job-status aw-job-status-' + exec.status_name.toLowerCase() + '">' + exec.status_name + '</span>')
-        execs += ('<br><b>Logs</b>: <a href="' + exec.log_stdout_url + '" title="' + exec.log_stdout + '" download>Output</a>, ')
-        execs += ('<a href="' + exec.log_stderr_url + '" title="' + exec.log_stderr + '" download>Error</a>')
+        execs += ('<hr><b>Start time</b>: ' + exec.time_start);
+        execs += ('<br><b>Finish time</b>: ' + exec.time_fin);
+        execs += ('<br><b>Executed by</b>: ' + exec.user_name);
+        execs += ('<br><b>Status</b>: <span class="aw-job-status aw-job-status-' + exec.status_name.toLowerCase() + '">' + exec.status_name + '</span>');
+        execs += ('<br><b>Logs</b>: <a href="' + exec.log_stdout_url + '" title="' + exec.log_stdout + '" download>Output</a>, ');
+        execs += ('<a href="' + exec.log_stderr_url + '" title="' + exec.log_stderr + '" download>Error</a>');
         if (exec.error_s != null) {
-            execs += ('<br><br><b>Error</b>: <code>' + exec.error_s + '</code>')
-            if (exec.error_m != null) {
-                execs += ('<br><b>Error full</b>:<div class="code">' + exec.error_m + '</div>')
-            }
+            execs += ('<br><br><b>Error</b>: <code>' + exec.error_s + '</code>');
         }
     }
     execs += '</div>';

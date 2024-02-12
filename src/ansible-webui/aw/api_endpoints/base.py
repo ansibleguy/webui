@@ -1,12 +1,12 @@
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import ObjectDoesNotExist
-from django.contrib.auth.models import User, Group
 from rest_framework import serializers
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_api_key.permissions import BaseHasAPIKey
 
 from aw.model.api import AwAPIKey
+from aw.base import USERS, GROUPS
 
 
 class HasAwAPIKey(BaseHasAPIKey):
@@ -17,7 +17,7 @@ API_PERMISSION = [IsAuthenticated | HasAwAPIKey]
 
 
 # see: rest_framework_api_key.permissions.BaseHasAPIKey:get_from_header
-def get_api_user(request) -> settings.AUTH_USER_MODEL:
+def get_api_user(request) -> USERS:
     if isinstance(request.user, AnonymousUser):
         try:
             return AwAPIKey.objects.get_from_key(
@@ -45,9 +45,9 @@ class GenericResponse(BaseResponse):
 
 class GroupSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Group
+        model = GROUPS
 
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = User
+        model = USERS

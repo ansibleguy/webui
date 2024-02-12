@@ -1,6 +1,15 @@
 from pathlib import Path
 
-from aw.config.main import config, VERSION
+try:
+    from aw.config.main import config, VERSION
+
+except ImportError:
+    # pylint-django
+    from aw.config.main import init_globals
+    init_globals()
+    from aw.config.main import config, VERSION
+
+
 from aw.config.hardcoded import LOGIN_PATH, PORT_WEB
 from aw.utils.deployment import deployment_dev, deployment_prod
 from aw.config.environment import get_aw_env_var

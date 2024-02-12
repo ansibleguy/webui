@@ -1,12 +1,12 @@
 from crontab import CronTab
 from django.db import models
-from django.conf import settings
 from django.core.validators import ValidationError
 from django.utils import timezone
 
 from aw.model.base import BareModel, BaseModel, CHOICES_BOOL, DEFAULT_NONE
 from aw.config.hardcoded import SHORT_TIME_FORMAT
 from aw.model.job_credential import JobGlobalCredentials, JobUserCredentials
+from aw.base import USERS
 
 
 class JobError(BareModel):
@@ -50,7 +50,6 @@ class BaseJob(BaseModel):
         abstract = True
 
     def clean(self):
-        # pylint: disable=E1101
         super().clean()
 
         for flag in self.BAD_ANSIBLE_FLAGS:
@@ -171,7 +170,7 @@ class JobExecution(BaseJob):
 
     # NOTE: scheduled execution will have no user
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True,
+        USERS, on_delete=models.SET_NULL, null=True,
         related_name='jobexec_fk_user', editable=False,
     )
     job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name='jobexec_fk_job')
@@ -185,6 +184,7 @@ class JobExecution(BaseJob):
     )
     log_stdout = models.CharField(max_length=300, **DEFAULT_NONE)
     log_stderr = models.CharField(max_length=300, **DEFAULT_NONE)
+    command = models.CharField(max_length=1000, **DEFAULT_NONE)
 
     credential_global = models.ForeignKey(
         JobGlobalCredentials, on_delete=models.SET_NULL, related_name='jobexec_fk_credglob', null=True,
@@ -194,7 +194,6 @@ class JobExecution(BaseJob):
     )
 
     def __str__(self) -> str:
-        # pylint: disable=E1101
         status_name = CHOICES_JOB_EXEC_STATUS[int(self.status)][1]
         executor = 'scheduled'
         if self.user is not None:
@@ -207,6 +206,6 @@ class JobExecution(BaseJob):
 class JobQueue(BareModel):
     job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name='jobqueue_fk_job')
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True,
+        USERS, on_delete=models.SET_NULL, null=True,
         related_name='jobqueue_fk_user',
     )

@@ -1,11 +1,10 @@
 from django.db import models
-from django.conf import settings
-from django.contrib.auth.models import Group
 
 from aw.model.base import BareModel, BaseModel
 from aw.utils.util import get_choice_by_value
 from aw.model.job import Job
 from aw.model.job_credential import JobGlobalCredentials
+from aw.base import USERS, GROUPS
 
 CHOICE_PERMISSION_READ = 5
 CHOICE_PERMISSION_EXECUTE = 10
@@ -29,12 +28,12 @@ class JobPermission(BaseModel):
     name = models.CharField(max_length=100)
     permission = models.PositiveSmallIntegerField(choices=CHOICES_PERMISSION, default=0)
     users = models.ManyToManyField(
-        settings.AUTH_USER_MODEL,
+        USERS,
         through='JobPermissionMemberUser',
         through_fields=('permission', 'user'),
     )
     groups = models.ManyToManyField(
-        Group,
+        GROUPS,
         through='JobPermissionMemberGroup',
         through_fields=('permission', 'group'),
     )
@@ -86,11 +85,10 @@ class JobCredentialsPermissionMapping(BareModel):
 
 
 class JobPermissionMemberUser(BareModel):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.ForeignKey(USERS, on_delete=models.CASCADE)
     permission = models.ForeignKey(JobPermission, on_delete=models.CASCADE)
 
     def __str__(self) -> str:
-        # pylint: disable=E1101
         return f"Permission '{self.permission.name}' member user '{self.user.username}'"
 
     class Meta:
@@ -100,7 +98,7 @@ class JobPermissionMemberUser(BareModel):
 
 
 class JobPermissionMemberGroup(BareModel):
-    group = models.ForeignKey(Group, on_delete=models.CASCADE)
+    group = models.ForeignKey(GROUPS, on_delete=models.CASCADE)
     permission = models.ForeignKey(JobPermission, on_delete=models.CASCADE)
 
     def __str__(self) -> str:

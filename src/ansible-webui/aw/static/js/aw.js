@@ -220,7 +220,7 @@ function fetchApiTableDataPlaceholder(dataTable, placeholderId) {
 
 // for example with second (hidden) child-row - see: 'job-manage'
 // for example with two tables - see: 'job-credentials'
-function fetchApiTableData(apiEndpoint, updateFunction, secondRow = false, placeholderFunction = null, targetTable = null, dataSubKey = null) {
+function fetchApiTableData(apiEndpoint, updateFunction, secondRow = false, placeholderFunction = null, targetTable = null, dataSubKey = null, reverseData = false) {
     // NOTE: data needs to be list of dict and include an 'id' attribute
     if (targetTable == null) {
         targetTable = "aw-api-data-table";
@@ -233,6 +233,9 @@ function fetchApiTableData(apiEndpoint, updateFunction, secondRow = false, place
     $.get(apiEndpoint, function(data) {
         if (dataSubKey != null) {
             var data = data[dataSubKey];
+        }
+        if (reverseData) {
+            var data = data.reverse();
         }
         existingEntryIds = [];
         // for each existing entry

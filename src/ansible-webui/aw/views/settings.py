@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 from aw.utils.http import ui_endpoint_wrapper, ui_endpoint_wrapper_kwargs
 from aw.model.job_permission import JobPermission
 from aw.config.form_metadata import FORM_LABEL, FORM_HELP
-from aw.views.base import choices_job, choices_user, choices_credentials, choices_group
+from aw.views.base import choices_global_credentials, choices_job, choices_user, choices_group
 
 
 @login_required
@@ -38,7 +38,7 @@ class SettingPermissionForm(forms.ModelForm):
     credentials = forms.MultipleChoiceField(
         required=False,
         widget=forms.SelectMultiple,
-        choices=choices_credentials,
+        choices=choices_global_credentials,
     )
     users = forms.MultipleChoiceField(
         required=False,
@@ -61,7 +61,6 @@ def setting_permission_edit(request, perm_id: int = None) -> HttpResponse:
     perm = {}
 
     if perm_id is not None and perm_id != 0:
-        # pylint: disable=E1101
         perm = JobPermission.objects.filter(id=perm_id).first()
         if perm is None:
             return redirect(f"/ui/settings/permissions?error=Permission with ID {perm_id} does not exist")

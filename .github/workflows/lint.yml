@@ -44,7 +44,7 @@ jobs:
       - name: Running PyLint
         run: |
           pylint --version
-          pylint --recursive=y .
+          pylint --recursive=y --load-plugins pylint_django --django-settings-module=aw.settings .
 
       - name: Running YamlLint
         run: |

@@ -1,5 +1,3 @@
-from django.conf import settings
-from django.contrib.auth.models import User, Group
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.utils import IntegrityError
 from rest_framework.generics import GenericAPIView
@@ -14,8 +12,7 @@ from aw.model.job_permission import JobPermission, JobPermissionMapping, JobPerm
 from aw.api_endpoints.base import API_PERMISSION, GenericResponse, get_api_user
 from aw.utils.permission import get_permission_name
 from aw.utils.util import is_set
-
-# pylint: disable=E1101
+from aw.base import USERS, GROUPS
 
 
 class PermissionReadResponse(serializers.ModelSerializer):
@@ -48,14 +45,13 @@ class PermissionWriteRequest(serializers.ModelSerializer):
     groups = serializers.MultipleChoiceField(allow_blank=True, choices=[])
 
     def __init__(self, *args, **kwargs):
-        # pylint: disable=E1101
         super().__init__(*args, **kwargs)
         self.fields['jobs'] = serializers.MultipleChoiceField(choices=[job.id for job in Job.objects.all()])
         self.fields['credentials'] = serializers.MultipleChoiceField(
             choices=[creds.id for creds in JobGlobalCredentials.objects.all()]
         )
-        self.fields['users'] = serializers.MultipleChoiceField(choices=[user.id for user in User.objects.all()])
-        self.fields['groups'] = serializers.MultipleChoiceField(choices=[group.id for group in Group.objects.all()])
+        self.fields['users'] = serializers.MultipleChoiceField(choices=[user.id for user in USERS.objects.all()])
+        self.fields['groups'] = serializers.MultipleChoiceField(choices=[group.id for group in GROUPS.objects.all()])
 
     @staticmethod
     def create_or_update(validated_data: dict, perm: JobPermission = None):
@@ -98,7 +94,7 @@ class PermissionWriteRequest(serializers.ModelSerializer):
             users = []
             for user_id in validated_data['users']:
                 try:
-                    users.append(User.objects.get(id=user_id))
+                    users.append(USERS.objects.get(id=user_id))
 
                 except ObjectDoesNotExist:
                     continue
@@ -109,7 +105,7 @@ class PermissionWriteRequest(serializers.ModelSerializer):
             groups = []
             for group_id in validated_data['groups']:
                 try:
-                    groups.append(Group.objects.get(id=group_id))
+                    groups.append(GROUPS.objects.get(id=group_id))
 
                 except ObjectDoesNotExist:
                     continue
@@ -178,7 +174,7 @@ def build_permissions(perm_id_filter: int = None) -> (list, dict):
     return permissions
 
 
-def has_permission_privileges(user: settings.AUTH_USER_MODEL) -> bool:
+def has_permission_privileges(user: USERS) -> bool:
     # todo: create explicit privilege
     return user.is_staff
 

@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.utils import IntegrityError
 from rest_framework.views import APIView
@@ -11,6 +10,7 @@ from aw.model.job_permission import CHOICE_PERMISSION_READ, CHOICE_PERMISSION_WR
 from aw.api_endpoints.base import API_PERMISSION, get_api_user, GenericResponse, BaseResponse
 from aw.utils.permission import has_credentials_permission
 from aw.utils.util import is_null
+from aw.base import USERS
 
 
 class JobGlobalCredentialsReadResponse(serializers.ModelSerializer):
@@ -61,9 +61,8 @@ def are_global_credentials(request) -> bool:
 
 
 def _find_credentials(
-        credentials_id: int, are_global: bool, user: settings.AUTH_USER_MODEL
+        credentials_id: int, are_global: bool, user: USERS
 ) -> (BaseJobCredentials, None):
-    # pylint: disable=E1101
     try:
         if are_global:
             return JobGlobalCredentials.objects.get(id=credentials_id)
@@ -108,7 +107,6 @@ class APIJobCredentials(APIView):
         operation_id='credentials_list',
     )
     def get(self, request):
-        # pylint: disable=E1101
         user = get_api_user(request)
         credentials_global = []
         credentials_global_raw = JobGlobalCredentials.objects.all()
@@ -333,7 +331,6 @@ class APIJobCredentialsItem(APIView):
                 status=400,
             )
 
-        # pylint: disable=E1101
         try:
             # not working with password properties: 'Job.objects.filter(id=job_id).update(**serializer.data)'
             for field, value in serializer.data.items():

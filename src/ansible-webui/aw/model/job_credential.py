@@ -1,9 +1,9 @@
 from django.db import models
-from django.conf import settings
 
 from aw.model.base import BaseModel, DEFAULT_NONE
 from aw.utils.util import is_null, is_set
 from aw.utils.crypto import decrypt, encrypt
+from aw.base import USERS
 
 
 class BaseJobCredentials(BaseModel):
@@ -147,10 +147,9 @@ class JobUserCredentials(BaseJobCredentials):
     api_fields_write.append('user')
     form_fields = JobGlobalCredentials.api_fields_write.copy()
 
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.ForeignKey(USERS, on_delete=models.CASCADE)
 
     def __str__(self) -> str:
-        # pylint: disable=E1101
         return f"Credentials '{self.name}' of user '{self.user.username}'{self._get_set_creds_str()}"
 
     class Meta:

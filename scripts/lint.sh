@@ -8,7 +8,7 @@ echo ''
 echo 'LINTING Python'
 echo ''
 
-pylint --recursive=y .
+pylint --recursive=y --load-plugins pylint_django --django-settings-module=aw.settings .
 
 echo ''
 echo 'LINTING YAML'

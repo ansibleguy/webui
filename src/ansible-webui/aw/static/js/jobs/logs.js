@@ -77,6 +77,17 @@ function updateApiTableDataJobLogs(row, row2, entry) {
     let row2Col = row2.insertCell(0);
     row2Col.setAttribute("colspan", "100%");
     row2Col.innerHTML = logsTemplates;
+    if (entry.command != null) {
+        let logsContainer = document.getElementById("aw-execution-logs-" + entry.id);
+        logsContainer.innerHTML = "<b>Running command:</b><br><small>" + entry.command + "</small><br>" + logsContainer.innerHTML;
+    }
+    if (entry.error_s != null) {
+        let errorContainer = document.getElementById("aw-execution-errors-" + entry.id);
+        errorContainer.innerHTML += ('<br><br><b>Error</b>:<br><code>' + entry.error_s + '</code>');
+        if (entry.error_m != null) {
+            errorContainer.innerHTML += ('<br><b>Error full</b>:<div class="code">' + entry.error_m + '</div>');
+        }
+    }
 }
 
 $( document ).ready(function() {
@@ -86,6 +97,6 @@ $( document ).ready(function() {
         setInterval('addLogLines($this)', (DATA_REFRESH_SEC * 1000));
     });
     apiEndpoint = "/api/job_exec";
-    fetchApiTableData(apiEndpoint, updateApiTableDataJobLogs, true);
-    setInterval('fetchApiTableData(apiEndpoint, updateApiTableDataJobLogs, true)', (DATA_REFRESH_SEC * 1000));
+    fetchApiTableData(apiEndpoint, updateApiTableDataJobLogs, true, null, null, null, true);
+    setInterval('fetchApiTableData(apiEndpoint, updateApiTableDataJobLogs, true, null, null, null, true)', (DATA_REFRESH_SEC * 1000));
 });

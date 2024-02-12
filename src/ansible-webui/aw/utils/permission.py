@@ -1,14 +1,12 @@
-from django.conf import settings
-
 from aw.model.job import Job
 from aw.model.job_permission import JobPermissionMapping, JobPermissionMemberUser, JobPermissionMemberGroup, \
     CHOICE_PERMISSION_READ, CHOICES_PERMISSION, JobCredentialsPermissionMapping
-from aw.model.job_credential import BaseJobCredentials
+from aw.model.job_credential import BaseJobCredentials, JobGlobalCredentials, JobUserCredentials
 from aw.utils.util import get_choice_by_value
+from aw.base import USERS
 
 
-def get_job_if_allowed(user: settings.AUTH_USER_MODEL, job: Job, permission_needed: int) -> (Job, None):
-    # pylint: disable=E1101
+def get_job_if_allowed(user: USERS, job: Job, permission_needed: int) -> (Job, None):
     if job is None:
         return None
 
@@ -23,9 +21,8 @@ def get_job_if_allowed(user: settings.AUTH_USER_MODEL, job: Job, permission_need
 
 def _has_permission(
         permission_links: (JobPermissionMapping, JobCredentialsPermissionMapping), permission_needed: int,
-        user: settings.AUTH_USER_MODEL,
+        user: USERS,
 ) -> bool:
-    # pylint: disable=E1101
     if user.is_superuser:
         return True
 
@@ -51,8 +48,7 @@ def _has_permission(
     return False
 
 
-def has_job_permission(user: settings.AUTH_USER_MODEL, job: Job, permission_needed: int) -> bool:
-    # pylint: disable=E1101
+def has_job_permission(user: USERS, job: Job, permission_needed: int) -> bool:
     return _has_permission(
         permission_links=JobPermissionMapping.objects.filter(job=job),
         permission_needed=permission_needed,
@@ -61,9 +57,8 @@ def has_job_permission(user: settings.AUTH_USER_MODEL, job: Job, permission_need
 
 
 def has_credentials_permission(
-        user: settings.AUTH_USER_MODEL, credentials: BaseJobCredentials, permission_needed: int,
+        user: USERS, credentials: BaseJobCredentials, permission_needed: int,
 ) -> bool:
-    # pylint: disable=E1101
     return _has_permission(
         permission_links=JobCredentialsPermissionMapping.objects.filter(credentials=credentials),
         permission_needed=permission_needed,
@@ -71,17 +66,24 @@ def has_credentials_permission(
     )
 
 
-def get_viewable_jobs(user: settings.AUTH_USER_MODEL) -> list[Job]:
-    # pylint: disable=E1101
-    jobs = Job.objects.all()
+def get_viewable_jobs(user: USERS) -> list[Job]:
     jobs_viewable = []
 
-    for job in jobs:
-        job = get_job_if_allowed(user=user, job=job, permission_needed=CHOICE_PERMISSION_READ)
-        if job is not None:
+    for job in Job.objects.all():
+        if has_job_permission(user=user, job=job, permission_needed=CHOICE_PERMISSION_READ):
             jobs_viewable.append(job)
 
     return jobs_viewable
+
+
+def get_viewable_credentials(user: USERS) -> list[BaseJobCredentials]:
+    credentials_viewable = JobUserCredentials.objects.filter(user=user)
+
+    for credentials in JobGlobalCredentials.objects.all():
+        if has_credentials_permission(user=user, credentials=credentials, permission_needed=CHOICE_PERMISSION_READ):
+            credentials_viewable.append(credentials)
+
+    return credentials_viewable
 
 
 def get_permission_name(perm: int) -> str:

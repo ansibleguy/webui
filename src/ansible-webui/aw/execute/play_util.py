@@ -1,6 +1,5 @@
 from pathlib import Path
 from shutil import rmtree
-from datetime import datetime
 from re import sub as regex_replace
 from os import symlink
 from os import path as os_path
@@ -8,7 +7,6 @@ from os import remove as remove_file
 
 from ansible_runner import Runner, RunnerConfig
 from django.core.exceptions import ObjectDoesNotExist
-from django.conf import settings
 
 from aw.config.main import config, check_config_is_true
 from aw.config.hardcoded import FILE_TIME_FORMAT
@@ -19,6 +17,7 @@ from aw.model.job_credential import BaseJobCredentials, JobUserCredentials
 from aw.execute.util import update_execution_status, overwrite_and_delete_file, decode_job_env_vars, \
     create_dirs, get_pwd_file, get_pwd_file_arg, write_pwd_file, is_execution_status
 from aw.utils.permission import has_credentials_permission, CHOICE_PERMISSION_READ
+from aw.base import USERS
 # from aw.utils.debug import log_warn
 
 # see: https://ansible.readthedocs.io/projects/runner/en/latest/intro/
@@ -39,7 +38,7 @@ def _commandline_arguments_credentials(credentials: BaseJobCredentials, path_run
     return cmd_arguments
 
 
-def _scheduled_or_has_credentials_access(user: settings.AUTH_USER_MODEL, credentials: BaseJobCredentials) -> bool:
+def _scheduled_or_has_credentials_access(user: USERS, credentials: BaseJobCredentials) -> bool:
     if user is None:
         # scheduled execution
         return True
@@ -70,13 +69,18 @@ def _get_credentials_to_use(job: Job, execution: JobExecution) -> (BaseJobCreden
         credentials = job.credentials_default
 
     elif job.credentials_needed and is_set(execution.user):
-        # pylint: disable=E1101
         # try to get default user-credentials as a last-resort if the job needs some credentials
         try:
             credentials = JobUserCredentials.objects.filter(user=execution.user).first()
 
         except ObjectDoesNotExist:
             pass
+
+    if job.credentials_needed and credentials is None:
+        raise AnsibleConfigError(
+            'The job is set to require credentials - but none were provided or readable! '
+            'Make sure you have privileges for the configured credentials or create user-specific ones.'
+        ).with_traceback(None) from None
 
     return credentials
 
@@ -238,7 +242,7 @@ def job_logs(job: Job, execution: JobExecution) -> dict:
     }
 
 
-def _run_stats(runner: Runner, job_result: JobExecutionResult) -> bool:
+def _run_stats(runner: Runner, result: JobExecutionResult) -> bool:
     any_task_failed = False
     # https://stackoverflow.com/questions/70348314/get-python-ansible-runner-module-stdout-key-value
     for host in runner.stats['processed']:
@@ -256,26 +260,23 @@ def _run_stats(runner: Runner, job_result: JobExecutionResult) -> bool:
             any_task_failed = True
             # todo: create errors
 
-        result_host.result = job_result
+        result_host.result = result
         result_host.save()
 
     return any_task_failed
 
 
-def parse_run_result(execution: JobExecution, time_start: datetime, runner: Runner):
-    job_result = JobExecutionResult(
-        time_start=time_start,
-        time_fin=datetime_w_tz(),
-        failed=runner.errored,
-    )
-    job_result.save()
+def parse_run_result(execution: JobExecution, result: JobExecutionResult, runner: Runner):
+    result.time_fin = datetime_w_tz()
+    result.failed = runner.errored
+    result.save()
 
     any_task_failed = False
     if runner.stats is not None:
-        any_task_failed = _run_stats(runner=runner, job_result=job_result)
+        any_task_failed = _run_stats(runner=runner, result=result)
 
-    execution.result = job_result
-    if job_result.failed or any_task_failed:
+    execution.result = result
+    if result.failed or any_task_failed:
         update_execution_status(execution, status='Failed')
 
     else:
@@ -288,7 +289,7 @@ def parse_run_result(execution: JobExecution, time_start: datetime, runner: Runn
 
 def failure(
         execution: JobExecution, path_run: Path,
-        time_start: datetime, error_s: str, error_m: str
+        result: JobExecutionResult, error_s: str, error_m: str
 ):
     update_execution_status(execution, status='Failed')
     job_error = JobError(
@@ -296,13 +297,11 @@ def failure(
         med=error_m,
     )
     job_error.save()
-    job_result = JobExecutionResult(
-        time_start=time_start,
-        time_fin=datetime_w_tz(),
-        failed=True,
-        error=job_error,
-    )
-    job_result.save()
-    execution.result = job_result
+    result.time_fin = datetime_w_tz()
+    result.failed = True
+    result.error = job_error
+    result.save()
+
+    execution.result = result
     execution.save()
     runner_cleanup(path_run)

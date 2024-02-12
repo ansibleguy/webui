@@ -62,6 +62,8 @@ class Workload(Thread):
 
         if self.config_invalid >= self.MAX_CONFIG_INVALID:
             self.next_execution_time = None
+            self.job.enabled = False
+            self.job.save()
             log(msg=f"Disabling job {self.log_name} because of invalid config! Please fix it", level=2)
             # exit loop because it will always fail; fixing the config will replace this threat instance
             return

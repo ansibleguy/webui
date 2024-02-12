@@ -1,10 +1,10 @@
-from django.conf import settings
 from rest_framework import serializers
 
 from aw.config.hardcoded import SHORT_TIME_FORMAT, JOB_EXECUTION_LIMIT
 from aw.model.job import Job, CHOICES_JOB_EXEC_STATUS, JobExecution
 from aw.utils.permission import get_viewable_jobs
 from aw.utils.util import datetime_from_db, get_next_cron_execution_str
+from aw.base import USERS
 
 
 class JobReadResponse(serializers.ModelSerializer):
@@ -36,7 +36,6 @@ class JobExecutionReadResponse(serializers.ModelSerializer):
 
 
 def get_job_execution_serialized(execution: JobExecution) -> dict:
-    # pylint: disable=E1101
     serialized = {
         'id': execution.id,
         'job': execution.job.id,
@@ -44,6 +43,7 @@ def get_job_execution_serialized(execution: JobExecution) -> dict:
         'job_comment': execution.job.comment,
         'user': execution.user.id if execution.user is not None else None,
         'user_name': execution.user.username if execution.user is not None else 'Scheduled',
+        'command': execution.command,
         'status': execution.status,
         'status_name': CHOICES_JOB_EXEC_STATUS[execution.status][1],
         'time_start': datetime_from_db(execution.created).strftime(SHORT_TIME_FORMAT),
@@ -67,7 +67,6 @@ def get_job_execution_serialized(execution: JobExecution) -> dict:
 
 
 def get_job_executions_serialized(job: Job, execution_count: int = JOB_EXECUTION_LIMIT) -> list[dict]:
-    # pylint: disable=E1101
     serialized = []
     for execution in JobExecution.objects.filter(job=job).order_by('-updated')[:execution_count]:
         serialized.append(get_job_execution_serialized(execution))
@@ -76,7 +75,7 @@ def get_job_executions_serialized(job: Job, execution_count: int = JOB_EXECUTION
 
 
 def get_viewable_jobs_serialized(
-        user: settings.AUTH_USER_MODEL, executions: bool = False,
+        user: USERS, executions: bool = False,
         execution_count: int = None
 ) -> list[dict]:
     serialized = []

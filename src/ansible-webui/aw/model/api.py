@@ -1,7 +1,8 @@
 from django.db import models
-from django.conf import settings
 from rest_framework_api_key.models import AbstractAPIKey
+
+from aw.base import USERS
 
 
 class AwAPIKey(AbstractAPIKey):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, editable=False)
+    user = models.ForeignKey(USERS, on_delete=models.CASCADE, editable=False)

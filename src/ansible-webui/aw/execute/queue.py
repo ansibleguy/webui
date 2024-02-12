@@ -1,11 +1,9 @@
-from django.conf import settings
-
 from aw.model.job import Job, JobQueue
 from aw.utils.debug import log
+from aw.base import USERS
 
 
-def queue_get() -> (tuple[Job, settings.AUTH_USER_MODEL], None):
-    # pylint: disable=E1101
+def queue_get() -> (tuple[Job, USERS], None):
     next_queue_item = JobQueue.objects.order_by('-created').first()
     if next_queue_item is None:
         return None
@@ -15,7 +13,7 @@ def queue_get() -> (tuple[Job, settings.AUTH_USER_MODEL], None):
     return job, user
 
 
-def queue_add(job: Job, user: settings.AUTH_USER_MODEL):
+def queue_add(job: Job, user: USERS):
     log(msg=f"Job '{job.name}' added to execution queue", level=4)
     queue_item = JobQueue(job=job, user=user)
     queue_item.save()

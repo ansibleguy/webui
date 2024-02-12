@@ -50,7 +50,6 @@ def update_execution_status(execution: JobExecution, status: str):
 
 
 def is_execution_status(execution: JobExecution, status: str) -> bool:
-    # pylint: disable=E1101
     is_status = JobExecution.objects.get(id=execution.id).status
     check_status = get_choice_key_by_value(choices=CHOICES_JOB_EXEC_STATUS, value=status)
     return is_status == check_status
@@ -94,7 +93,7 @@ def get_pwd_file_arg(credentials: BaseJobCredentials, attr: str, path_run: (Path
 
 
 def write_pwd_file(credentials: BaseJobCredentials, attr: str, path_run: (Path, str)):
-    if is_null(getattr(credentials, attr)):
+    if credentials is None or is_null(getattr(credentials, attr)):
         return None
 
     return write_file_0600(

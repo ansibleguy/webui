@@ -13,9 +13,9 @@
 .. |perm_overview| image:: ../_static/img/permission_overview.svg
    :class: wiki-img
 
-===========
-Permissions
-===========
+==========
+Privileges
+==========
 
 You can set job-permissions to limit user actions.
 
@@ -24,20 +24,20 @@ Users & Groups
 
 The :code:`System - Admin - Users/Groups` admin-page allows you to create new users and manage group memberships.
 
-To allow a user to create jobs and permissions you need to activate the :code:`Staff status`.
+To allow a user to create jobs, permissions and global-credentials you need to activate the :code:`Staff status`.
 
 |perm_users_groups|
 
 ----
 
-Job permissions
-***************
+Permissions
+***********
 
-The UI at :code:`Settings - Permissions` allows you to create job permissions and link them to users and groups.
+The UI at :code:`Settings - Permissions` allows you to create job & credential permissions and link them to users and groups.
 
 |perm_ui|
 
-Each job can have multiple permissions linked to it.
+Each job & credential can have multiple permissions linked to it.
 
 **Permission types:**
 

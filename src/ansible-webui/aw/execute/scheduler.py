@@ -139,7 +139,6 @@ class Scheduler:
             self.status()
 
     def _reload_check(self) -> dict:
-        # pylint: disable=E1101
         result = {'added': [], 'removed': [], 'changed': []}
         running = self.thread_manager.list()
         running_ids = [job.id for job in running]

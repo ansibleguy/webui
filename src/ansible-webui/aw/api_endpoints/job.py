@@ -10,12 +10,15 @@ from aw.config.hardcoded import JOB_EXECUTION_LIMIT
 from aw.model.job import Job, JobExecution
 from aw.model.job_permission import CHOICE_PERMISSION_READ, CHOICE_PERMISSION_EXECUTE, \
     CHOICE_PERMISSION_WRITE, CHOICE_PERMISSION_FULL
+from aw.model.job_credential import JobGlobalCredentials
 from aw.api_endpoints.base import API_PERMISSION, get_api_user, BaseResponse, GenericResponse
 from aw.api_endpoints.job_util import get_viewable_jobs_serialized, JobReadResponse, get_job_executions_serialized, \
     JobExecutionReadResponse, get_viewable_jobs, get_job_execution_serialized
-from aw.utils.permission import has_job_permission
+from aw.utils.permission import has_job_permission, has_credentials_permission
 from aw.execute.queue import queue_add
 from aw.execute.util import update_execution_status, is_execution_status
+from aw.utils.util import is_set
+from aw.base import USERS
 
 
 class JobWriteRequest(serializers.ModelSerializer):
@@ -23,13 +26,8 @@ class JobWriteRequest(serializers.ModelSerializer):
         model = Job
         fields = Job.api_fields_write
 
-    # vault_pass = serializers.CharField(max_length=100, required=False, default=None)
-    # become_pass = serializers.CharField(max_length=100, required=False, default=None)
-    # connect_pass = serializers.CharField(max_length=100, required=False, default=None)
-
 
 def _find_job(job_id: int) -> (Job, None):
-    # pylint: disable=E1101
     try:
         return Job.objects.get(id=job_id)
 
@@ -38,7 +36,6 @@ def _find_job(job_id: int) -> (Job, None):
 
 
 def _find_job_and_execution(job_id: int, exec_id: int) -> tuple[Job, (JobExecution, None)]:
-    # pylint: disable=E1101
     job = _find_job(job_id)
     try:
         return job, JobExecution.objects.get(id=exec_id, job=job)
@@ -66,6 +63,21 @@ def _want_job_executions(request) -> tuple:
             pass
 
     return False, max_count
+
+
+def _has_credentials_permission(user: USERS, data: dict) -> bool:
+    if 'credentials_default' in data and is_set(data['credentials_default']):
+        try:
+            return has_credentials_permission(
+                user=user,
+                credentials=JobGlobalCredentials.objects.get(id=data['credentials_default']),
+                permission_needed=CHOICE_PERMISSION_READ,
+            )
+
+        except ObjectDoesNotExist:
+            pass
+
+    return True
 
 
 class APIJob(APIView):
@@ -118,7 +130,8 @@ class APIJob(APIView):
         operation_id='job_create'
     )
     def post(self, request):
-        if not get_api_user(request).is_staff:
+        user = get_api_user(request)
+        if not user.is_staff:
             return Response(data={'msg': 'Not privileged to create jobs'}, status=403)
 
         serializer = JobWriteRequest(data=request.data)
@@ -127,6 +140,12 @@ class APIJob(APIView):
             return Response(
                 data={'msg': f"Provided job data is not valid: '{serializer.errors}'"},
                 status=400,
+            )
+
+        if not _has_credentials_permission(user=user, data=serializer.validated_data):
+            return Response(
+                data={'msg': "Not privileged to use provided credentials"},
+                status=403,
             )
 
         try:
@@ -240,17 +259,14 @@ class APIJobItem(APIView):
                         status=400,
                     )
 
-                # pylint: disable=E1101
+                if not _has_credentials_permission(user=user, data=serializer.validated_data):
+                    return Response(
+                        data={'msg': "Not privileged to use provided credentials"},
+                        status=403,
+                    )
+
                 try:
-                    # not working with password properties: 'Job.objects.filter(id=job_id).update(**serializer.data)'
-                    for field, value in serializer.data.items():
-                    #     if field in BaseJobCredentials.SECRET_ATTRS and \
-                    #             (is_null(value) or value == BaseJobCredentials.SECRET_HIDDEN):
-                    #         value = getattr(job, field)
-
-                        setattr(job, field, value)
-
-                    job.save()
+                    Job.objects.filter(id=job_id).update(**serializer.data)
 
                 except IntegrityError as err:
                     return Response(
@@ -451,14 +467,13 @@ class APIJobExecution(APIView):
         ],
     )
     def get(self, request):
-        # pylint: disable=E1101
         jobs = get_viewable_jobs(get_api_user(request))
         exec_count = _job_execution_count(request)
         if exec_count is None:
             exec_count = JOB_EXECUTION_LIMIT
 
         serialized = []
-        for execution in JobExecution.objects.filter(job__in=jobs).order_by('updated')[:exec_count]:
+        for execution in JobExecution.objects.filter(job__in=jobs).order_by('-updated')[:exec_count]:
             serialized.append(get_job_execution_serialized(execution))
 
         return Response(data=serialized, status=200)
