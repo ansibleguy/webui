@@ -12,7 +12,11 @@ from aw.utils.subps import process
 
 
 def _parsed_ansible_collections() -> dict:
-    collections_raw = process(['ansible-galaxy', 'collection', 'list'])['stdout']
+    result = process(['ansible-galaxy', 'collection', 'list'])
+    if result['rc'] != 0:
+        return {}
+
+    collections_raw = result['stdout']
     collections = {}
     col_counter = {}
     collection_path = ''

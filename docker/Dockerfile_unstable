@@ -1,0 +1,21 @@
+FROM python:3.10-alpine
+
+# BUILD: docker build -f Dockerfile_unstable -t ansible-webui:unstable .
+# RUN: docker run --publish 127.0.0.1:8000:8000 --volume /tmp/awtest:/data ansible-webui:unstable
+
+RUN apk add --no-cache git ansible-core && \
+    pip install --no-cache-dir --upgrade pip 2>/dev/null && \
+    mkdir -p /play /data/log
+
+ENV AW_ENV dev
+ENV AW_VERSION latest
+ENV AW_DOCKER 1
+ENV PYTHONUNBUFFERED 1
+ENV AW_DB /data/aw.db
+ENV AW_PATH_LOG /data/log
+ENV AW_PATH_PLAY /play
+WORKDIR /play
+EXPOSE 8000
+
+COPY --chmod=0755 entrypoint_dev.sh /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]

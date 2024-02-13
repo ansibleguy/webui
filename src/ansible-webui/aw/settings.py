@@ -1,4 +1,5 @@
 from pathlib import Path
+from os import environ
 
 try:
     from aw.config.main import config, VERSION
@@ -96,8 +97,15 @@ if deployment_prod():
         DB_FILE = DB_FILE / 'aw.db'
 
 else:
-    DB_FILE = 'aw.dev.db' if deployment_dev() else 'aw.staging.db'
-    DB_FILE = BASE_DIR / DB_FILE
+    dev_db_file = 'aw.dev.db' if deployment_dev() else 'aw.staging.db'
+    if 'AW_DB' in environ:
+        DB_FILE = Path(get_aw_env_var('db'))
+        if DB_FILE.is_dir():
+            DB_FILE = DB_FILE / dev_db_file
+
+    else:
+        DB_FILE = dev_db_file
+        DB_FILE = BASE_DIR / DB_FILE
 
 DATABASES = {
     'default': {

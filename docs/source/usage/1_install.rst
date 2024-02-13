@@ -22,6 +22,13 @@ Install
 
     python3 -m pip install ansible-webui
 
+**Using docker**:
+
+.. code-block:: bash
+
+    docker image pull ansible0guy/ansible-webui:<VERSION>
+
+
 Start
 *****
 
@@ -49,8 +56,15 @@ Start
 
 Now you can open the Ansible-WebUI in your browser: `http://localhost:8000 <http://localhost:8000>`_
 
-Install Latest/Development Version
-**********************************
+**Using docker**:
+
+.. code-block:: bash
+
+    docker run --publish 127.0.0.1:8000:8000 --volume $(pwd)/ansible/data:/data --volume $(pwd)/ansible/play:/play ansible-webui:<VERSION>
+
+
+Install Unstable/Development Version
+************************************
 
 .. code-block:: bash
 
@@ -64,6 +78,13 @@ Install Latest/Development Version
 
     # run
     python3 src/ansible-webui/
+
+**Using docker**:
+
+.. code-block:: bash
+
+    docker image pull ansible0guy/ansible-webui:unstable
+    docker run --publish 127.0.0.1:8000:8000 --volume /tmp/awdata:/data ansible0guy/ansible-webui:unstable
 
 Service
 *******
