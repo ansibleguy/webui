@@ -1,6 +1,7 @@
 from multiprocessing import cpu_count
 from string import ascii_letters
 from random import choice as random_choice
+from os import environ
 
 import gunicorn
 from gunicorn.app.wsgiapp import WSGIApplication
@@ -20,6 +21,9 @@ OPTIONS_PROD = {
     'reload': False,
     'loglevel': 'warning',
 }
+
+if 'AW_DOCKER' in environ and environ['AW_DOCKER'] == '1':
+    OPTIONS_PROD['bind'] = f'0.0.0.0:{PORT_WEB}'
 
 
 class StandaloneApplication(WSGIApplication):

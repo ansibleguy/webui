@@ -101,7 +101,6 @@ def _make_migrations() -> bool:
 def create_first_superuser():
     # pylint: disable=C0415
     from aw.base import USERS
-    print(USERS, type(USERS))
     if len(USERS.objects.filter(is_superuser=True)) == 0:
         name = get_aw_env_var('init_admin')
         pwd = get_aw_env_var('init_admin_pwd')

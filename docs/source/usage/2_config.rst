@@ -125,3 +125,8 @@ Environmental variables
    Used in development.
    If unset or value is neither 'dev' nor 'staging' the webservice will be in production mode.
    'staging' mode is close to production behavior.
+
+
+* **AW_DOCKER**
+
+   Used to notify the software that it is running inside a docker container. Needed for listen port.

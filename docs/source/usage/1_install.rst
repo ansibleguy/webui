@@ -90,6 +90,7 @@ Without a virtual environment:
     Type=simple
     Environment=LANG="en_US.UTF-8"
     Environment=LC_ALL="en_US.UTF-8"
+    Environment=PYTHONUNBUFFERED="1"
 
     ExecStart=/usr/bin/python3 -m ansible-webui
     ExecReload=/usr/bin/kill -s HUP $MAINPID
@@ -122,6 +123,7 @@ When using a virtual environment: (recommended)
     Type=simple
     Environment=LANG="en_US.UTF-8"
     Environment=LC_ALL="en_US.UTF-8"
+    Environment=PYTHONUNBUFFERED="1"
 
     ExecStart=/bin/bash -c 'source /home/ansible-webui/venv/bin/activate \
                             && /usr/bin/python3 -m ansible-webui'
