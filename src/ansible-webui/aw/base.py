@@ -1,5 +1,5 @@
-from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 
-USERS = settings.AUTH_USER_MODEL
+USERS = get_user_model()
 GROUPS = Group
