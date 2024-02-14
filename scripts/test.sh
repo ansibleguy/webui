@@ -30,5 +30,4 @@ sleep 5
 python3 test/integration/webui/main.py
 
 sleep 1
-
 pkill -f 'ansible-webui'
