@@ -65,8 +65,8 @@ Now you can open the Ansible-WebUI in your browser: `http://localhost:8000 <http
     docker logs ansible-webui
 
 
-Install Unstable/Development Version
-************************************
+Install Unstable Version
+************************
 
 .. code-block:: bash
 
@@ -85,14 +85,8 @@ Install Unstable/Development Version
 
 .. code-block:: bash
 
-    # unstable
     docker image pull ansible0guy/ansible-webui:unstable
     docker run -it --name ansible-webui-dev --publish 127.0.0.1:8000:8000 --volume /tmp/awdata:/data ansible0guy/ansible-webui:unstable
-
-    # development
-    docker image pull ansible0guy/ansible-webui:dev
-    cd ${PATH_TO_SRC}  # repository root directory
-    docker run -it --name ansible-webui-dev --publish 127.0.0.1:8000:8000 --volume /tmp/awtest:/data --volume $(pwd):/aw ansible0guy/ansible-webui:dev
 
 Service
 *******
