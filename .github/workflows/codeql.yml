@@ -4,15 +4,19 @@ name: 'CodeQL'
 
 on:
   push:
-    branches: ['latest']
-    paths:
-      - '**.py'
-      - '.github/workflows/codeql.yml'
-  pull_request:
-    branches: ['latest']
-    paths:
-      - '**.py'
-      - '.github/workflows/codeql.yml'
+    tags:
+      - '*'
+  # takes too long to run on every push..
+  # push:
+  #   branches: ['latest']
+  #  paths:
+  #    - '**.py'
+  #    - '.github/workflows/codeql.yml'
+  #pull_request:
+  #  branches: ['latest']
+  #  paths:
+  #    - '**.py'
+  #    - '.github/workflows/codeql.yml'
 
 jobs:
   analyze:
