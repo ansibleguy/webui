@@ -26,7 +26,8 @@ class JobPermission(BaseModel):
     api_fields_read.extend(form_fields)
 
     name = models.CharField(max_length=100)
-    permission = models.PositiveSmallIntegerField(choices=CHOICES_PERMISSION, default=0)
+    permission_default = 0
+    permission = models.PositiveSmallIntegerField(choices=CHOICES_PERMISSION, default=permission_default)
     users = models.ManyToManyField(
         USERS,
         through='JobPermissionMemberUser',

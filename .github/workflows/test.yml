@@ -96,15 +96,25 @@ jobs:
           pytest --version
           python3 -m pytest
 
-      - name: Running Web-UI Integration Tests
+      - name: Running Integration Tests
         run: |
+          export AW_ENV='dev'
           export AW_DB="/tmp/$(date +%s).aw.db"
           export AW_ADMIN='tester'
           export AW_ADMIN_PWD='someSecret!Pwd'
-          python3 src/ansible-webui/ >/dev/null &
+          python3 src/ansible-webui/ >/dev/null 2>/dev/null &
           sleep 5
 
+          echo 'WEB-UI INTEGRATION TESTS'
           python3 test/integration/webui/main.py
-
           sleep 1
+
+          echo 'API INTEGRATION TESTS'
+          echo 'Create API key'
+          api_key="$(python3 src/ansible-webui/cli.py -f api-key -a create -p "$AW_ADMIN" | grep 'Key=' | cut -d '=' -f2)"
+          export AW_API_KEY="$api_key"
+          sleep 1
+          python3 test/integration/api/main.py
+          sleep 1
+
           pkill -f 'ansible-webui'

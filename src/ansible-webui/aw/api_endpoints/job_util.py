@@ -82,12 +82,14 @@ def get_viewable_jobs_serialized(
 
     for job in get_viewable_jobs(user):
         job_serialized = JobReadResponse(instance=job).data
+        job_serialized['next_run'] = None
 
         try:
-            job_serialized['next_run'] = get_next_cron_execution_str(job.schedule)
+            if job.schedule is not None:
+                job_serialized['next_run'] = get_next_cron_execution_str(job.schedule)
 
         except ValueError:
-            job_serialized['next_run'] = None
+            pass
 
         if executions:
             job_serialized['executions'] = get_job_executions_serialized(job=job, execution_count=execution_count)

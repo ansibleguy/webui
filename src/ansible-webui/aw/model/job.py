@@ -85,7 +85,7 @@ class Job(BaseJob):
     inventory_file = models.CharField(max_length=300)  # NOTE: one or multiple comma-separated inventories
     playbook_file = models.CharField(max_length=100)
     schedule_max_len = 50
-    schedule = models.CharField(max_length=schedule_max_len, validators=[validate_cronjob], blank=True, default=None)
+    schedule = models.CharField(max_length=schedule_max_len, validators=[validate_cronjob], **DEFAULT_NONE)
     enabled = models.BooleanField(choices=CHOICES_BOOL, default=True)
 
     credentials_needed = models.BooleanField(choices=CHOICES_BOOL, default=True)

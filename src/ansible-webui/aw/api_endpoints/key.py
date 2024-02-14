@@ -49,10 +49,7 @@ class APIKey(APIView):
         self.serializer_class = KeyWriteResponse
         user = get_api_user(request)
         token = f'{user}-{datetime_w_tz().strftime(KEY_TIME_FORMAT)}'
-        _, key = AwAPIKey.objects.create_key(
-            name=token,
-            user=user,
-        )
+        _, key = AwAPIKey.objects.create_key(name=token, user=user)
         return Response({'token': token, 'key': key})
 
 

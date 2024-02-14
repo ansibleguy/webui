@@ -32,11 +32,13 @@ def manage(request) -> HttpResponse:
     for job in jobs_viewable:
         executions[job.id] = JobExecution.objects.filter(job=job).order_by('-updated')[:LIMIT_JOB_RESULTS]
 
+        cron = '-'
         try:
-            cron = get_next_cron_execution_str(job.schedule)
+            if job.schedule is not None:
+                cron = get_next_cron_execution_str(job.schedule)
 
         except ValueError:
-            cron = '-'
+            pass
 
         next_executions[job.id] = cron
 
