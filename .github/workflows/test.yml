@@ -84,7 +84,7 @@ jobs:
         run: |
           set +e
           export AW_DB="/tmp/$(date +%s).aw.db"
-          timeout 2 python3 src/ansible-webui
+          timeout 10 python3 src/ansible-webui
           ec="$?"
           if [[ "$ec" != "124" ]]
           then

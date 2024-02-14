@@ -154,6 +154,8 @@ There are multiple Ansible WebUI products - how do they compare to this product?
 
   - [ ] Integration Tests
 
+    - [x] Basic WebUI checks
+
     - [ ] API Endpoints
 
     - [ ] Permission system

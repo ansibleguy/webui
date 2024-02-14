@@ -45,7 +45,7 @@ jobs:
           set +e
           echo 'RUNNING APP'
           export AW_DB="/tmp/$(date +%s).aw.db"
-          timeout 5 python3 -m ansible-webui
+          timeout 20 python3 -m ansible-webui
           ec="$?"
 
           echo 'CLEANUP'
