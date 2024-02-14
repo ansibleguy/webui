@@ -1,27 +1,14 @@
 #!/bin/sh
 
-echo 'INSTALLING/UPGRADING DEFAULT ANSIBLE DEPENDENCIES..'
-pip install --upgrade jmespath netaddr passlib pywinrm requests cryptography >/dev/null
-
-if [ -f '/data/requirements.txt' ]
+if ! [ -d '/aw' ]
 then
-  echo 'INSTALLING/UPGRADING PYTHON MODULES..'
-  pip install --upgrade -r '/data/requirements.txt' >/dev/null
+  echo 'YOU HAVE TO MOUNT THE APP SOURCES AT /aw'
+  exit 1
 fi
 
-if [ -f '/data/requirements_collections.yml' ]
-then
-  echo 'INSTALLING/UPGRADING ANSIBLE-COLLECTIONS..'
-  ansible-galaxy collection install --upgrade -r /data/requirements_collections.yml >/dev/null
-fi
+echo 'INSTALLING/UPGRADING REQUIREMENTS..'
+pip install --upgrade -r /aw/requirements.txt >/dev/null
 
-if [ -f '/data/requirements_roles.yml' ]
-then
-  echo 'INSTALLING ANSIBLE-ROLES..'
-  ansible-galaxy role install -r /data/requirements_roles.yml >/dev/null
-fi
+. /entrypoint_requirements.sh
 
-echo 'INSTALLING/UPGRADING latest..'
-pip install --upgrade --no-cache-dir "git+https://github.com/ansibleguy/ansible-webui.git@latest" >/dev/null
-
-python3 -m ansible-webui
+python3 /aw/src/ansible-webui/

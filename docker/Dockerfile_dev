@@ -1,0 +1,22 @@
+FROM python:3.10-alpine
+
+# BUILD: docker build -f Dockerfile_dev -t ansible0guy/ansible-webui:dev .
+# RUN: docker run -it --name ansible-webui-dev --publish 127.0.0.1:8000:8000 --volume /tmp/awtest:/data --volume $(pwd):/aw ansible-webui:dev
+
+RUN apk add --no-cache ansible-core && \
+    pip install --no-cache-dir --upgrade pip 2>/dev/null && \
+    mkdir -p /data/log
+
+ENV AW_ENV=dev \
+    AW_VERSION=dev \
+    AW_DOCKER=1 \
+    PYTHONUNBUFFERED=1 \
+    AW_DB=/data/aw.db \
+    AW_PATH_LOG=/data/log \
+    AW_PATH_PLAY=/aw/test
+WORKDIR /aw/test
+EXPOSE 8000
+
+COPY --chmod=0755 entrypoint_dev.sh /entrypoint.sh
+COPY --chmod=0755 requirements.sh /entrypoint_requirements.sh
+ENTRYPOINT ["/entrypoint.sh"]

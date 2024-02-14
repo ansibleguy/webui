@@ -20,5 +20,3 @@ then
   echo 'INSTALLING ANSIBLE-ROLES..'
   ansible-galaxy role install -r /data/requirements_roles.yml >/dev/null
 fi
-
-python3 -m ansible-webui
