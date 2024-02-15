@@ -1,6 +1,6 @@
 FROM python:3.10-alpine
 
-# BUILD: docker build -f Dockerfile_unstable -t ansible-webui:unstable .
+# BUILD: docker build -f Dockerfile_unstable -t ansible-webui:unstable --no-cache .
 # RUN: docker run -it --name ansible-webui-dev --publish 127.0.0.1:8000:8000 --volume /tmp/awtest:/data ansible-webui:unstable
 
 RUN apk add --no-cache git ansible-core && \

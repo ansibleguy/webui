@@ -2,7 +2,7 @@ FROM python:3.10-alpine
 
 ARG AW_VERSION
 
-# BUILD CMD: docker build -f Dockerfile_production -t ansible-webui:<VERSION> --build-arg "AW_VERSION=<VERSION>" .
+# BUILD CMD: docker build -f Dockerfile_production -t ansible-webui:<VERSION> --build-arg "AW_VERSION=<VERSION>" --no-cache .
 # RUN: docker run -d --name ansible-webui --publish 127.0.0.1:8000:8000 --volume $(pwd)/ansible/data:/data --volume $(pwd)/ansible/play:/play ansible-webui:<VERSION>
 
 RUN apk add --no-cache git ansible-core && \

@@ -21,7 +21,7 @@ cd /tmp
 rm -rf /tmp/ansible-webui
 git clone https://github.com/ansibleguy/ansible-webui.git
 cd /tmp/ansible-webui/docker
-docker build -f Dockerfile_production -t ansible-webui:latest --build-arg "AW_VERSION=latest" .
+docker build -f Dockerfile_production -t ansible-webui:latest --build-arg "AW_VERSION=latest" --no-cache .
 
 echo '### STARTING ###'
 envs="--env AW_HOSTNAMES=demo.webui.ansibleguy.net --env AW_PROXY=1 --env AW_ADMIN_PWD=$AW_ADMIN_PWD --env AW_ADMIN=$AW_ADMIN"
