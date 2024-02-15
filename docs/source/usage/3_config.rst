@@ -89,6 +89,16 @@ Environmental variables
    Timeout for WebUI sessions in seconds. Default: 43.200 (12h)
 
 
+* **AW_PROXY**
+
+   Set if Ansible-WebUI is operated behind a proxy-server.
+
+
+* **AW_HOSTNAMES**
+
+   Set a comma-separated list of hostnames that are in use and should be trusted.
+
+
 * **AW_SERVE_STATIC**
 
    If defined - the built-in static-file serving is disabled.

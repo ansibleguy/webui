@@ -56,6 +56,17 @@ CSRF_TRUSTED_ORIGINS = [
     'http://127.0.0.1',
     f'http://127.0.0.1:{PORT_WEB}',
 ]
+if 'AW_PROXY' in environ:
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+if 'AW_HOSTNAMES' in environ:
+    for hostname in environ['AW_HOSTNAMES'].split(','):
+        ALLOWED_HOSTS.append(hostname)
+        CSRF_TRUSTED_ORIGINS.extend([
+            f'http://{hostname}', f'https://{hostname}',
+            f'http://{hostname}:{PORT_WEB}', f'https://{hostname}:{PORT_WEB}',
+        ])
+
 ROOT_URLCONF = 'aw.urls'
 TEMPLATES = [
     {

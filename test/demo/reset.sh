@@ -24,4 +24,6 @@ cd /tmp/ansible-webui/docker
 docker build -f Dockerfile_production -t ansible-webui:latest --build-arg "AW_VERSION=latest" .
 
 echo '### STARTING ###'
-docker run -d --restart unless-stopped --name ansible-webui --publish 8000:8000 --volume /var/local/ansible-webui/:/data --volume /var/local/ansible-webui/play/:/play --env AW_ADMIN_PWD="$AW_ADMIN_PWD" --env AW_ADMIN="$AW_ADMIN" ansible-webui
+envs="--env AW_HOSTNAMES=demo.webui.ansibleguy.net --env AW_PROXY=1 --env AW_ADMIN_PWD=$AW_ADMIN_PWD --env AW_ADMIN=$AW_ADMIN"
+# shellcheck disable=SC2086
+docker run -d --restart unless-stopped --name ansible-webui --publish 8000:8000 --volume /var/local/ansible-webui/:/data --volume /var/local/ansible-webui/play/:/play $envs ansible-webui
