@@ -21,7 +21,6 @@ TEMPLATE_DIRS = [
 ]
 
 DEBUG = deployment_dev()
-ALLOWED_HOSTS = ['*']
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 X_FRAME_OPTIONS = 'SAMEORIGIN'
 
@@ -58,14 +57,21 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 if 'AW_PROXY' in environ:
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    USE_X_FORWARDED_HOST = True
 
+ALLOWED_HOSTS = ['*']
 if 'AW_HOSTNAMES' in environ:
     for hostname in environ['AW_HOSTNAMES'].split(','):
         ALLOWED_HOSTS.append(hostname)
         CSRF_TRUSTED_ORIGINS.extend([
-            f'http://{hostname}', f'https://{hostname}',
-            f'http://{hostname}:{PORT_WEB}', f'https://{hostname}:{PORT_WEB}',
+            f'http://{hostname}',
+            f'https://{hostname}',
+            f'http://{hostname}:{PORT_WEB}',
+            f'https://{hostname}:{PORT_WEB}',
         ])
+
+CSRF_ALLOWED_ORIGINS = CSRF_TRUSTED_ORIGINS
+CORS_ORIGINS_WHITELIST = CSRF_TRUSTED_ORIGINS
 
 ROOT_URLCONF = 'aw.urls'
 TEMPLATES = [
