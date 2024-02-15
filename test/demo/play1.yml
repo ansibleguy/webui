@@ -1,0 +1,36 @@
+---
+
+- hosts: localhost
+  become: false
+  gather_facts: false
+  tasks:
+    - name: Listing files in directory
+      ansible.builtin.command: 'ls -l /play'
+      register: job1
+
+    - name: Show response
+      ansible.builtin.debug:
+        var: job1.stdout_lines
+
+    - name: Add config file
+      ansible.builtin.copy:
+        content: |
+          # ansible_managed
+          # this is some config..
+          key={{ job_value | default('no') }}
+        dest: '/tmp/awtest.txt'
+        mode: 0640
+
+    - name: Wait some time
+      ansible.builtin.pause:
+        seconds: 30
+
+    - name: Remove file
+      ansible.builtin.file:
+        path: '/tmp/awtest.txt'
+        state: absent
+
+
+    - name: Output some information
+      ansible.builtin.debug:
+        msg: 'Ansible-WebUI DEMO'

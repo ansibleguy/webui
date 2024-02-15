@@ -33,6 +33,7 @@ def init_globals():
     environ.setdefault('DJANGO_SETTINGS_MODULE', 'aw.settings')
     environ['PYTHONIOENCODING'] = 'utf8'
     environ['PYTHONUNBUFFERED'] = '1'
+    environ['ANSIBLE_FORCE_COLOR'] = '1'
 
     for cnf_key in AW_ENV_VARS:
         config[cnf_key] = get_aw_env_var(cnf_key)

@@ -2,7 +2,7 @@ import signal
 from os import getpid
 from os import kill as os_kill
 from sys import exit as sys_exit
-from threading import Thread
+from threading import Thread, ThreadError
 from time import sleep, time
 
 from gunicorn.arbiter import Arbiter
@@ -68,18 +68,22 @@ class Scheduler:
             time_last_reload = time()
 
             while True:
-                if self.stopping:
-                    break
+                try:
+                    if self.stopping:
+                        break
 
-                if time() > (time_last_check + INTERVAL_CHECK):
-                    self.check()
-                    time_last_check = time()
+                    if time() > (time_last_check + INTERVAL_CHECK):
+                        self.check()
+                        time_last_check = time()
 
-                if time() > (time_last_reload + INTERVAL_RELOAD):
-                    self.reload()
-                    time_last_reload = time()
+                    if time() > (time_last_reload + INTERVAL_RELOAD):
+                        self.reload()
+                        time_last_reload = time()
 
-                sleep(self.WAIT_TIME)
+                    sleep(self.WAIT_TIME)
+
+                except ThreadError as err:
+                    log(msg=f'Got thread error: {err}', level=2)
 
         except Exception as err:
             log(msg=f'Got unexpected error: {err}', level=1)

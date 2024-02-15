@@ -63,7 +63,7 @@ def test_add():
             'limit': 'srv1',
         }},
         {'l': 'key', 'd': None},
-        {'l': 'permission', 'd': {'name': 'perm1', 'jobs': 1}},
+        {'l': 'permission', 'd': {'name': 'perm1', 'jobs': 1, 'credentials': 1}},
     ])
 
 

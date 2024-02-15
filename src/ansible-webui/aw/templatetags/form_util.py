@@ -77,20 +77,31 @@ def get_form_field_select(bf: BoundField, existing: dict) -> str:
     selected = None
     if bf.name in existing:
         selected = str(existing[bf.name])
+    elif f'{bf.name}_id' in existing:
+        selected = str(existing[f'{bf.name}_id'])
     elif bf.field.initial is not None:
         selected = bf.field.initial
 
     options_str = f'<select class="form-control" id="{bf.id_for_label}" name="{bf.name}"'
     if isinstance(bf.field, MultipleChoiceField):
+        # todo: selected for multi-select
         options_str += ' multiple'
         selected = None  # not implemented
 
     options_str += '>'
-    if selected is None:
-        options_str += '<option disabled selected value>Choose an option</option>'
 
     if not hasattr(bf.field, '_choices'):
         raise AttributeError(f"Field '{bf.name}' is of an invalid type: {type(bf.field)} - {bf.field.__dict__}")
+
+    if bf.field.required:
+        if selected is None:
+            options_str += '<option disabled selected value>Choose an option</option>'
+
+    else:
+        if selected is None:
+            options_str += '<option selected value>None</option>'
+        else:
+            options_str += '<option value>None</option>'
 
     # pylint: disable=W0212
     for option in bf.field._choices:

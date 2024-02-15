@@ -15,6 +15,13 @@ See `the documentation <https://docs.ansible.com/ansible/latest/installation_gui
 
 **Make sure to read** the `Ansible best-practices <https://docs.ansible.com/ansible/2.8/user_guide/playbooks_best_practices.html#directory-layout>`_ on how to use Ansible!
 
+Demo
+****
+
+Check out the demo at: `demo.webui.ansibleguy.net <demo.webui.ansibleguy.net>`_
+
+Login: User :code:`demo`, Password :code:`Ansible1337`
+
 Install
 *******
 

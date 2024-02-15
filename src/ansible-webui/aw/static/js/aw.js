@@ -325,6 +325,7 @@ function fetchApiTableData(apiEndpoint, updateFunction, secondRow = false, place
             }
         }
     });
+    updateReloadTime();
 }
 
 // EVENTHANDLER

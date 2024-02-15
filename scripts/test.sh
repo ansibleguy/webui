@@ -26,7 +26,7 @@ export AW_ENV='dev'
 export AW_DB="/tmp/$(date +%s).aw.db"
 # shellcheck disable=SC2155
 export AW_PATH_PLAY="$(pwd)/test"
-export AW_ADMIN='ansible'
+export AW_ADMIN='tester'
 export AW_ADMIN_PWD='someSecret!Pwd'
 python3 src/ansible-webui/ >/dev/null 2>/dev/null &
 echo ''

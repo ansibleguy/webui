@@ -12,7 +12,7 @@ on:
   #  paths:
   #    - '**.py'
   #    - '.github/workflows/codeql.yml'
-  #pull_request:
+  # pull_request:
   #  branches: ['latest']
   #  paths:
   #    - '**.py'

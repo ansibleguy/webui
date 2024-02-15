@@ -68,9 +68,13 @@ def _want_job_executions(request) -> tuple:
 def _has_credentials_permission(user: USERS, data: dict) -> bool:
     if 'credentials_default' in data and is_set(data['credentials_default']):
         try:
+            credentials = data['credentials_default']
+            if not isinstance(credentials, JobGlobalCredentials):
+                credentials = JobGlobalCredentials.objects.get(id=credentials)
+
             return has_credentials_permission(
                 user=user,
-                credentials=JobGlobalCredentials.objects.get(id=data['credentials_default']),
+                credentials=credentials,
                 permission_needed=CHOICE_PERMISSION_READ,
             )
 
@@ -266,7 +270,7 @@ class APIJobItem(APIView):
                     )
 
                 try:
-                    Job.objects.filter(id=job_id).update(**serializer.data)
+                    Job.objects.filter(id=job.id).update(**serializer.data)
 
                 except IntegrityError as err:
                     return Response(
