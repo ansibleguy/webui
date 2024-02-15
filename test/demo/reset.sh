@@ -16,7 +16,9 @@ then
   docker image rm ansible-webui:latest
 fi
 
+echo '### CLEANUP ###'
 cp /var/local/ansible-webui/aw.db.bak /var/local/ansible-webui/aw.db
+rm /var/local/ansible-webui/log/*
 
 echo '### BUILDING LATEST ###'
 cd /tmp

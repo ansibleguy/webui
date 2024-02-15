@@ -1,5 +1,6 @@
 from sys import version_info
 from importlib import metadata
+from os import environ
 
 from django.urls import path
 from django.shortcuts import HttpResponse
@@ -46,7 +47,9 @@ def _parsed_ansible_collections() -> dict:
 
 
 def _parsed_ansible_config() -> dict:
+    environ['ANSIBLE_FORCE_COLOR'] = '0'
     config_raw = get_ansible_config(action='dump', quiet=True)[0].split('\n')
+    environ['ANSIBLE_FORCE_COLOR'] = '1'
     config = {}
 
     for line in config_raw:

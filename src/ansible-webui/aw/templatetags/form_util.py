@@ -74,6 +74,7 @@ def get_form_field_value(bf: BoundField, existing: dict) -> (str, None):
 
 @register.filter
 def get_form_field_select(bf: BoundField, existing: dict) -> str:
+    multi = False
     selected = None
     if bf.name in existing:
         selected = str(existing[bf.name])
@@ -87,21 +88,23 @@ def get_form_field_select(bf: BoundField, existing: dict) -> str:
         # todo: selected for multi-select
         options_str += ' multiple'
         selected = None  # not implemented
+        multi = True
 
     options_str += '>'
 
     if not hasattr(bf.field, '_choices'):
         raise AttributeError(f"Field '{bf.name}' is of an invalid type: {type(bf.field)} - {bf.field.__dict__}")
 
-    if bf.field.required:
-        if selected is None:
-            options_str += '<option disabled selected value>Choose an option</option>'
+    if not multi:
+        if bf.field.required:
+            if selected is None:
+                options_str += '<option disabled selected value>Choose an option</option>'
 
-    else:
-        if selected is None:
-            options_str += '<option selected value>None</option>'
         else:
-            options_str += '<option value>None</option>'
+            if selected is None:
+                options_str += '<option selected value>None</option>'
+            else:
+                options_str += '<option value>None</option>'
 
     # pylint: disable=W0212
     for option in bf.field._choices:

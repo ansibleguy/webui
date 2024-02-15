@@ -39,9 +39,9 @@ def _has_permission(
             return True
 
         # if one of the permissions allows a group that the user is a member of
-        groups = JobPermissionMemberGroup.objects.filter(permission=link.permission)
-        if groups.exists() and user.groups.filter(name__in=[
-            group.name for group in groups
+        links = JobPermissionMemberGroup.objects.filter(permission=link.permission)
+        if links.exists() and user.groups.filter(name__in=[
+            link.group.name for link in links
         ]).exists():
             return True
 
