@@ -18,7 +18,7 @@ See `the documentation <https://docs.ansible.com/ansible/latest/installation_gui
 Demo
 ****
 
-Check out the demo at: `demo.webui.ansibleguy.net <demo.webui.ansibleguy.net>`_
+Check out the demo at: `demo.webui.ansibleguy.net <https://demo.webui.ansibleguy.net>`_
 
 Login: User :code:`demo`, Password :code:`Ansible1337`
 

@@ -30,7 +30,7 @@ python3 -m ansible-webui
 
 ## Demo
 
-Check out the demo at: [demo.webui.ansibleguy.net](demo.webui.ansibleguy.net)
+Check out the demo at: [demo.webui.ansibleguy.net](https://demo.webui.ansibleguy.net)
 
 Login: User `demo`, Password `Ansible1337`
 
