@@ -11,7 +11,7 @@
    :class: wiki-img
 
 ==========
-2 - Config
+3 - Config
 ==========
 
 WebUI

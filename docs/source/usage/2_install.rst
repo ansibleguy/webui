@@ -5,7 +5,7 @@
 .. include:: ../_include/warn_develop.rst
 
 ================
-1 - Installation
+2 - Installation
 ================
 
 Ansible
