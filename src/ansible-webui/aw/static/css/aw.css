@@ -544,6 +544,14 @@ td div hr {
     font-size: medium;
 }
 
+.aw-execution-errors {
+    color: var(--awLight);
+}
+
+.aw-execution-errors h3 {
+    color: var(--awSoftWhite);
+}
+
 /* Ansible console output colors */
 .aw-log-ok {
     color: #11D116;

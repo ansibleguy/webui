@@ -11,11 +11,10 @@ from django.core.exceptions import ObjectDoesNotExist
 from aw.config.main import config, check_config_is_true
 from aw.config.hardcoded import FILE_TIME_FORMAT
 from aw.utils.util import is_set, is_null, datetime_w_tz, write_file_0640
-from aw.utils.handlers import AnsibleConfigError
 from aw.model.job import Job, JobExecution, JobExecutionResult, JobExecutionResultHost, JobError
 from aw.model.job_credential import BaseJobCredentials, JobUserCredentials
 from aw.execute.util import update_execution_status, overwrite_and_delete_file, decode_job_env_vars, \
-    create_dirs, get_pwd_file, get_pwd_file_arg, write_pwd_file, is_execution_status
+    create_dirs, get_pwd_file, get_pwd_file_arg, write_pwd_file, is_execution_status, config_error
 from aw.utils.permission import has_credentials_permission, CHOICE_PERMISSION_READ
 from aw.base import USERS
 # from aw.utils.debug import log_warn
@@ -77,10 +76,10 @@ def _get_credentials_to_use(job: Job, execution: JobExecution) -> (BaseJobCreden
             pass
 
     if job.credentials_needed and credentials is None:
-        raise AnsibleConfigError(
+        config_error(
             'The job is set to require credentials - but none were provided or readable! '
             'Make sure you have privileges for the configured credentials or create user-specific ones.'
-        ).with_traceback(None) from None
+        )
 
     return credentials
 
@@ -180,12 +179,12 @@ def runner_prep(job: Job, execution: JobExecution, path_run: Path) -> dict:
 
     ppf = project_dir + opts['playbook']
     if not Path(ppf).is_file():
-        raise AnsibleConfigError(f"Configured playbook not found: '{ppf}'").with_traceback(None) from None
+        config_error(f"Configured playbook not found: '{ppf}'")
 
     for inventory in opts['inventory']:
         pi = project_dir + inventory
         if not Path(pi).exists():
-            raise AnsibleConfigError(f"Configured inventory not found: '{pi}'").with_traceback(None) from None
+            config_error(f"Configured inventory not found: '{pi}'")
 
     create_dirs(path=path_run, desc='run')
     create_dirs(path=config['path_log'], desc='log')

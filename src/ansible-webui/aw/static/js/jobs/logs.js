@@ -86,10 +86,10 @@ function updateApiTableDataJobLogs(row, row2, entry) {
         logsContainer.innerHTML = "<b>Running command:</b><br><small>" + entry.command + "</small><br>" + logsContainer.innerHTML;
     }
     if (entry.error_s != null) {
-        let errorContainer = document.getElementById("aw-execution-errors-" + entry.id);
-        errorContainer.innerHTML += ('<br><br><b>Error</b>:<br><code>' + entry.error_s + '</code>');
+        let logsContainer = document.getElementById("aw-execution-logs-" + entry.id);
+        logsContainer.innerHTML += ('<div class="aw-execution-errors"><h3>Error</h3>' + entry.error_s + '</div>');
         if (entry.error_m != null) {
-            errorContainer.innerHTML += ('<br><b>Error full</b>:<div class="code">' + entry.error_m + '</div>');
+            logsContainer.innerHTML += ('<br><br><div class="aw-execution-errors"><h3>Error full</h3>' + entry.error_m + '</div>');
         }
     }
 }

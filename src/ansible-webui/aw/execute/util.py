@@ -12,6 +12,10 @@ from aw.model.job import JobExecution, CHOICES_JOB_EXEC_STATUS
 from aw.model.job_credential import BaseJobCredentials
 
 
+def config_error(msg: str):
+    raise AnsibleConfigError(msg).with_traceback(None) from None
+
+
 def overwrite_and_delete_file(file: (str, Path)):
     if not isinstance(file, Path):
         file = Path(file)
@@ -38,10 +42,11 @@ def decode_job_env_vars(env_vars_csv: str, src: str) -> dict:
         return env_vars
 
     except ValueError:
-        raise AnsibleConfigError(
+        config_error(
             f"Environmental variables of {src} are not in a valid format "
             f"(comma-separated key-value pairs). Example: 'key1=val1,key2=val2'"
-        ).with_traceback(None) from None
+        )
+        return {}
 
 
 def update_execution_status(execution: JobExecution, status: str):
