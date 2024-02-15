@@ -52,7 +52,7 @@
         <button class="btn btn-primary aw-btn-action aw-api-click" title="Run" aw-api-endpoint="job" aw-api-item="${ID}" aw-api-method="post">
             {% include "../button/icon/run.html" %}
         </button>
-        <a href="/ui/jobs/log/${ID}">
+        <a href="/ui/jobs/log?filter=${ID}">
             <button class="btn btn-info aw-btn-action" title="Logs">
                 <i class="fa-solid fa-scroll fa-2x aw-btn-action-icon"></i>
             </button>

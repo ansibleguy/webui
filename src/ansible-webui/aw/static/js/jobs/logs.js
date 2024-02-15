@@ -18,8 +18,7 @@ function replaceAll(str, search, replace) {
 function replaceLineColors(rawLines) {
     var fixedLines = [];
 
-    for (i = 0, len = rawLines.length; i < len; i++) {
-        let line = rawLines[i];
+    for (line of rawLines) {
         for (let [search, replace] of Object.entries(colorMapping)) {
             line = replaceAll(line, search, replace);
         }
@@ -53,6 +52,10 @@ function addLogLines($this) {
 }
 
 function updateApiTableDataJobLogs(row, row2, entry) {
+    row.setAttribute("id_job", entry.job);
+    row.setAttribute("id_execution", entry.id);
+    row2.setAttribute("id_execution", entry.id);
+
     row.insertCell(0).innerHTML = shortExecutionStatus(entry);
     row.insertCell(1).innerText = entry.job_name;
     if (entry.job_comment == "") {
@@ -91,13 +94,38 @@ function updateApiTableDataJobLogs(row, row2, entry) {
     }
 }
 
+function applyFilter() {
+    if (HTTP_PARAMS.has('filter')) {
+        let filter_by = HTTP_PARAMS.get('filter');
+        let dataTable = document.getElementById("aw-api-data-table");
+        for (row of dataTable.rows) {
+            let id_job = row.getAttribute("id_job");
+            if (!is_set(id_job)) {
+                continue;
+            }
+            if (id_job == filter_by) {
+                row.removeAttribute("hidden");
+            } else {
+                row.setAttribute("hidden", "hidden");
+            }
+        }
+    }
+}
+
 $( document ).ready(function() {
     $(".aw-main").on("click", ".aw-log-read", function(){
         $this = jQuery(this);
         addLogLines($this);
         setInterval('addLogLines($this)', (DATA_REFRESH_SEC * 1000));
     });
-    apiEndpoint = "/api/job_exec";
+    executionCount = 20;
+    if (HTTP_PARAMS.has('filter')) {
+        executionCount = 50;
+    }
+    apiEndpoint = "/api/job_exec?execution_count=" + executionCount;
     fetchApiTableData(apiEndpoint, updateApiTableDataJobLogs, true, null, null, null, true);
     setInterval('fetchApiTableData(apiEndpoint, updateApiTableDataJobLogs, true, null, null, null, true)', (DATA_REFRESH_SEC * 1000));
+
+    applyFilter()
+    setInterval('applyFilter()', (DATA_REFRESH_SEC * 1000));
 });

@@ -123,8 +123,7 @@ def job_edit(request, job_id: int = None) -> HttpResponse:
 
 @login_required
 @ui_endpoint_wrapper_kwargs
-def job_logs(request, job_id: int = None) -> HttpResponse:
-    del job_id
+def job_logs(request) -> HttpResponse:
     return render(request, status=200, template_name='jobs/logs.html')
 
 
@@ -190,7 +189,7 @@ def job_credentials_edit(request, credentials_id: int = None) -> HttpResponse:
         if credentials is None:
             return redirect(f"/ui/jobs/credentials?error=Credentials with ID {credentials_id} do not exist")
 
-        if not has_credentials_permission(
+        if isinstance(credentials, JobGlobalCredentials) and not has_credentials_permission(
                 user=request.user,
                 credentials=credentials,
                 permission_needed=CHOICE_PERMISSION_WRITE,
@@ -217,7 +216,6 @@ def job_credentials_edit(request, credentials_id: int = None) -> HttpResponse:
 urlpatterns_jobs = [
     path('ui/jobs/credentials/<int:credentials_id>', job_credentials_edit),
     path('ui/jobs/credentials', job_credentials),
-    path('ui/jobs/log/<int:job_id>', job_logs),
     path('ui/jobs/log', job_logs),
     path('ui/jobs/manage/job/<int:job_id>', job_edit),
     path('ui/jobs/manage/job', job_edit),
