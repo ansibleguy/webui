@@ -48,8 +48,7 @@ function updateApiTableDataJob(row, row2, entry) {
     row2.setAttribute("hidden", "hidden");
     row2.innerHTML = row2.innerHTML.replaceAll('${ID}', entry.id);
     let execs = '<div>';
-    for (i = 0, len = entry.executions.length; i < len; i++) {
-        exec = entry.executions[i];
+    for (exec of entry.executions) {
         execs += ('<hr><b>Start time</b>: ' + exec.time_start);
         execs += ('<br><b>Finish time</b>: ' + exec.time_fin);
         execs += ('<br><b>Executed by</b>: ' + exec.user_name);

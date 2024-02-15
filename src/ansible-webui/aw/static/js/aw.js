@@ -2,6 +2,7 @@
 
 // CONSTANTS
 const DATA_REFRESH_SEC = 1;
+const HTTP_PARAMS = new URLSearchParams(window.location.search);
 
 // UTIL FUNCTIONS
 function getCookie(name) {
@@ -172,13 +173,11 @@ function apiBrowseDirUpdateChoices(inputElement, choicesElement, searchType, res
     inputElement.attr("title", title);
 
     choicesHtml = "";
-    for (i = 0, len = choices.length; i < len; i++) {
-        let choice = choices[i];
+    for (choice of choices) {
         choicesHtml += "<li>" + choice + "</li>";
     }
     if (searchType != 'directories') {
-        for (i = 0, len = dirs.length; i < len; i++) {
-            let dir = dirs[i];
+        for (dir of dirs) {
             choicesHtml += '<li><i class="fa fa-folder" aria-hidden="true"></i> ' + dir + "</li>";
         }
     }
@@ -239,8 +238,7 @@ function fetchApiTableData(apiEndpoint, updateFunction, secondRow = false, place
         }
         existingEntryIds = [];
         // for each existing entry
-        for (i = 0, len = data.length; i < len; i++) {
-            let entry = data[i];
+        for (entry of data) {
             let entryId = String(entry.id);
             let entryId2 = String(entry.id) + secondRowAppendix;
             if (dataSubKey != null) {
@@ -256,8 +254,7 @@ function fetchApiTableData(apiEndpoint, updateFunction, secondRow = false, place
             let entryRow2 = null;
             let lastDataHash = null;
             // check if the entry existed before
-            for (i2 = 0, len2 = dataTable.rows.length; i2 < len2; i2++) {
-                let existingRow = dataTable.rows[i2];
+            for (existingRow of dataTable.rows) {
                 let existingRowId = existingRow.getAttribute("aw-api-entry");
                 if (String(existingRowId) == entryId) {
                     entryRow = existingRow;
@@ -295,8 +292,7 @@ function fetchApiTableData(apiEndpoint, updateFunction, secondRow = false, place
         }
         // remove rows of deleted entries
         let rowsToDelete = [];
-        for (i3 = 0, len3 = dataTable.rows.length; i3 < len3; i3++) {
-            let rowIdx = i3;
+        for (rowIdx = 0, rowCnt = dataTable.rows.length; rowIdx < rowCnt; rowIdx++) {
             let existingRow = dataTable.rows[rowIdx];
             let existingRowId = existingRow.getAttribute("aw-api-entry");
             if (typeof(existingRowId) == 'undefined' || existingRowId == null) {
@@ -311,8 +307,7 @@ function fetchApiTableData(apiEndpoint, updateFunction, secondRow = false, place
                 rowsToDelete.push(rowIdx);
             }
         }
-        for (i4 = 0, len4 = rowsToDelete.length; i4 < len4; i4++) {
-            let rowIdx = rowsToDelete[i4];
+        for (rowIdx of rowsToDelete) {
             console.log("Removing entry row", rowIdx);
             dataTable.deleteRow(rowIdx);
         }
