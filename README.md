@@ -119,6 +119,8 @@ See also: [Contributing](https://github.com/ansibleguy/ansible-webui/blob/latest
 
     - [ ] Check Collections for available updates (Galaxy + GitHub releases)
 
+  - [x] Mobile Support
+
 - [ ] API
 
   - [x] Manage and execute Jobs
