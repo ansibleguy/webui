@@ -11,11 +11,14 @@ body:
       value: |
         Please make sure to go through these steps **before opening an issue**:
 
-        - [ ] Read the documentation to make sure the feature does not yet exist: [Docs](https://ansible-webui.readthedocs.io/)
+        - [ ] Read the documentation to make sure the feature does not yet exist:
+        [Docs](https://ansible-webui.readthedocs.io/)
 
-        - [ ] Make sure the feature is in-scope. We cannot extend the basic functionality of Ansible itself: [Ansible Docs](https://docs.ansible.com/ansible/2.8/user_guide/playbooks_best_practices.html#directory-layout)
+        - [ ] Make sure the feature is in-scope. We cannot extend the basic functionality of Ansible itself:
+        [Ansible Docs](https://docs.ansible.com/ansible/2.8/user_guide/playbooks_best_practices.html#directory-layout)
 
-        The Ansible-WebUI project tries to keep its codebase as simple & small as possible. Be aware we will not implement all 'nice-to-have' or 'fancy' features.
+        The Ansible-WebUI project tries to keep its codebase as simple & small as possible.
+        Be aware we will not implement all 'nice-to-have' or 'fancy' features.
 
   - type: dropdown
     id: scope
