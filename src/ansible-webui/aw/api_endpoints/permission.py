@@ -184,6 +184,12 @@ def has_permission_privileges(user: USERS) -> bool:
     return user.is_staff
 
 
+def permission_in_use(permission: JobPermission) -> bool:
+    in_use_jobs = JobPermissionMapping.objects.filter(permission=permission).exists()
+    in_use_creds = JobCredentialsPermissionMapping.objects.filter(permission=permission).exists()
+    return in_use_jobs or in_use_creds
+
+
 class APIPermission(GenericAPIView):
     http_method_names = ['get', 'post']
     serializer_class = PermissionReadResponse
@@ -321,6 +327,12 @@ class APIPermissionItem(GenericAPIView):
         try:
             permission = JobPermission.objects.get(id=perm_id)
             if permission is not None:
+                if permission_in_use(permission):
+                    return Response(
+                        data={'msg': f"Permission '{permission.name}' cannot be deleted as it is still in use"},
+                        status=400,
+                    )
+
                 permission.delete()
                 return Response(data={'msg': f"Permission '{permission.name}' deleted"}, status=200)
 

@@ -131,8 +131,12 @@ function apiActionError(result, exception) {
 
     // inform user about the error and allow to toggle/show the full/verbose error message
     errorDiv =  document.getElementById('aw-api-error');
-    let errorHTML = "Got error: " + result.statusText + ' (' + result.status + ')<br>' +
-    '<button class="btn btn-warning aw-btn-action" title="Full error" onclick="apiActionFullError()">Show full error</button><br>';
+    let errorHTML = "Got error: " + result.statusText + ' (' + result.status + ')';
+    if (is_set(result.responseJSON.msg)) {
+        errorHTML += ' - ' + result.responseJSON.msg;
+    } else {
+        errorHTML += '<br><button class="btn btn-warning aw-btn-action" title="Full error" onclick="apiActionFullError()">Show full error</button><br>';
+    }
     errorDiv.innerHTML = errorHTML;
 
     apiActionSuccessClear();

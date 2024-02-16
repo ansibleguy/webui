@@ -5,6 +5,7 @@ from rest_framework import serializers
 from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiParameter
 
+from aw.model.job import Job, JobExecution
 from aw.model.job_credential import BaseJobCredentials, JobUserCredentials, JobGlobalCredentials
 from aw.model.job_permission import CHOICE_PERMISSION_READ, CHOICE_PERMISSION_WRITE, CHOICE_PERMISSION_FULL
 from aw.api_endpoints.base import API_PERMISSION, get_api_user, GenericResponse, BaseResponse
@@ -84,6 +85,18 @@ def _log_global_user(are_global: bool, lower: bool = False) -> str:
         return msg.lower()
 
     return msg
+
+
+def credentials_in_use(credentials: BaseJobCredentials) -> bool:
+    if isinstance(credentials, JobGlobalCredentials):
+        in_use_jobs = Job.objects.filter(credentials_default=credentials).exists()
+        in_use_execs = JobExecution.objects.filter(credential_global=credentials).exists()
+        in_use = in_use_jobs or in_use_execs
+
+    else:
+        in_use = JobExecution.objects.filter(credential_user=credentials).exists()
+
+    return in_use
 
 
 class APIJobCredentials(APIView):
@@ -274,6 +287,13 @@ class APIJobCredentialsItem(APIView):
                 data={'msg': f"Not privileged to delete the {_log_global_user(are_global, lower=True)} "
                              f"'{credentials.name}'"},
                 status=403)
+
+        if credentials_in_use(credentials):
+            return Response(
+                data={'msg': f"{_log_global_user(are_global)} '{credentials.name}' cannot be deleted "
+                             "as they are still in use"},
+                status=400,
+            )
 
         credentials.delete()
         return Response(data={'msg': f"{_log_global_user(are_global)} '{credentials.name}' deleted"}, status=200)
