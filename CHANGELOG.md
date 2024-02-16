@@ -2,6 +2,19 @@
 
 ## Version 0
 
+## 0.0.8
+
+* Credentials
+  * Global/Shared credentials
+  * User-specific credentials
+  * Credential permissions
+* Basic Integration Tests
+* Support for dockerized deployments
+* Support to run behind Proxy (Nginx tested)
+* Dynamic pulling of UI data using JS
+
+----
+
 ### 0.0.7
 
 * Job Permissions
