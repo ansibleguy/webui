@@ -31,7 +31,7 @@ body.light {
     --bg: #fcfdff;
     --bgLight: #3A9188;
     --bgNav: #343a40;
-    --bgNav2: #343a40;
+    --bgNav2: #505050;
     --bgNav3: #343a40;
     --tableHead: rgba(0, 0, 0, .05);
     --tableActive: rgba(0, 0, 0, .075);
@@ -48,7 +48,7 @@ body.dark {
     --textHead: #ff7400;
     --bg: #121212;
     --bgNav: #343a40;
-    --bgNav2: #343a40;
+    --bgNav2: #505050;
     --bgNav3: #343a40;
     --tableHead: #282828;
     --tableActive: #404040;
