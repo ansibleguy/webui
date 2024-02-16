@@ -43,6 +43,8 @@ You can use the :code:`System - Admin` page to administer those using the Django
 |cnf_admin|
 
 
+----
+
 Environmental variables
 ***********************
 

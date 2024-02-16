@@ -15,12 +15,16 @@ See `the documentation <https://docs.ansible.com/ansible/latest/installation_gui
 
 **Make sure to read** the `Ansible best-practices <https://docs.ansible.com/ansible/2.8/user_guide/playbooks_best_practices.html#directory-layout>`_ on how to use Ansible!
 
+----
+
 Demo
 ****
 
 Check out the demo at: `demo.webui.ansibleguy.net <https://demo.webui.ansibleguy.net>`_
 
 Login: User :code:`demo`, Password :code:`Ansible1337`
+
+----
 
 Install
 *******
@@ -72,6 +76,7 @@ Now you can open the Ansible-WebUI in your browser: `http://localhost:8000 <http
     # find initial password
     docker logs ansible-webui
 
+----
 
 Install Unstable Version
 ************************
@@ -95,6 +100,15 @@ Install Unstable Version
 
     docker image pull ansible0guy/ansible-webui:unstable
     docker run -it --name ansible-webui-dev --publish 127.0.0.1:8000:8000 --volume /tmp/awdata:/data ansible0guy/ansible-webui:unstable
+
+----
+
+Proxy
+*****
+
+You can find a nginx config example here: `Nginx config example <https://github.com/ansibleguy/ansible-webui/blob/latest/config/nginx.conf>`_
+
+----
 
 Service
 *******
