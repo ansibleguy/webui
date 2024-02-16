@@ -39,6 +39,6 @@ Requests must have the API key set in the :code:`X-Api-Key` header.
 API Docs
 ********
 
-You can see the available API-endpoints in the built-in API-docs: `ui/api_docs <http://localhost:8000/ui/api_docs>`_ (*swagger*)
+You can see the available API-endpoints in the built-in API-docs at :code:`System - API Docs` (*swagger*)
 
 |api_docs|

@@ -1,0 +1,54 @@
+---
+
+name: Problem
+description: You have encountered problems when using the modules
+title: "Problem: "
+labels: ['problem', 'triage']
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please make sure to go through these steps **before opening an issue**:
+
+        - [ ] Read the documentation: [Docs](https://ansible-webui.readthedocs.io/)
+
+        - [ ] Read the troubleshooting info: [Troubleshooting](https://ansible-webui.readthedocs.io/en/latest/usage/troubleshooting.html)
+
+        - [ ] Check if there are existing [issues](https://github.com/ansibleguy/ansible-webui/issues)
+        or [discussions](https://github.com/ansibleguy/ansible-webui/discussions) regarding your topic
+
+  - type: textarea
+    id: versions
+    attributes:
+      label: Versions
+      description: |
+        Provide your system versions.
+        You can find it at `System - Environment`
+        Copy & paste all versions in the `System version` table.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: scope
+    attributes:
+      label: Scope
+      description: What version of our software are you running?
+      options:
+        - Unknown
+        - Frontend (User Interface)
+        - Ansible (Job Execution)
+        - Backend (API)
+        - Service (Job Scheduling, Job Preparation)
+      default: 0
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Issue
+      description: |
+        Describe the problem you encountered and tell us what you would have expected to happen
+    validations:
+      required: true

@@ -20,6 +20,48 @@
                 <td>{% get_version %}</td>
             </tr>
             <tr>
+                <td>Django</td>
+                <td>{{ env_django }}</td>
+            </tr>
+            <tr>
+                <td>Django Rest-Framework</td>
+                <td>{{ env_django_api }}</td>
+            </tr>
+            <tr>
+                <td>Gunicorn</td>
+                <td>{{ env_gunicorn }}</td>
+            </tr>
+{% if env_ansible is not none %}
+            <tr>
+                <td>Ansible</td>
+                <td>{{ env_ansible }}</td>
+            </tr>
+{% endif %}
+{% if env_ansible_core is not none %}
+            <tr>
+                <td>Ansible Core</td>
+                <td>{{ env_ansible_core }}</td>
+            </tr>
+{% endif %}
+{% if env_ansible_runner is not none %}
+            <tr>
+                <td>Ansible Runner</td>
+                <td>{{ env_ansible_runner }}</td>
+            </tr>
+{% endif %}
+{% if env_jinja is not none %}
+            <tr>
+                <td>Jinja</td>
+                <td>{{ env_jinja }}</td>
+            </tr>
+{% endif %}
+{% if env_libyaml is not none %}
+            <tr>
+                <td>Using libyaml</td>
+                <td>{{ env_libyaml }}</td>
+            </tr>
+{% endif %}
+            <tr>
                 <td>Linux</td>
                 <td>{{ env_linux }}</td>
             </tr>
@@ -69,10 +111,10 @@
                 <th>Module</th>
                 <th>Version</th>
             </tr>
-{% for name, version in env_pip.items %}
+{% for module in env_python_modules.values %}
             <tr>
-                <td><a href="https://pypi.org/project/{{ name }}/">{{ name }}</a></td>
-                <td>{{ version }}</td>
+                <td><a href="https://pypi.org/project/{{ module|get_value:'name' }}/">{{ module|get_value:'name' }}</a></td>
+                <td>{{ module|get_value:'version' }}</td>
             </tr>
 {% endfor %}
         </table>

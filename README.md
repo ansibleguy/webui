@@ -8,8 +8,6 @@
 
 The goal is to allow users to quickly install & run a WebUI for using Ansible locally.
 
-This is achieved by [distributing it using pip](https://pypi.org/project/ansible-webui/).
-
 Keep it simple.
 
 **This project is still in early development! DO NOT USE IN PRODUCTION!**
@@ -18,12 +16,21 @@ Keep it simple.
 
 ## Setup
 
-```
+### Local - PIP
+
+```bash
 # install
 python3 -m pip install ansible-webui
 
 # run
 python3 -m ansible-webui
+```
+
+### Docker
+
+```bash
+docker image pull ansible0guy/ansible-webui:<VERSION>
+docker run -d --name ansible-webui --publish 127.0.0.1:8000:8000 --volume $(pwd)/ansible/data:/data --volume $(pwd)/ansible/play:/play ansible-webui:<VERSION>
 ```
 
 ----

@@ -1,5 +1,22 @@
 # Contribute
 
+Contributions are very welcome!
+
+We're also open to allow co-maintainers.
+
+## What to contribute?
+
+* [Find and report issues/bugs](https://github.com/ansibleguy/ansible-webui/issues/new)
+* [Start Discussions about Implementations/Optimizations](https://github.com/ansibleguy/ansible-webui/discussions/new/choose)
+* Help optimizing/polishing the frontend is very welcome
+  * Fix/optimize styles/css
+  * Extend/fix/optimize JS
+
+* Add Unit-Tests (*pytest*)
+* Add [Integration-Tests](https://github.com/ansibleguy/ansible-webui/tree/latest/test/integration) for the Web-UI and/or API
+
+----
+
 ## Install
 
 ### Directly
@@ -49,8 +66,6 @@ Admin user for testing:
 ----
 
 ## Testing
-
-You are very welcome to extend the unit- & [integration-Tests](https://github.com/ansibleguy/ansible-webui/tree/latest/test/integration)!
 
 Test to build the app using PIP:
 ```bash
