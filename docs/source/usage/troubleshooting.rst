@@ -4,10 +4,7 @@
 
 .. include:: ../_include/warn_develop.rst
 
-.. |cnf_admin| image:: ../_static/img/config_admin.png
-   :class: wiki-img
-
-.. |cnf_jobs| image:: ../_static/img/config_jobs.png
+.. |ts_sys_ov| image:: ../_static/img/troubleshoot_system_overview.png
    :class: wiki-img
 
 ===============
@@ -17,4 +14,6 @@ Troubleshooting
 Ansible vs WebUI
 ****************
 
-If you want to troubleshoot a job execution, you will have to find out if
+If you want to troubleshoot a job execution, you will have to find out if it is an issue with Ansible or the WebUI system.
+
+|ts_sys_ov|
