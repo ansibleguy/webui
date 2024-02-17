@@ -172,9 +172,12 @@ class APIJobCredentials(APIView):
 
         for field in BaseJobCredentials.SECRET_ATTRS:
             value = serializer.validated_data[field]
-            if field in BaseJobCredentials.SECRET_ATTRS and \
-                    (is_null(value) or value == BaseJobCredentials.SECRET_HIDDEN):
-                serializer.validated_data[field] = None
+            if field in BaseJobCredentials.SECRET_ATTRS:
+                if is_null(value) or value == BaseJobCredentials.SECRET_HIDDEN:
+                    serializer.validated_data[field] = None
+
+                elif field == 'ssh_key':
+                    serializer.validated_data[field] = value.replace(' ', '\n')
 
         try:
             serializer.save()
@@ -354,9 +357,12 @@ class APIJobCredentialsItem(APIView):
         try:
             # not working with password properties: 'Job.objects.filter(id=job_id).update(**serializer.data)'
             for field, value in serializer.data.items():
-                if (field in BaseJobCredentials.SECRET_ATTRS and
-                        (is_null(value) or value == BaseJobCredentials.SECRET_HIDDEN)):
-                    value = getattr(credentials, field)
+                if field in BaseJobCredentials.SECRET_ATTRS:
+                    if is_null(value) or value == BaseJobCredentials.SECRET_HIDDEN:
+                        value = getattr(credentials, field)
+
+                    elif field == 'ssh_key':
+                        value = value.replace(' ', '\n')
 
                 setattr(credentials, field, value)
 
