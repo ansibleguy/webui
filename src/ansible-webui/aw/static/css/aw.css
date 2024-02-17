@@ -39,6 +39,7 @@ body.light {
     --bgError: #f8d7da;
     --borderError: #f5c6cb;
     --tcError: #721c24;
+    --awLogs: #404040;
 }
 
 body.dark {
@@ -58,6 +59,7 @@ body.dark {
     --bgError: #282828;
     --borderError: #404040;
     --tcError: #721c24;
+    --awLogs: #282828;
 }
 
 /* START basic */
@@ -557,7 +559,7 @@ td div hr {
     white-space: pre-wrap;
     padding: 1% 1.5%;
     color: var(--awSoftWhite);
-    background-color: #404040;
+    background-color: var(--awLogs);
     letter-spacing: normal;
     font-size: medium;
 }

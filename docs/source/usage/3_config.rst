@@ -10,14 +10,29 @@
 .. |cnf_jobs| image:: ../_static/img/config_jobs.png
    :class: wiki-img
 
+.. |cnf_sys| image:: ../_static/img/config_system.png
+   :class: wiki-img
+
 ==========
 3 - Config
 ==========
 
+Getting Started
+***************
+
+You have to:
+
+* Set the :code:`AW_SECRET` environmental variable with a length of at least 30 characters!
+* Set the :code:`AW_PATH_PLAY` to your Playbook base-directory (env or via WebUI)
+
+----
+
 WebUI
 *****
 
-Most configuration can be managed using the WebUI.
+Most system configuration can be managed using the WebUI :code:`System - Config` page.
+
+|cnf_sys|
 
 Jobs
 ====
@@ -48,12 +63,62 @@ You can use the :code:`System - Admin` page to administer those using the Django
 Environmental variables
 ***********************
 
+You can find the currently set environmental variables at the :code:`System - Config` page.
+
+Environmental variables can be set before/when starting Ansible-WebUI:
+
+Usage
+=====
+
+With basic setup:
+
+.. code-block:: bash
+
+    export AW_SECRET=aaaaaaaaaaaaaaaaaaaaabaaaaaaaaaaaaa
+    export AW_PROXY=1
+    python3 -m ansible-webui
+
+    # OR
+
+    AW_SECRET=aaaaaaaaaaaaaaaaaaaaabaaaaaaaaaaaaa python3 -m ansible-webui
+
+When using Docker:
+
+.. code-block:: bash
+
+    docker run -d --name ansible-webui --env AW_SECRET=aaaaaaaaaaaaaaaaaaaaabaaaaaaaaaaaaa --env AW_PROXY=1 ...
+
+When running as Systemd service:
+
+.. code-block:: bash
+
+    # add inside the '[Service]' area of the service-config-file
+    EnvironmentFile=/etc/ansible-webui/env.txt
+
+    # add variables to the file
+    echo 'AW_SECRET=aaaaaaaaaaaaaaaaaaaaabaaaaaaaaaaaaa' >> /etc/ansible-webui/env.txt
+    echo 'AW_PROXY=1' >> /etc/ansible-webui/env.txt
+
+    # make sure the access is limited so your secret(s) are safe
+    chown root /etc/ansible-webui/env.txt
+    chmod 600 /etc/ansible-webui/env.txt
+
+
+Settings
+========
+
+Some settings are only available as environmental variables.
+
+Only Env
+--------
+
 * **AW_SECRET**
 
    Define a secret key to use for cookie and password encryption.
    By default it will be re-generated at service restart.
    It **has to be set** for job-secrets like passwords to be loadable after restart.
    It has to be **at least 30 characters** long!
+
 
 * **AW_ADMIN**
 
@@ -64,6 +129,26 @@ Environmental variables
 
    Define the password for the initial admin user.
 
+
+* **AW_PROXY**
+
+   Set if Ansible-WebUI is operated behind a proxy-server.
+
+
+* **AW_HOSTNAMES**
+
+   Set a comma-separated list of hostnames that are in use and should be trusted. If not set you might encounter 'CSRF' errors.
+
+
+* **AW_DB**
+
+   Define the path where the SQLite3 database is placed. Default: :code:`${HOME}/.config/ansible-webui/aw.db`
+
+
+General System Settings
+-----------------------
+
+These settings are also configurable using the WebUI.
 
 * **AW_PATH_LOG**
 
@@ -91,29 +176,6 @@ Environmental variables
    Timeout for WebUI sessions in seconds. Default: 43.200 (12h)
 
 
-* **AW_PROXY**
-
-   Set if Ansible-WebUI is operated behind a proxy-server.
-
-
-* **AW_HOSTNAMES**
-
-   Set a comma-separated list of hostnames that are in use and should be trusted.
-
-
-* **AW_SERVE_STATIC**
-
-   If defined - the built-in static-file serving is disabled.
-   Use this if in production and a `proxy like nginx <https://docs.nginx.com/nginx/admin-guide/web-server/serving-static-content/>`_ is in front of the Ansible-WebUI webservice.
-
-   Path to serve: :code:`/static/ => ${PATH_VENV}/lib/python${PY_VERSION}/site-packages/ansible-webui/aw/static/`
-
-
-* **AW_DB**
-
-   Define the path where the SQLite3 database is placed. Default: :code:`${HOME}/.config/ansible-webui/aw.db`
-
-
 * **AW_SSH_KNOWN_HOSTS**
 
    Define the path to the known-hosts file that should be used. You can use :code:`${AW_PATH_PLAY}` to reference paths relative to your playbook base-directory!
@@ -127,6 +189,19 @@ Environmental variables
 
    Override the timezone used.
    Default is the system timezone.
+
+
+Advanced Settings
+-----------------
+
+Normal users will not have to use these.
+
+* **AW_SERVE_STATIC**
+
+   If defined - the built-in static-file serving is disabled.
+   Use this if in production and a `proxy like nginx <https://docs.nginx.com/nginx/admin-guide/web-server/serving-static-content/>`_ is in front of the Ansible-WebUI webservice.
+
+   Path to serve: :code:`/static/ => ${PATH_VENV}/lib/python${PY_VERSION}/site-packages/ansible-webui/aw/static/`
 
 
 * **AW_DB_MIGRATE**
@@ -151,3 +226,4 @@ Environmental variables
 * **AW_DOCKER**
 
    Used to notify the software that it is running inside a docker container. Needed for listen port.
+

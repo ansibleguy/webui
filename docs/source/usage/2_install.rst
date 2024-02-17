@@ -120,70 +120,7 @@ You might want to create a service-user:
     sudo useradd ansible-webui --shell /usr/sbin/nologin --create-home --home-dir /home/ansible-webui
 
 
-Without a virtual environment:
-
-.. code-block:: text
-
-    # /etc/systemd/system/ansible-webui.service
-
-    [Unit]
-    Description=Ansible WebUI Service
-    Documentation=https://ansible-webui.readthedocs.io/
-    Documentation=https://github.com/ansibleguy/ansible-webui
-
-    [Service]
-    Type=simple
-    Environment=LANG="en_US.UTF-8"
-    Environment=LC_ALL="en_US.UTF-8"
-    Environment=PYTHONUNBUFFERED="1"
-
-    ExecStart=/usr/bin/python3 -m ansible-webui
-    ExecReload=/usr/bin/kill -s HUP $MAINPID
-
-    User=ansible-webui
-    Group=ansible-webui
-    Restart=on-failure
-    RestartSec=5s
-
-    StandardOutput=journal
-    StandardError=journal
-    SyslogIdentifier=ansible-webui
-
-    [Install]
-    WantedBy=multi-user.target
-
-
-When using a virtual environment: (recommended)
-
-.. code-block:: text
-
-    # /etc/systemd/system/ansible-webui.service
-
-    [Unit]
-    Description=Ansible WebUI Service
-    Documentation=https://ansible-webui.readthedocs.io/
-    Documentation=https://github.com/ansibleguy/ansible-webui
-
-    [Service]
-    Type=simple
-    Environment=LANG="en_US.UTF-8"
-    Environment=LC_ALL="en_US.UTF-8"
-    Environment=PYTHONUNBUFFERED="1"
-
-    ExecStart=/bin/bash -c 'source /home/ansible-webui/venv/bin/activate \
-                            && /usr/bin/python3 -m ansible-webui'
-
-    User=ansible-webui
-    Group=ansible-webui
-    Restart=on-failure
-    RestartSec=5s
-
-    StandardOutput=journal
-    StandardError=journal
-    SyslogIdentifier=ansible-webui
-
-    [Install]
-    WantedBy=multi-user.target
+You can find a service config example here: `Systemd config example <https://github.com/ansibleguy/ansible-webui/blob/latest/config/systemd_service.conf>`_
 
 Enabling & starting the service:
 
