@@ -29,8 +29,9 @@ git clone https://github.com/ansibleguy/ansible-webui
 
 # install dependencies (venv recommended)
 cd ansible-webui
-python3 -m pip install --upgrade requirements.txt
+python3 -m pip install --upgrade -r requirements.txt
 bash scripts/update_version.sh
+export AW_VERSION="$(cat VERSION)"
 
 # run
 python3 src/ansible-webui/

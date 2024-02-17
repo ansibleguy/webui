@@ -1,10 +1,15 @@
 const colorMapping = {
     '[0m': '</span>',
     '[0;32m': '<span class="aw-log-ok">',
+    '[1;32m': '<span class="aw-log-ok">',
     '[0;36m': '<span class="aw-log-skip">',
+    '[1;36m': '<span class="aw-log-skip">',
+    '[0;35m': '<span class="aw-log-warn">',
     '[1;35m': '<span class="aw-log-warn">',
     '[0;31m': '<span class="aw-log-err">',
+    '[1;31m': '<span class="aw-log-err">',
     '[0;33m': '<span class="aw-log-change">',
+    '[1;33m': '<span class="aw-log-change">',
 }
 
 function escapeRegExp(string) {

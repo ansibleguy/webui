@@ -114,6 +114,7 @@ class Scheduler:
                 self._signum_log(signum=signum)
 
             self._reload_action(**self._reload_check())
+            self.thread_manager.clean_stopped_threads()
             self.reloading = False
 
     def _reload_action(self, added: list, removed: list, changed: list):

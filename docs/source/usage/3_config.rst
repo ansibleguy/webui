@@ -107,10 +107,10 @@ When running as Systemd service:
 Settings
 ========
 
-Some settings are only available as environmental variables.
-
 Only Env
 --------
+
+Some settings are only available as environmental variables.
 
 * **AW_SECRET**
 

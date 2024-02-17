@@ -173,7 +173,7 @@ class ThreadManager:
     def start_thread(self, job: Job) -> None:
         for thread in self.threads:
             if thread.job == job:
-                if not thread.started:
+                if not thread.started and not thread.stopped:
                     thread.start()
                     log(f"Thread '{job.name}' started.", level=5)
                     break
@@ -198,6 +198,15 @@ class ThreadManager:
             pretty.append(f'{thread.job.name} next run at {next_run}')
 
         return pretty
+
+    def clean_stopped_threads(self):
+        to_remove = []
+        for thread in self.threads:
+            if thread.stopped:
+                to_remove.append(thread)
+
+        for thread in to_remove:
+            self.threads.remove(thread)
 
     def __del__(self):
         try:

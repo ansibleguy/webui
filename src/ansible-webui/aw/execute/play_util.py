@@ -51,7 +51,7 @@ def _commandline_arguments(job: Job, execution: JobExecution, path_run: Path) ->
     if is_set(config['path_ssh_known_hosts']) and \
             ' '.join(cmd_arguments).find('ansible_ssh_extra_args') == -1:
         if Path(config['path_ssh_known_hosts']).is_file():
-            cmd_arguments.append(f"-e ansible_ssh_extra_args='-o UserKnownHostsFile={config['path_ssh_known_hosts']}'")
+            cmd_arguments.append(f"-e ansible_ssh_extra_args=\"-o UserKnownHostsFile={config['path_ssh_known_hosts']}\"")
 
         else:
             _exec_log(execution=execution, msg='Ignoring known_host file because it does not exist', level=5)
