@@ -37,7 +37,7 @@ Install
 
 .. code-block:: bash
 
-    docker image pull ansible0guy/ansible-webui:<VERSION>
+    docker image pull ansible0guy/ansible-webui:latest
 
 
 Start

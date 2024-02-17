@@ -29,8 +29,8 @@ python3 -m ansible-webui
 ### Docker
 
 ```bash
-docker image pull ansible0guy/ansible-webui:<VERSION>
-docker run -d --name ansible-webui --publish 127.0.0.1:8000:8000 --volume $(pwd)/ansible/data:/data --volume $(pwd)/ansible/play:/play ansible-webui:<VERSION>
+docker image pull ansible0guy/ansible-webui:latest
+docker run -d --name ansible-webui --publish 127.0.0.1:8000:8000 --volume $(pwd)/ansible/data:/data --volume $(pwd)/ansible/play:/play ansible-webui:latest
 ```
 
 ----
