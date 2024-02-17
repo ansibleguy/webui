@@ -124,7 +124,7 @@ def job_edit(request, job_id: int = None) -> HttpResponse:
 @login_required
 @ui_endpoint_wrapper_kwargs
 def job_logs(request) -> HttpResponse:
-    return render(request, status=200, template_name='jobs/logs.html')
+    return render(request, status=200, template_name='jobs/logs.html', context={'show_update_time': True})
 
 
 class CredentialGlobalForm(forms.ModelForm):
@@ -159,7 +159,7 @@ class CredentialUserForm(CredentialGlobalForm):
 @login_required
 @ui_endpoint_wrapper_kwargs
 def job_credentials(request) -> HttpResponse:
-    return render(request, status=200, template_name='jobs/credentials.html')
+    return render(request, status=200, template_name='jobs/credentials.html', context={'show_update_time': True})
 
 
 @login_required

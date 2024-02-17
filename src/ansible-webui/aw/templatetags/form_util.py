@@ -66,7 +66,7 @@ def get_form_field_value(bf: BoundField, existing: dict) -> (str, None):
 
         value = str(existing[bf.name])
 
-    if value is None:
+    if value is None or value == 'None':
         return None
 
     return str(value)

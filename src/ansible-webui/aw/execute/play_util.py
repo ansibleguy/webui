@@ -7,7 +7,7 @@ from os import remove as remove_file
 
 from ansible_runner import Runner, RunnerConfig
 
-from aw.config.main import config, check_config_is_true
+from aw.config.main import config
 from aw.config.hardcoded import FILE_TIME_FORMAT
 from aw.utils.util import is_set, is_null, datetime_w_tz, write_file_0640
 from aw.model.job import Job, JobExecution, JobExecutionResult, JobExecutionResultHost, JobError
@@ -104,15 +104,6 @@ def _runner_options(job: Job, execution: JobExecution, path_run: Path) -> dict:
         'envvars': env_vars,
         'cmdline': cmdline_args if is_set(cmdline_args) else None,
     }
-
-    if check_config_is_true('run_isolate_dir'):
-        opts['directory_isolation_base_path'] = path_run / 'play_base'
-
-    if check_config_is_true('run_isolate_process'):
-        opts['process_isolation'] = True
-        opts['process_isolation_hide_paths'] = config['run_isolate_process_path_hide']
-        opts['process_isolation_show_paths'] = config['run_isolate_process_path_show']
-        opts['process_isolation_ro_paths'] = config['run_isolate_process_path_ro']
 
     return opts
 

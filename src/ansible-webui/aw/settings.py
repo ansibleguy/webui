@@ -167,7 +167,7 @@ handler403 = 'aw.utils.handlers.handler403'
 handler500 = 'aw.utils.handlers.handler500'
 
 SECRET_KEY = config['secret']
-TIMEZONE = config['timezone']
+TIMEZONE = config.timezone
 
 # api
 API_KEY_CUSTOM_HEADER = 'HTTP_X_API_KEY'

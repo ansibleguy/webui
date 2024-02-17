@@ -20,7 +20,7 @@ from aw.utils.util_no_config import is_set, is_null
 
 
 def datetime_w_tz() -> datetime:
-    return datetime.now(config['timezone'])
+    return datetime.now(config.timezone)
 
 
 def datetime_from_db(dt: (datetime, None)) -> (datetime, None):
@@ -28,8 +28,8 @@ def datetime_from_db(dt: (datetime, None)) -> (datetime, None):
     if not isinstance(dt, datetime):
         return None
 
-    local_dt = dt.replace(tzinfo=utc).astimezone(config['timezone'])
-    return config['timezone'].normalize(local_dt)
+    local_dt = dt.replace(tzinfo=utc).astimezone(config.timezone)
+    return config.timezone.normalize(local_dt)
 
 
 def datetime_from_db_str(dt: (datetime, None), fmt: str = SHORT_TIME_FORMAT) -> str:
@@ -50,7 +50,7 @@ def get_choice_key_by_value(choices: list[tuple], value):
 
 def get_next_cron_execution_sec(schedule: str) -> float:
     cron = CronTab(schedule)
-    set_timezone(str(config['timezone']))
+    set_timezone(str(config.timezone))
     return cron.next(now=datetime_w_tz())
 
 

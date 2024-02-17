@@ -27,10 +27,10 @@ def _api_request(location: str, method: str = None, data: dict = None) -> Respon
         return api.post(url=url, data=data)
 
     if method == 'put':
-        return api.post(url=url, data=data)
+        return api.put(url=url, data=data)
 
     if method == 'delete':
-        return api.post(url)
+        return api.delete(url)
 
     print('ERROR: - got unsupported method!')
     sys_exit(1)
@@ -43,6 +43,11 @@ def _api_request_ok(location: str, method: str = None, data: dict = None) -> boo
         sys_exit(1)
 
     return response.ok
+
+
+def test_modify_locations(location_data_list: list[dict]):
+    for loc_data in location_data_list:
+        assert _api_request_ok(loc_data['l'], 'put', loc_data['d'])
 
 
 def test_add_locations(location_data_list: list[dict]):
@@ -67,15 +72,22 @@ def test_add():
     ])
 
 
+def test_modify():
+    test_modify_locations([
+        {'l': 'config', 'd': {'run_timeout': 6060}},
+    ])
+
+
 def test_list():
     test_get_locations([
-        'credentials', 'job', 'job_exec', 'key', 'permission',
+        'credentials', 'job', 'job_exec', 'key', 'permission', 'config',
     ])
 
 
 def main():
     test_add()
     test_list()
+    test_modify()
 
 
 if __name__ == '__main__':

@@ -2,10 +2,13 @@ from os import environ
 from importlib.metadata import version, PackageNotFoundError
 from sys import stderr
 
-from pytz import all_timezones, timezone
+from pytz import all_timezones, timezone, BaseTzInfo
+from django.db.utils import IntegrityError, OperationalError
+from django.core.exceptions import ImproperlyConfigured, AppRegistryNotReady
 
-from aw.config.environment import AW_ENV_VARS, get_aw_env_var_or_default
+from aw.config.environment import get_aw_env_var, get_aw_env_var_or_default
 from aw.utils.util_no_config import set_timezone
+from aw.config.defaults import CONFIG_DEFAULTS
 
 
 def get_version() -> str:
@@ -25,33 +28,61 @@ def get_version() -> str:
 VERSION = get_version()
 
 
-def init_globals():
-    # pylint: disable=W0601
-    global config
-    config = {}
+class Config:
+    def __init__(self):
+        set_timezone(self.get('timezone'))
 
+    @staticmethod
+    def _from_env_or_db(setting: str) -> any:
+        env_var_value = get_aw_env_var(setting)
+        if env_var_value is not None:
+            return env_var_value
+
+        try:
+            # pylint: disable = C0415
+            from aw.model.system import get_config_from_db
+            return getattr(get_config_from_db(), str(setting))
+
+        except (IntegrityError, OperationalError, ImproperlyConfigured, AppRegistryNotReady, ImportError,
+                AttributeError):
+            # if database not initialized or migrations missing; or env-only var
+            if setting not in CONFIG_DEFAULTS:
+                return None
+
+            return CONFIG_DEFAULTS[setting]
+
+    def get(self, setting: str) -> any:
+        return self._from_env_or_db(setting)
+
+    def __getitem__(self, setting):
+        return self._from_env_or_db(setting)
+
+    @property
+    def timezone(self) -> BaseTzInfo:
+        tz_str = self.get('timezone')
+
+        if tz_str not in all_timezones:
+            return timezone('GMT')
+
+        return timezone(tz_str)
+
+    def is_true(self, setting: str, fallback: bool = False) -> bool:
+        val = self.get(setting)
+        if val is None:
+            return fallback
+
+        if isinstance(val, bool):
+            return val
+
+        return str(val).lower() in ['1', 'true', 'y', 'yes']
+
+
+def init_globals():
     environ.setdefault('DJANGO_SETTINGS_MODULE', 'aw.settings')
     environ['PYTHONIOENCODING'] = 'utf8'
     environ['PYTHONUNBUFFERED'] = '1'
     environ['ANSIBLE_FORCE_COLOR'] = '1'
 
-    for cnf_key in AW_ENV_VARS:
-        _val = get_aw_env_var_or_default(var=cnf_key, references=config)
-        config[cnf_key] = _val
-
-    if config['timezone'] not in all_timezones:
-        config['timezone'] = 'GMT'
-
-    # todo: merge config from webUI
-    # todo: grey-out settings that are provided via env-var in webUI form and show value
-
-    set_timezone(config['timezone'])
-    config['timezone'] = timezone(config['timezone'])
-
-
-def check_config_is_true(var: str, fallback: bool = False) -> bool:
-    val = config[var]
-    if val is None:
-        return fallback
-
-    return str(val).lower() in ['1', 'true', 'y', 'yes']
+    # pylint: disable=W0601
+    global config
+    config = Config()

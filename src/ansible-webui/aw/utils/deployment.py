@@ -1,4 +1,5 @@
-from aw.config.environment import get_aw_env_var, inside_docker
+from aw.config.environment import get_aw_env_var
+from aw.config.defaults import inside_docker
 
 
 def deployment_dev() -> bool:

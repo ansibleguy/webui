@@ -264,6 +264,7 @@ class APIPermissionItem(GenericAPIView):
         request=PermissionWriteRequest,
         responses={
             200: OpenApiResponse(response=GenericResponse, description='Permission updated'),
+            400: OpenApiResponse(response=GenericResponse, description='Invalid permission data provided'),
             403: OpenApiResponse(response=GenericResponse, description='Not privileged to edit the permission'),
             404: OpenApiResponse(response=GenericResponse, description='Permission does not exist'),
         },

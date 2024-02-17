@@ -16,7 +16,7 @@ NAVIGATION = {
         'System': {
             'Admin': '/ui/system/admin/',
             'API Docs': '/ui/system/api_docs',
-            # 'Config': '/ui/system/config',
+            'Config': '/ui/system/config',
             'Environment': '/ui/system/environment',
         },
     },

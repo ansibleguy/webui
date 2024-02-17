@@ -3,6 +3,7 @@ from importlib import metadata
 from os import environ
 from collections import OrderedDict
 
+from django import forms
 from django.urls import path
 from django.shortcuts import HttpResponse
 from django.shortcuts import render
@@ -11,6 +12,10 @@ from ansible_runner.interface import get_ansible_config
 
 from aw.utils.http import ui_endpoint_wrapper
 from aw.utils.subps import process
+from aw.config.form_metadata import FORM_LABEL, FORM_HELP
+from aw.config.main import config
+from aw.config.environment import AW_ENV_VARS, AW_ENV_VARS_SECRET
+from aw.model.system import SystemConfig
 
 
 def _parsed_ansible_collections() -> dict:
@@ -49,11 +54,11 @@ def _parsed_ansible_collections() -> dict:
 
 def _parsed_ansible_config() -> dict:
     environ['ANSIBLE_FORCE_COLOR'] = '0'
-    config_raw = get_ansible_config(action='dump', quiet=True)[0].split('\n')
+    ansible_config_raw = get_ansible_config(action='dump', quiet=True)[0].split('\n')
     environ['ANSIBLE_FORCE_COLOR'] = '1'
-    config = {}
+    ansible_config = {}
 
-    for line in config_raw:
+    for line in ansible_config_raw:
         try:
             setting_comment, value = line.split('=', 1)
 
@@ -71,9 +76,9 @@ def _parsed_ansible_config() -> dict:
         url = ("https://docs.ansible.com/ansible/latest/reference_appendices/config.html#"
                f"{setting.lower().replace('_', '-')}")
 
-        config[setting] = {'value': value, 'comment': comment, 'url': url}
+        ansible_config[setting] = {'value': value, 'comment': comment, 'url': url}
 
-    return dict(sorted(config.items()))
+    return dict(sorted(ansible_config.items()))
 
 
 def _parsed_ansible_version(python_modules) -> dict:
@@ -133,6 +138,40 @@ def system_environment(request) -> HttpResponse:
     )
 
 
+class SystemConfigForm(forms.ModelForm):
+    class Meta:
+        model = SystemConfig
+        fields = SystemConfig.form_fields
+        field_order = SystemConfig.form_fields
+        labels = FORM_LABEL['system']['config']
+        help_texts = FORM_HELP['system']['config']
+
+
+@login_required
+@ui_endpoint_wrapper
+def system_config(request) -> HttpResponse:
+    config_form = SystemConfigForm()
+    form_method = 'put'
+    form_api = 'config'
+
+    config_form_html = config_form.render(
+        template_name='forms/snippet.html',
+        context={'form': config_form, 'existing': {
+            key: config[key] for key in SystemConfig.form_fields
+        }},
+    )
+    return render(
+        request, status=200, template_name='system/config.html',
+        context={
+            'form': config_form_html, 'form_api': form_api, 'form_method': form_method,
+            'env_vars': AW_ENV_VARS, 'env_labels': FORM_LABEL['system']['config'],
+            'env_vars_secret': AW_ENV_VARS_SECRET,
+            'env_vars_config': {key: config[key] for key in AW_ENV_VARS},
+        }
+    )
+
+
 urlpatterns_system = [
     path('ui/system/environment', system_environment),
+    path('ui/system/config', system_config),
 ]

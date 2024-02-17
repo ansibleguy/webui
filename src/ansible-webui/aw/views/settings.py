@@ -13,13 +13,13 @@ from aw.views.base import choices_global_credentials, choices_job, choices_user,
 @login_required
 @ui_endpoint_wrapper
 def setting_api_key(request) -> HttpResponse:
-    return render(request, status=200, template_name='settings/api_key.html')
+    return render(request, status=200, template_name='settings/api_key.html', context={'show_update_time': True})
 
 
 @login_required
 @ui_endpoint_wrapper
 def setting_permission(request) -> HttpResponse:
-    return render(request, status=200, template_name='settings/permission.html')
+    return render(request, status=200, template_name='settings/permission.html', context={'show_update_time': True})
 
 
 class SettingPermissionForm(forms.ModelForm):

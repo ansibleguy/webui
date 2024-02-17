@@ -37,11 +37,13 @@ The Ansible execution itself can fail because of some common issues:
 
   * Ansible needs Python Modules and in some cases Ansible Collections and Ansible Roles to function correctly
 
-    These need to be installed and up-to-date.
+    These need to be installed and should be up-to-date.
 
     You can find the current versions used by your Controller system at the :code:`System - Environment` page
 
   * If you are using Docker - you can install those dependencies using requirements-files. See :ref:`Usage - Docker <usage_docker>`
+
+* to be continued..
 
 ----
 
@@ -57,17 +59,17 @@ SSH Hostkey Verification
 
 * SSH has a security feature that should keep you safe from `man-in-the-middle attacks <https://en.wikipedia.org/wiki/Man-in-the-middle_attack>`_ which could allow the attacker to take over your SSH account/credentials.
 
-   See also: `Ansible Docs - Hostkey Verification <https://docs.ansible.com/ansible/latest/inventory_guide/connection_details.html>`_
+  See also: `Ansible Docs - Hostkey Verification <https://docs.ansible.com/ansible/latest/inventory_guide/connection_details.html>`_
 
 * As this security feature is important you **SHOULD NOT DISABLE IT IN PRODUCTION** by adding the environmental variable `ANSIBLE_HOST_KEY_CHECKING=False` to your jobs!
 
 * In production you might want to either:
 
-   * Maintain a `list of known-good hostkeys <https://en.wikibooks.org/wiki/OpenSSH/Client_Configuration_Files#~/.ssh/known_hosts>`_
+  * Maintain a `list of known-good hostkeys <https://en.wikibooks.org/wiki/OpenSSH/Client_Configuration_Files#~/.ssh/known_hosts>`_
 
-     You can specify which :code:`known_hosts` file Ansible WebUI should use, using the config setting :code:`AW_SSH_KNOWN_HOSTS`
+    You can specify which :code:`known_hosts` file Ansible WebUI should use, using the config setting :code:`AW_SSH_KNOWN_HOSTS`
 
-   * Implement `CA signed-hostkeys <https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/6/html/deployment_guide/sec-creating_ssh_ca_certificate_signing-keys>`_
+  * Implement `CA signed-hostkeys <https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/6/html/deployment_guide/sec-creating_ssh_ca_certificate_signing-keys>`_
 
 
 ----

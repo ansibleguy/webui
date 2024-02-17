@@ -27,6 +27,24 @@ FORM_LABEL = {
     'settings': {
         'permissions': {},
     },
+    'system': {
+        'config': {
+            'path_run': 'Runtime directory',
+            'path_play': 'Playbook base-directory',
+            'path_log': 'Directory for execution-logs',
+            'run_timeout': 'Timeout for playbook execution',
+            'session_timeout': 'Timeout for WebUI login-sessions',
+            'path_ansible_config': 'Ansible Config-File',
+            'path_ssh_known_hosts': 'SSH Known-Hosts File',
+            # env-vars
+            'timezone': 'Timezone',
+            'db': 'Database',
+            'db_migrate': 'Database auto-upgrade',
+            'serve_static': 'Serving static files',
+            'deployment': 'Deployment',
+            'version': 'Ansible Web-UI Version',
+        }
+    }
 }
 
 FORM_HELP = {
@@ -71,4 +89,17 @@ FORM_HELP = {
     'settings': {
         'permissions': {},
     },
+    'system': {
+        'config': {
+            'path_run': 'Base directory for <a href="https://ansible.readthedocs.io/projects/runner/en/latest/intro/">'
+                        'Ansible-Runner runtime files</a>',
+            'path_play': 'Path to the <a href="https://docs.ansible.com/ansible/2.8/user_guide/'
+                         'playbooks_best_practices.html#directory-layout">Ansible base/playbook directory</a>',
+            'path_log': 'Define the path where full job-logs are saved',
+            'path_ansible_config': 'Path to a <a href="https://docs.ansible.com/ansible/latest/installation_guide'
+                                   '/intro_configuration.html#configuration-file">Ansible config-file</a> to use',
+            'path_ssh_known_hosts': 'Path to a <a href="https://en.wikibooks.org/wiki/OpenSSH/'
+                                    'Client_Configuration_Files#~/.ssh/known_hosts">SSH known_hosts file</a> to use',
+        }
+    }
 }

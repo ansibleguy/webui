@@ -7,6 +7,7 @@ from aw.api_endpoints.job import APIJob, APIJobItem, APIJobExecutionItem, APIJob
 from aw.api_endpoints.permission import APIPermission, APIPermissionItem
 from aw.api_endpoints.credentials import APIJobCredentials, APIJobCredentialsItem
 from aw.api_endpoints.filesystem import APIFsBrowse
+from aw.api_endpoints.system import APISystemConfig
 
 urlpatterns_api = [
     path('api/key/<str:token>', APIKeyItem.as_view()),
@@ -21,6 +22,7 @@ urlpatterns_api = [
     path('api/permission', APIPermission.as_view()),
     path('api/credentials/<int:credentials_id>', APIJobCredentialsItem.as_view()),
     path('api/credentials', APIJobCredentials.as_view()),
+    path('api/config', APISystemConfig.as_view()),
     path('api/fs/browse/<str:selector>', APIFsBrowse.as_view()),
     path('api/_schema/', SpectacularAPIView.as_view(), name='_schema'),
     path('api/_docs', SpectacularSwaggerView.as_view(url_name='_schema'), name='swagger-ui'),

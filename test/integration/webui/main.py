@@ -45,7 +45,7 @@ def test_get_locations(locations: list):
     for location in locations:
         print(f'TESTING GET {location}')
         url = f'{BASE_URL}/{location}'
-        sleep(1)
+        sleep(0.1)
         DRIVER.get(url)
         assert _response_ok(url)
 
@@ -54,7 +54,7 @@ def test_main_pages():
     test_get_locations([
         'ui/jobs/manage', 'ui/jobs/log', 'ui/jobs/credentials',
         'ui/settings/api_keys', 'ui/settings/permissions',
-        'ui/system/admin/', 'ui/system/api_docs', 'ui/system/environment',
+        'ui/system/admin/', 'ui/system/api_docs', 'ui/system/environment', 'ui/system/config',
     ])
 
 

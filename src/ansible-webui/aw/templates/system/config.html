@@ -1,0 +1,27 @@
+{% extends "../body.html" %}
+{% load static %}
+{% load util %}
+{% block content %}
+{% include "../forms/base.html" %}
+<br><hr><br>
+<div class="table-responsive aw-data">
+    <h2>Active Environmental Variables</h2>
+    <p>Settings set <a href="https://ansible-webui.readthedocs.io/en/latest/usage/3_config.html#environmental-variables">by environmental variables<a/> are read-only!</p>
+    <table class="table table-striped aw-text-responsive" id="aw-api-data-table">
+        <tr>
+            <th>Setting</th>
+            <th>Env-Vars</th>
+            <th>Value</th>
+        </tr>
+{% for var in env_vars %}
+{%   if var not in env_vars_secret and env_vars_config|get_value:var|exists %}
+        <tr>
+            <td>{{ env_labels|get_value:var }}</td>
+            <td>{{ env_vars|get_value:var }}</td>
+            <td>{{ env_vars_config|get_value:var }}</td>
+        </tr>
+{%   endif %}
+{% endfor %}
+    </table>
+</div>
+{% endblock %}
