@@ -17,9 +17,11 @@ Our `docker image ansible0guy/ansible-webui <https://hub.docker.com/repository/d
 
 Files inside the container:
 
-* Python3 Modules: :code:`/data/requirements.txt`
-* Ansible Roles: :code:`/data/requirements_roles.yml`
-* Ansible Collections: :code:`/data/requirements_collections.yml`
+* Python3 Modules: :code:`/play/requirements.txt`
+* `Ansible Roles & Collections <https://docs.ansible.com/ansible/latest/collections_guide/collections_installing.html#install-multiple-collections-with-a-requirements-file>`_: :code:`/play/requirements.yml`
+
+    * Only Ansible Roles: :code:`/play/requirements_roles.yml`
+    * Only Ansible Collections: :code:`/play/requirements_collections.yml`
 
 ----
 

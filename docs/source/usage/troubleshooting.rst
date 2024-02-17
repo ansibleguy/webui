@@ -35,13 +35,13 @@ The Ansible execution itself can fail because of some common issues:
 
 * Controller dependencies
 
-   * Ansible needs Python Modules and in some cases Ansible Collections and Ansible Roles to function correctly
+  * Ansible needs Python Modules and in some cases Ansible Collections and Ansible Roles to function correctly
 
-     These need to be installed and up-to-date.
+    These need to be installed and up-to-date.
 
-     You can find the current versions used by your Controller system at the :code:`System - Environment` page
+    You can find the current versions used by your Controller system at the :code:`System - Environment` page
 
-   * If you are using Docker - you can install those dependencies using requirements-files. See :ref:`Usage - Docker <usage_docker>`
+  * If you are using Docker - you can install those dependencies using requirements-files. See :ref:`Usage - Docker <usage_docker>`
 
 ----
 
@@ -83,6 +83,6 @@ Python Module not installed
 
 * If you are NOT using Docker, you can install it manually using PIP: :code:`python3 -m pip install <MODULE>`
 
-   You could also find and install the module using your systems package manager: :code:`sudo apt install python3-<MODULE>` (NOTE: these packages are older versions)
+  You could also find and install the module using your systems package manager: :code:`sudo apt install python3-<MODULE>` (NOTE: these packages are older versions)
 
 * If you are using Docker, you can create and mount a :code:`requirements.txt` and restart your container. See also: :ref:`Usage - Docker <usage_docker>`
