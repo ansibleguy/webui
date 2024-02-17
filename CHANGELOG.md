@@ -2,6 +2,20 @@
 
 ## Version 0
 
+### 0.0.9
+
+**Features:**
+
+* `System - Config` UI
+* Support for SSH `known_hosts` file
+
+**Fixes:**
+
+* Dark-Mode fixes
+* Multiple fixes for SSH connections
+
+----
+
 ### 0.0.8
 
 * Credentials
