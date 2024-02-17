@@ -34,7 +34,8 @@ body.light {
     --bgNav2: #505050;
     --bgNav3: #343a40;
     --tableHead: rgba(0, 0, 0, .05);
-    --tableActive: rgba(0, 0, 0, .075);
+    --tableRow1: rgba(0, 0, 0, .075);
+    --tableRow2: rgba(0, 0, 0, .05);
     --bgError: #f8d7da;
     --borderError: #f5c6cb;
     --tcError: #721c24;
@@ -51,7 +52,8 @@ body.dark {
     --bgNav2: #505050;
     --bgNav3: #343a40;
     --tableHead: #282828;
-    --tableActive: #404040;
+    --tableRow1: #404040;
+    --tableRow2: #404040;
     --bgLight: #062925;
     --bgError: #282828;
     --borderError: #404040;
@@ -160,31 +162,27 @@ a:active {
 /* START table */
 
 th {
-    color: var(--tc1);
+    color: var(--tc1) !important;
 }
 
 td {
-    color: var(--tc1);
+    color: var(--tc1) !important;
 }
 
 .table {
     width: 100%;
 }
 
-.table-striped th {
-    background: var(--tableHead);
-}
-
-.table-active th {
-    background: var(--tableHead);
-}
-
-.table-active, .table-active > th {
+.table-striped>tbody>tr:nth-child(odd)>th {
     background: var(--tableHead) !important;
 }
 
-.table-active, .table-active > td {
-    background: var(--tableActive) !important;
+.table-striped>tbody>tr:nth-child(odd)>td {
+   background-color: var(--tableRow1) !important;
+}
+
+.table-striped>tbody>tr:nth-child(even)>td {
+   background-color: var(--tableRow2) !important;
 }
 
 /* STOP table */
