@@ -49,3 +49,7 @@ python3 test/integration/api/main.py
 
 sleep 1
 pkill -f 'ansible-webui'
+
+echo ''
+echo '### FINISHED ###'
+echo ''

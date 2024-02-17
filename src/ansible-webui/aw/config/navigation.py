@@ -14,9 +14,9 @@ NAVIGATION = {
             # 'Ansible': '/ui/settings/ansible',
         },
         'System': {
-            'Admin': '/ui/admin/',
-            'API Docs': '/ui/api_docs',
-            # 'Config': '/ui/settings/system',
+            'Admin': '/ui/system/admin/',
+            'API Docs': '/ui/system/api_docs',
+            # 'Config': '/ui/system/config',
             'Environment': '/ui/system/environment',
         },
     },

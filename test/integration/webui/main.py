@@ -54,7 +54,7 @@ def test_main_pages():
     test_get_locations([
         'ui/jobs/manage', 'ui/jobs/log', 'ui/jobs/credentials',
         'ui/settings/api_keys', 'ui/settings/permissions',
-        'ui/admin/', 'ui/api_docs', 'ui/system/environment',
+        'ui/system/admin/', 'ui/system/api_docs', 'ui/system/environment',
     ])
 
 
