@@ -199,7 +199,10 @@ def _run_stats(runner: Runner, result: JobExecutionResult) -> bool:
         result_host.tasks_rescued = runner.stats['rescued'][host] if host in runner.stats['rescued'] else 0
         result_host.tasks_changed = runner.stats['changed'][host] if host in runner.stats['changed'] else 0
 
-        if result_host.tasks_failed > 0:
+        if result_host.unreachable:
+            any_task_failed = True
+
+        elif result_host.tasks_failed > 0:
             any_task_failed = True
             # todo: create errors
 
