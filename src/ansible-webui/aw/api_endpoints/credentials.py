@@ -103,13 +103,13 @@ SSH_KEY_PREFIX = '-----BEGIN OPENSSH PRIVATE KEY-----'
 SSH_KEY_APPENDIX = '-----END OPENSSH PRIVATE KEY-----'
 
 
-def validate_and_fix_ssh_key(key: str) -> (str, None):
+def _validate_and_fix_ssh_key(key: str) -> (str, None):
     if key.find(SSH_KEY_PREFIX) == -1:
         # only support unencrypted keys for now
         return None
 
     key = key.replace(SSH_KEY_PREFIX, '').replace(SSH_KEY_APPENDIX, '').strip().replace(' ', '\n')
-    return f'{SSH_KEY_PREFIX}\n{key}\n{SSH_KEY_APPENDIX}'
+    return f'{SSH_KEY_PREFIX}\n{key}\n{SSH_KEY_APPENDIX}\n'
 
 
 class APIJobCredentials(APIView):
@@ -190,7 +190,7 @@ class APIJobCredentials(APIView):
                     serializer.validated_data[field] = None
 
                 elif field == 'ssh_key':
-                    value = validate_and_fix_ssh_key(value)
+                    value = _validate_and_fix_ssh_key(value)
                     if value is None:
                         return Response(
                             data={'msg': f"Provided {_log_global_user(are_global)} ssh-key is not valid'"},
@@ -382,7 +382,7 @@ class APIJobCredentialsItem(APIView):
                         value = getattr(credentials, field)
 
                     elif field == 'ssh_key':
-                        value = validate_and_fix_ssh_key(value)
+                        value = _validate_and_fix_ssh_key(value)
                         if value is None:
                             return Response(
                                 data={'msg': f"Provided {_log_global_user(are_global)} ssh-key is not valid'"},
