@@ -23,11 +23,10 @@ def _parsed_ansible_collections() -> dict:
     if result['rc'] != 0:
         return {}
 
-    collections_raw = result['stdout']
     collections = {}
     col_counter = {}
     collection_path = ''
-    for line in collections_raw.split('\n'):
+    for line in result['stdout'].split('\n'):
         if line.startswith('#'):
             collection_path = line[1:]
             continue
@@ -103,10 +102,24 @@ def _parsed_ansible_version(python_modules) -> dict:
 
 def _parsed_python_modules() -> dict:
     modules = OrderedDict()
-    module_list = [m[0] for m in metadata.packages_distributions().values()]
+    try:
+        module_list = [m[0] for m in metadata.packages_distributions().values()]
 
-    for module in sorted(module_list):
-        modules[module.lower()] = {'name': module, 'version': metadata.distribution(module).version}
+        for module in sorted(module_list):
+            modules[module.lower()] = {'name': module, 'version': metadata.distribution(module).version}
+
+    except (ImportError, AttributeError):
+        result = process(['pip', 'list'])
+        if result['rc'] != 0:
+            return {}
+
+        for line in result['stdout'].split('\n'):
+            if line.find('.') == -1:
+                continue
+
+            name, version = line.split(' ', 1)
+            name = name.strip()
+            modules[name.lower()] = {'name': name, 'version': version.strip()}
 
     return modules
 
@@ -130,7 +143,7 @@ def system_environment(request) -> HttpResponse:
             'env_jinja': ansible_version['jinja'],
             'env_libyaml': ansible_version['libyaml'],
             'env_python': f"{version_info.major}.{version_info.minor}.{version_info.micro}",
-            'env_python_modules': dict(sorted(python_modules.items())),
+            'env_python_modules': python_modules,
             'env_ansible_config': _parsed_ansible_config(),
             # 'env_ansible_roles': get_role_list(),
             'env_ansible_collections': _parsed_ansible_collections(),
