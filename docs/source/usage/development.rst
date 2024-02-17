@@ -13,3 +13,5 @@ Feel free to contribute to this project using `pull-requests <https://github.com
 Testers are also very welcome! Please `give feedback <https://github.com/ansibleguy/ansible-webui/issues>`_
 
 For further details - see: `Contribute <https://github.com/ansibleguy/ansible-webui/blob/latest/CONTRIBUTE.md>`_
+
+Read into the :ref:`Troubleshooting Guide <usage_troubleshooting>` to get some insight on how the stack works.

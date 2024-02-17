@@ -25,6 +25,7 @@ echo ''
 echo "### RELEASING IMAGE ${image} ###"
 docker push "$image"
 
+echo ''
 read -r -p "Release version ${VERSION} as latest? [y/N] " -n 1
 if [[ "$REPLY" =~ ^[Yy]$ ]]
 then

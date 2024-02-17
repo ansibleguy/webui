@@ -135,6 +135,26 @@ iframe {
     color: var(--tc1);
 }
 
+a {
+  text-decoration: none;
+  color: #66B2F5;
+}
+
+a:visited {
+  text-decoration: none;
+  color: #865bc1;
+}
+
+a:hover {
+  text-decoration: underline;
+  color: #B3D8FA;
+}
+
+a:active {
+  text-decoration: underline;
+  color: #B3D8FA;
+}
+
 /* STOP basic */
 
 /* START table */
