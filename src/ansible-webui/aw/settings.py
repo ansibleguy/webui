@@ -13,7 +13,7 @@ except ImportError:
 
 from aw.config.hardcoded import LOGIN_PATH, PORT_WEB
 from aw.utils.deployment import deployment_dev, deployment_prod
-from aw.config.environment import get_aw_env_var
+from aw.config.environment import get_aw_env_var_or_default
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 TEMPLATE_DIRS = [
@@ -94,7 +94,7 @@ WSGI_APPLICATION = 'aw.main.app'
 
 # Database
 if deployment_prod():
-    DB_FILE = Path(get_aw_env_var('db'))
+    DB_FILE = Path(get_aw_env_var_or_default('db'))
 
     if not DB_FILE.parent.exists():
         try:
@@ -116,7 +116,7 @@ if deployment_prod():
 else:
     dev_db_file = 'aw.dev.db' if deployment_dev() else 'aw.staging.db'
     if 'AW_DB' in environ:
-        DB_FILE = Path(get_aw_env_var('db'))
+        DB_FILE = Path(get_aw_env_var_or_default('db'))
         if DB_FILE.is_dir():
             DB_FILE = DB_FILE / dev_db_file
 

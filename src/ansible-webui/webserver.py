@@ -1,13 +1,12 @@
 from multiprocessing import cpu_count
 from string import ascii_letters
 from random import choice as random_choice
-from os import environ
 
 import gunicorn
 from gunicorn.app.wsgiapp import WSGIApplication
 
 from aw.config.hardcoded import PORT_WEB
-from aw.utils.deployment import deployment_dev
+from aw.utils.deployment import deployment_dev, deployment_docker
 from aw.utils.debug import log, warn_if_development
 
 # https://docs.gunicorn.org/en/stable/settings.html
@@ -22,7 +21,7 @@ OPTIONS_PROD = {
     'loglevel': 'warning',
 }
 
-if 'AW_DOCKER' in environ and environ['AW_DOCKER'] == '1':
+if deployment_docker():
     OPTIONS_PROD['bind'] = f'0.0.0.0:{PORT_WEB}'
 
 

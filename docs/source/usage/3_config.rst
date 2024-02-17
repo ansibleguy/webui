@@ -30,7 +30,7 @@ Jobs can be managed at the :code:`Jobs - Manage` page.
 Permissions, Users, Groups
 ==========================
 
-See: :ref:`Usage - Permissions <usage_permission>`
+See: :ref:`Usage - Privileges <usage_permission>`
 
 
 Administration
@@ -112,6 +112,15 @@ Environmental variables
 * **AW_DB**
 
    Define the path where the SQLite3 database is placed. Default: :code:`${HOME}/.config/ansible-webui/aw.db`
+
+
+* **AW_SSH_KNOWN_HOSTS**
+
+   Define the path to the known-hosts file that should be used. You can use :code:`${AW_PATH_PLAY}` to reference paths relative to your playbook base-directory!
+
+   Default: None - fallback to user defaults
+
+   Default in docker: :code:`${AW_PATH_PLAY}/known_hosts`
 
 
 * **AW_TIMEZONE**

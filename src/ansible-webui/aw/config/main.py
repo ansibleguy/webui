@@ -4,12 +4,12 @@ from sys import stderr
 
 from pytz import all_timezones, timezone
 
-from aw.config.environment import AW_ENV_VARS, get_aw_env_var
+from aw.config.environment import AW_ENV_VARS, get_aw_env_var_or_default
 from aw.utils.util_no_config import set_timezone
 
 
 def get_version() -> str:
-    env_version = get_aw_env_var('version')
+    env_version = get_aw_env_var_or_default('version')
     if env_version is not None:
         return env_version
 
@@ -36,7 +36,8 @@ def init_globals():
     environ['ANSIBLE_FORCE_COLOR'] = '1'
 
     for cnf_key in AW_ENV_VARS:
-        config[cnf_key] = get_aw_env_var(cnf_key)
+        _val = get_aw_env_var_or_default(var=cnf_key, references=config)
+        config[cnf_key] = _val
 
     if config['timezone'] not in all_timezones:
         config['timezone'] = 'GMT'

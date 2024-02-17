@@ -1,4 +1,4 @@
-from aw.config.environment import get_aw_env_var
+from aw.config.environment import get_aw_env_var, inside_docker
 
 
 def deployment_dev() -> bool:
@@ -11,3 +11,7 @@ def deployment_staging() -> bool:
 
 def deployment_prod() -> bool:
     return not deployment_dev() and not deployment_staging()
+
+
+def deployment_docker() -> bool:
+    return inside_docker()
