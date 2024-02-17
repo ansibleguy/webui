@@ -28,6 +28,8 @@ def ansible_playbook(job: Job, execution: (JobExecution, None)):
 
     result = JobExecutionResult(time_start=time_start)
     result.save()
+    execution.result = result
+    execution.save()
 
     log_files = job_logs(job=job, execution=execution)
     execution.log_stdout = log_files['stdout']

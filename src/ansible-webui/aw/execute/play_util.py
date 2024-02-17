@@ -6,82 +6,26 @@ from os import path as os_path
 from os import remove as remove_file
 
 from ansible_runner import Runner, RunnerConfig
-from django.core.exceptions import ObjectDoesNotExist
 
 from aw.config.main import config, check_config_is_true
 from aw.config.hardcoded import FILE_TIME_FORMAT
 from aw.utils.util import is_set, is_null, datetime_w_tz, write_file_0640
 from aw.model.job import Job, JobExecution, JobExecutionResult, JobExecutionResultHost, JobError
-from aw.model.job_credential import BaseJobCredentials, JobUserCredentials
+from aw.model.job_credential import BaseJobCredentials
 from aw.execute.util import update_execution_status, overwrite_and_delete_file, decode_job_env_vars, \
-    create_dirs, get_pwd_file, get_pwd_file_arg, write_pwd_file, is_execution_status, config_error
-from aw.utils.permission import has_credentials_permission, CHOICE_PERMISSION_READ
-from aw.base import USERS
-# from aw.utils.debug import log_warn
+    create_dirs, is_execution_status, config_error
+from aw.utils.debug import log
+from aw.execute.play_credentials import get_credentials_to_use, commandline_arguments_credentials, \
+    write_pwd_file, get_pwd_file
 
 # see: https://ansible.readthedocs.io/projects/runner/en/latest/intro/
 
 
-def _commandline_arguments_credentials(credentials: BaseJobCredentials, path_run: Path) -> list:
-    cmd_arguments = []
-
-    for attr, flag in BaseJobCredentials.PUBLIC_ATTRS_ARGS.items():
-        if is_set(getattr(credentials, attr)):
-            cmd_arguments.append(f'{flag} {getattr(credentials, attr)}')
-
-    for attr in BaseJobCredentials.SECRET_ATTRS:
-        pwd_arg = get_pwd_file_arg(credentials, attr=attr, path_run=path_run)
-        if pwd_arg is not None:
-            cmd_arguments.append(pwd_arg)
-
-    return cmd_arguments
-
-
-def _scheduled_or_has_credentials_access(user: USERS, credentials: BaseJobCredentials) -> bool:
-    if user is None:
-        # scheduled execution
-        return True
-
-    return has_credentials_permission(
-        user=user,
-        credentials=credentials,
-        permission_needed=CHOICE_PERMISSION_READ,
+def _exec_log(execution: JobExecution, msg: str, level: int = 3):
+    log(
+        msg=f"Job-execution '{execution.job}' @ {execution.result.time_start}: {msg}",
+        level=level,
     )
-
-
-def _get_credentials_to_use(job: Job, execution: JobExecution) -> (BaseJobCredentials, None):
-    credentials = None
-
-    # todo: write warn log if user tried to execute job using non-permitted credentials (if execution.cred*)
-    if execution.user is not None and is_set(execution.credential_user) and \
-            execution.credential_user.user.id == execution.user.id:
-        credentials = execution.credential_user
-
-    elif is_set(execution.credential_global) and _scheduled_or_has_credentials_access(
-        user=execution.user, credentials=execution.credential_global,
-    ):
-        credentials = execution.credential_global
-
-    elif is_set(job.credentials_default) and _scheduled_or_has_credentials_access(
-        user=execution.user, credentials=job.credentials_default,
-    ):
-        credentials = job.credentials_default
-
-    elif job.credentials_needed and is_set(execution.user):
-        # try to get default user-credentials as a last-resort if the job needs some credentials
-        try:
-            credentials = JobUserCredentials.objects.filter(user=execution.user).first()
-
-        except ObjectDoesNotExist:
-            pass
-
-    if job.credentials_needed and credentials is None:
-        config_error(
-            'The job is set to require credentials - but none were provided or readable! '
-            'Make sure you have privileges for the configured credentials or create user-specific ones.'
-        )
-
-    return credentials
 
 
 def _commandline_arguments(job: Job, execution: JobExecution, path_run: Path) -> str:
@@ -98,11 +42,19 @@ def _commandline_arguments(job: Job, execution: JobExecution, path_run: Path) ->
     if execution.mode_diff:
         cmd_arguments.append('--diff')
 
-    credentials = _get_credentials_to_use(job=job, execution=execution)
+    credentials = get_credentials_to_use(job=job, execution=execution)
     if credentials is not None:
         cmd_arguments.extend(
-            _commandline_arguments_credentials(credentials=credentials, path_run=path_run)
+            commandline_arguments_credentials(credentials=credentials, path_run=path_run)
         )
+
+    if is_set(config['path_ssh_known_hosts']) and \
+            ' '.join(cmd_arguments).find('ansible_ssh_extra_args') == -1:
+        if Path(config['path_ssh_known_hosts']).is_file():
+            cmd_arguments.append(f"-e ansible_ssh_extra_args='-o UserKnownHostsFile={config['path_ssh_known_hosts']}'")
+
+        else:
+            _exec_log(execution=execution, msg='Ignoring known_host file because it does not exist', level=5)
 
     return ' '.join(cmd_arguments)
 
@@ -189,7 +141,7 @@ def runner_prep(job: Job, execution: JobExecution, path_run: Path) -> dict:
     create_dirs(path=path_run, desc='run')
     create_dirs(path=config['path_log'], desc='log')
 
-    credentials = _get_credentials_to_use(job=job, execution=execution)
+    credentials = get_credentials_to_use(job=job, execution=execution)
     for secret_attr in BaseJobCredentials.SECRET_ATTRS:
         write_pwd_file(credentials, attr=secret_attr, path_run=path_run)
 
@@ -243,7 +195,6 @@ def job_logs(job: Job, execution: JobExecution) -> dict:
 
 def _run_stats(runner: Runner, result: JobExecutionResult) -> bool:
     any_task_failed = False
-    # https://stackoverflow.com/questions/70348314/get-python-ansible-runner-module-stdout-key-value
     for host in runner.stats['processed']:
         result_host = JobExecutionResultHost(hostname=host)
 
@@ -274,7 +225,6 @@ def parse_run_result(execution: JobExecution, result: JobExecutionResult, runner
     if runner.stats is not None:
         any_task_failed = _run_stats(runner=runner, result=result)
 
-    execution.result = result
     if result.failed or any_task_failed:
         update_execution_status(execution, status='Failed')
 
@@ -301,6 +251,5 @@ def failure(
     result.error = job_error
     result.save()
 
-    execution.result = result
     execution.save()
     runner_cleanup(path_run)

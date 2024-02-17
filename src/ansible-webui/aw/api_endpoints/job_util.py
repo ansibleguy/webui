@@ -1,9 +1,9 @@
 from rest_framework import serializers
 
-from aw.config.hardcoded import SHORT_TIME_FORMAT, JOB_EXECUTION_LIMIT
+from aw.config.hardcoded import JOB_EXECUTION_LIMIT
 from aw.model.job import Job, CHOICES_JOB_EXEC_STATUS, JobExecution
 from aw.utils.permission import get_viewable_jobs
-from aw.utils.util import datetime_from_db, get_next_cron_execution_str
+from aw.utils.util import datetime_from_db_str, get_next_cron_execution_str
 from aw.base import USERS
 
 
@@ -46,7 +46,7 @@ def get_job_execution_serialized(execution: JobExecution) -> dict:
         'command': execution.command,
         'status': execution.status,
         'status_name': CHOICES_JOB_EXEC_STATUS[execution.status][1],
-        'time_start': datetime_from_db(execution.created).strftime(SHORT_TIME_FORMAT),
+        'time_start': datetime_from_db_str(execution.created),
         'time_fin': None,
         'failed': None,
         'error_s': None,
@@ -57,7 +57,7 @@ def get_job_execution_serialized(execution: JobExecution) -> dict:
         'log_stderr_url': f"/api/job/{execution.job.id}/{execution.id}/log?type=stderr",
     }
     if execution.result is not None:
-        serialized['time_fin'] = datetime_from_db(execution.result.time_fin).strftime(SHORT_TIME_FORMAT)
+        serialized['time_fin'] = datetime_from_db_str(execution.result.time_fin)
         serialized['failed'] = execution.result.failed
         if execution.result.error is not None:
             serialized['error_s'] = execution.result.error.short

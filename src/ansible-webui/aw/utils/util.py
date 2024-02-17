@@ -14,15 +14,30 @@ from aw.config.main import config
 from aw.config.hardcoded import SHORT_TIME_FORMAT
 from aw.utils.util_no_config import set_timezone
 
+# allow import from other modules
+# pylint: disable=W0611
+from aw.utils.util_no_config import is_set, is_null
+
 
 def datetime_w_tz() -> datetime:
     return datetime.now(config['timezone'])
 
 
-def datetime_from_db(dt: datetime) -> datetime:
+def datetime_from_db(dt: (datetime, None)) -> (datetime, None):
     # datetime form db will always be UTC; convert it
+    if not isinstance(dt, datetime):
+        return None
+
     local_dt = dt.replace(tzinfo=utc).astimezone(config['timezone'])
     return config['timezone'].normalize(local_dt)
+
+
+def datetime_from_db_str(dt: (datetime, None), fmt: str = SHORT_TIME_FORMAT) -> str:
+    dt = datetime_from_db(dt)
+    if not isinstance(dt, datetime):
+        return ''
+
+    return dt.strftime(fmt)
 
 
 def get_choice_key_by_value(choices: list[tuple], value):
@@ -31,17 +46,6 @@ def get_choice_key_by_value(choices: list[tuple], value):
             return k
 
     return None
-
-
-def is_null(data) -> bool:
-    if data is None:
-        return True
-
-    return str(data).strip() == ''
-
-
-def is_set(data: str) -> bool:
-    return not is_null(data)
 
 
 def get_next_cron_execution_sec(schedule: str) -> float:
