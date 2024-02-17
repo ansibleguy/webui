@@ -20,7 +20,7 @@ TEMPLATE_DIRS = [
     BASE_DIR / 'aw' / 'templates/'
 ]
 
-DEBUG = deployment_dev()
+DEBUG = deployment_dev() or config['debug']
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 X_FRAME_OPTIONS = 'SAMEORIGIN'
 

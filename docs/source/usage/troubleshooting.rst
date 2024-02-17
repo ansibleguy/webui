@@ -20,6 +20,21 @@ It will be beneficial for the troubleshooting process if we find out in which th
 
 |ts_sys_ov|
 
+----
+
+Debugging
+*********
+
+You can enable the debug mode at the :code:`System - Config` page.
+
+If that is not possible you can alternatively set the :code:`AW_ENV` environmental variable to :code:`dev`.
+
+This debug mode **SHOULD ONLY BE ENABLED TEMPORARILY**! It could possibly open attack vectors.
+
+You might need to restart the application to apply this setting.
+
+----
+
 Job Execution
 *************
 

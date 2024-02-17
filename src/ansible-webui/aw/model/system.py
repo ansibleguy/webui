@@ -2,15 +2,16 @@ from pytz import all_timezones
 from django.db import models
 from django.core.exceptions import ObjectDoesNotExist
 
-from aw.model.base import BaseModel
+from aw.model.base import BaseModel, CHOICES_BOOL
 from aw.config.defaults import CONFIG_DEFAULTS
 from aw.config.environment import check_aw_env_var_is_set
+from aw.utils.deployment import deployment_dev
 
 
 class SystemConfig(BaseModel):
     form_fields = [
         'path_run', 'path_play', 'path_log', 'timezone', 'run_timeout', 'session_timeout', 'path_ansible_config',
-        'path_ssh_known_hosts',
+        'path_ssh_known_hosts', 'debug',
     ]
     # NOTE: 'AW_DB' is needed to get this config from DB and 'AW_SECRET' cannot be saved because of security breach
     api_fields_write = form_fields
@@ -31,6 +32,7 @@ class SystemConfig(BaseModel):
     path_ssh_known_hosts = models.CharField(
         max_length=500, default=CONFIG_DEFAULTS['path_ssh_known_hosts'], null=True, blank=True,
     )
+    debug = models.BooleanField(default=CONFIG_DEFAULTS['debug'] or deployment_dev(), choices=CHOICES_BOOL)
 
     @classmethod
     def get_set_env_vars(cls) -> list:

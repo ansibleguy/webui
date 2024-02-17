@@ -36,6 +36,7 @@ FORM_LABEL = {
             'session_timeout': 'Timeout for WebUI login-sessions',
             'path_ansible_config': 'Ansible Config-File',
             'path_ssh_known_hosts': 'SSH Known-Hosts File',
+            'debug': 'Debug Mode',
             # env-vars
             'timezone': 'Timezone',
             'db': 'Database',
@@ -100,6 +101,9 @@ FORM_HELP = {
                                    '/intro_configuration.html#configuration-file">Ansible config-file</a> to use',
             'path_ssh_known_hosts': 'Path to a <a href="https://en.wikibooks.org/wiki/OpenSSH/'
                                     'Client_Configuration_Files#~/.ssh/known_hosts">SSH known_hosts file</a> to use',
+            'debug': 'Enable Debug-mode. Do not enable permanent on production systems! '
+                     'It can possibly open attack vectors. '
+                     'You might need to restart the application to apply this setting',
         }
     }
 }
