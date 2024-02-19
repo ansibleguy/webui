@@ -139,7 +139,7 @@ def get_form_field_input(bf: BoundField, existing: dict) -> str:
         else:
             field_attrs += 'pattern=".*"'
 
-        search_choices = f'<ul id="aw-fs-choices-{bf.name}"></ul>'
+        search_choices = f'<ul class="aw-fs-choices" id="aw-fs-choices-{bf.name}"></ul>'
 
     return (f'<input class="{field_classes}" {field_attrs} '
             f'{field_value} {get_form_required(bf)}'

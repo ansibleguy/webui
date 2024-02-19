@@ -24,12 +24,17 @@ def get_path_run_repo(path_run: Path) -> Path:
     return path_run / '.repository'
 
 
-def get_path_repo(repository: Repository, execution: JobExecution) -> Path:
+def get_path_repo_wo_isolate(repository: Repository) -> Path:
     if repository.rtype_name == 'Static':
         return repository.static_path
 
     path_repo = Path(config['path_run']) / 'repositories' / repository.name
     path_repo.mkdir(mode=0o750, parents=True, exist_ok=True)
+    return path_repo
+
+
+def get_path_repo(repository: Repository, execution: JobExecution) -> Path:
+    path_repo = get_path_repo_wo_isolate(repository)
 
     if repository.git_isolate:
         path_repo = path_repo / execution.id

@@ -26,7 +26,7 @@ urlpatterns_api = [
     path('api/repository/<int:repo_id>', APIRepositoryItem.as_view()),
     path('api/repository', APIRepository.as_view()),
     path('api/config', APISystemConfig.as_view()),
-    path('api/fs/browse/<str:selector>', APIFsBrowse.as_view()),
+    path('api/fs/browse/<str:repository>', APIFsBrowse.as_view()),
     path('api/_schema/', SpectacularAPIView.as_view(), name='_schema'),
     path('api/_docs', SpectacularSwaggerView.as_view(url_name='_schema'), name='swagger-ui'),
 ]

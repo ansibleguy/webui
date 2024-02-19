@@ -374,6 +374,12 @@ input:invalid {
     margin-bottom: 0.1rem !important;
 }
 
+.aw-fs-choices {
+    background-color: var(--tableRow1);
+}
+.aw-fs-choices-files {}
+.aw-fs-choices-directories {}
+
 .aw-success-msg {
     color: rgb(135,169,107);
     font-weight: bold;

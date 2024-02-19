@@ -160,29 +160,37 @@ function apiActionFullError() {
     document.getElementById("aw-api-error-full").scrollIntoView();
 }
 
-function apiBrowseDirUpdateChoices(inputElement, choicesElement, searchType, result) {
-    choices = result[searchType];
+function apiBrowseDirFilteredChoices(choices, userInputCurrent, allowEmpty = false) {
+    let choicesFiltered = [];
+    for (choice of choices) {
+        if (choice.startsWith(userInputCurrent)) {
+            choicesFiltered.push(choice);
+        }
+    }
+    if (!allowEmpty && choicesFiltered.length == 0) {
+        choicesFiltered = choices;
+    }
+    return choicesFiltered;
+}
+
+function apiBrowseDirUpdateChoices(inputElement, choicesElement, searchType, userInputCurrent, result) {
+    let choices = result[searchType];
     inputElement.attr("pattern", '(.*\\/|^)(' + choices.join('|') + ')$');
 
-    let title = "";
     if (choices.length == 0) {
-        title += "No available " + searchType + " found."
-    } else if (choices.length > 0) {
-        title += "You might choose one of the existing " + searchType + ": '" + choices.join(', ') + "'";
+        inputElement.attr("title", "No available " + searchType + " found.");
+    } else if (choices[0] == '.*') {
+        // isolated repository does not exist - cannot validate files
+        return
     }
-    dirs = result['directories'];
-    if (searchType != 'directories' && dirs.length > 0) {
-        title += " Available directories: '" + dirs.join(', ') + "'";
-    }
-    inputElement.attr("title", title);
 
-    choicesHtml = "";
-    for (choice of choices) {
-        choicesHtml += "<li>" + choice + "</li>";
+    let choicesHtml = "";
+    for (choice of apiBrowseDirFilteredChoices(choices, userInputCurrent)) {
+        choicesHtml += '<li class="aw-fs-choices-' + searchType + '">' + choice + "</li>";
     }
     if (searchType != 'directories') {
-        for (dir of dirs) {
-            choicesHtml += '<li><i class="fa fa-folder" aria-hidden="true"></i> ' + dir + "</li>";
+        for (dir of apiBrowseDirFilteredChoices(result['directories'], userInputCurrent, true)) {
+            choicesHtml += '<li class="aw-fs-choices-directories"><i class="fa fa-folder" aria-hidden="true"></i> ' + dir + "</li>";
         }
     }
     choicesElement.innerHTML = choicesHtml;
@@ -194,11 +202,24 @@ function apiBrowseDirRemoveChoices(inputElement, choicesElement, searchType, exc
     inputElement.attr("title", "You need to choose one of the existing " + searchType);
 }
 
-function apiBrowseDir(inputElement, choicesElement, selector, base, searchType) {
+function apiBrowseDir(inputElement, choicesElement, repository, searchType) {
+    if (!is_set(repository)){
+        repository = '0';
+    }
+
+    let userInput = $(inputElement).val();
+    if (typeof(userInput) == 'undefined' || userInput == null) {
+        userInput = "";
+    }
+
+    let userInputLevels = userInput.split('/');
+    let userInputCurrent = userInputLevels.pop();
+    let base = userInputLevels.join('/');
+
     $.ajax({
-        url: "/api/fs/browse/" + selector + "?base=" + base,
+        url: "/api/fs/browse/" + repository + "?base=" + base,
         type: "GET",
-        success: function (result) { apiBrowseDirUpdateChoices(inputElement, choicesElement, searchType, result); },
+        success: function (result) { apiBrowseDirUpdateChoices(inputElement, choicesElement, searchType, userInputCurrent, result); },
         error: function (exception) { apiBrowseDirRemoveChoices(inputElement, choicesElement, searchType, exception); },
     });
 }
@@ -394,7 +415,7 @@ $( document ).ready(function() {
     });
     $(".aw-main").on("input", ".aw-fs-browse", function(){
         let searchType = $(this).attr("aw-fs-type");
-        let apiSelector = $(this).attr("aw-fs-selector");
+        let repository = $(this).attr("aw-fs-repository");
         let apiChoices = document.getElementById($(this).attr("aw-fs-choices"));
 
         $(this).attr("value", "");
@@ -404,16 +425,7 @@ $( document ).ready(function() {
         }
 
         if (this.checkValidity() == false) {
-            let userInput = $(this).val();
-            if (typeof(userInput) == 'undefined' || userInput == null) {
-                userInput = "";
-            }
-
-            userInputLevels = userInput.split('/');
-            userInputLevels.pop();
-            apiBase = userInputLevels.join('/');
-
-            apiBrowseDir(jQuery(this), apiChoices, apiSelector, apiBase, searchType);
+            apiBrowseDir(jQuery(this), apiChoices, repository, searchType);
         } else {
             apiChoices.innerHTML = ""
         }

@@ -1,15 +1,18 @@
 from os import listdir
-from os import path as os_path
 from pathlib import Path
 from functools import cache
 
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.views import APIView
 from rest_framework import serializers
 from rest_framework.response import Response
-from drf_spectacular.utils import extend_schema, OpenApiResponse
+from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiParameter
 
 from aw.config.main import config
 from aw.api_endpoints.base import API_PERMISSION, BaseResponse, GenericResponse
+from aw.model.repository import Repository
+from aw.execute.repository import get_path_repo_wo_isolate
+from aw.utils.util import is_set
 
 
 class FileSystemReadResponse(BaseResponse):
@@ -21,10 +24,6 @@ class APIFsBrowse(APIView):
     http_method_names = ['get']
     serializer_class = FileSystemReadResponse
     permission_classes = API_PERMISSION
-    BROWSE_SELECTORS = {  # todo: switch with repository
-        'playbook_file': config['path_play'],
-        'inventory_file': config['path_play'],
-    }
 
     @staticmethod
     @cache
@@ -41,33 +40,61 @@ class APIFsBrowse(APIView):
             404: OpenApiResponse(GenericResponse, description='Base directory does not exist'),
         },
         summary='Return list of existing files and directories.',
-        description="This endpoint is mainly used for form auto-completion when selecting job-files. "
-                    f"Available selectors are: {BROWSE_SELECTORS}"
+        description="This endpoint is mainly used for form auto-completion when selecting job-files",
+        parameters=[
+            OpenApiParameter(
+                name='repository', type=int, default=None, required=False,
+                description='Repository to query',
+            ),
+            OpenApiParameter(
+                name='base', type=str, default='/', description='Relative directory to query',
+                required=False,
+            ),
+        ],
     )
-    def get(cls, request, selector: str):
-        if selector not in cls.BROWSE_SELECTORS:
-            return Response(data={'msg': 'Invalid browse-selector provided'}, status=400)
+    def get(cls, request, repository: int = None):
+        browse_root = Path(config['path_play'])
+        items = {'files': [], 'directories': []}
+
+        if repository not in [None, 0, '0']:
+            try:
+                repository = Repository.objects.get(id=repository)
+                if repository is None:
+                    raise ObjectDoesNotExist
+
+                if repository.rtype_name == 'Static':
+                    browse_root = repository.static_path
+
+                else:
+                    if repository.git_isolate:
+                        # do not validate as the repo does not exist..
+                        all_valid = ['.*']
+                        items['files'] = all_valid
+                        items['directories'] = all_valid
+                        return Response(items)
+
+                    browse_root = get_path_repo_wo_isolate(repository)
+                    if is_set(repository.git_playbook_base):
+                        browse_root = browse_root / repository.git_playbook_base
+
+            except ObjectDoesNotExist:
+                return Response(data={'msg': 'Provided repository does not exist'}, status=404)
+
+        if not browse_root.is_dir():
+            return Response(data={'msg': 'Base directory does not exist'}, status=404)
 
         if 'base' not in request.GET:
             base = '/'
         else:
             base = str(request.GET['base'])
 
-        if not base.startswith('/'):
-            base = f'/{base}'
-
         if base.find('..') != -1:
             return Response(data={'msg': 'Traversal not allowed'}, status=403)
 
-        path_check = cls.BROWSE_SELECTORS[selector] + base
-        if not Path(path_check).is_dir():
-            return Response(data={'msg': 'Base directory does not exist'}, status=404)
-
-        items = {'files': [], 'directories': []}
-        raw_items = cls._listdir(path_check)
+        raw_items = cls._listdir(browse_root / base)
 
         for item in raw_items:
-            item_path = Path(os_path.join(path_check, item))
+            item_path = browse_root / base / item
             if item_path.is_file():
                 items['files'].append(item)
             elif item_path.is_dir():
