@@ -20,6 +20,11 @@ class FileSystemReadResponse(BaseResponse):
     directories = serializers.ListSerializer(child=serializers.CharField())
 
 
+class FileSystemExistsResponse(BaseResponse):
+    exists = serializers.BooleanField()
+    fstype = serializers.CharField()
+
+
 class APIFsBrowse(APIView):
     http_method_names = ['get']
     serializer_class = FileSystemReadResponse
@@ -101,3 +106,40 @@ class APIFsBrowse(APIView):
                 items['directories'].append(item)
 
         return Response(items)
+
+
+class APIFsExists(APIView):
+    http_method_names = ['get']
+    serializer_class = FileSystemExistsResponse
+    permission_classes = API_PERMISSION
+
+    @classmethod
+    @extend_schema(
+        request=None,
+        responses={
+            200: FileSystemExistsResponse,
+            400: OpenApiResponse(GenericResponse, description='No file or directory not provided'),
+            403: OpenApiResponse(GenericResponse, description='Access to file or directory is forbidden'),
+        },
+        summary='Return if the provided file or directory exists.',
+        description="This endpoint is mainly used for form validation when configuring path and files",
+        parameters=[
+            OpenApiParameter(
+                name='item', type=str, default=None, required=True,
+                description='File or directory that should be checked',
+            ),
+        ],
+    )
+    def get(cls, request):
+        if 'item' not in request.GET:
+            return Response(data={'msg': "Required parameter 'item' was not provided"}, status=400)
+
+        try:
+            fs_item = Path(request.GET['item'])
+            return Response({
+                'exists': fs_item.exists(),
+                'fstype': 'file' if fs_item.is_file() else 'directory',
+            })
+
+        except PermissionError:
+            return Response(data={'msg': 'Access to file or directory is forbidden'}, status=403)

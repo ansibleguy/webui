@@ -224,6 +224,30 @@ function apiBrowseDir(inputElement, choicesElement, repository, searchType) {
     });
 }
 
+function apiFsExistsUpdateValidation(inputElement, result) {
+    if (result.exists) {
+        inputElement.attr("pattern", '.*');
+        inputElement.attr("title", "Found existing " + result.fstype);
+    } else {
+        inputElement.attr("pattern", '^\\b$');
+        inputElement.attr("title", "File or directory does not exist");
+    }
+}
+
+function apiFsExists(inputElement) {
+    let userInput = $(inputElement).val();
+    if (typeof(userInput) == 'undefined' || userInput == null) {
+        return
+    }
+
+    $.ajax({
+        url: "/api/fs/exists?item=" + userInput,
+        type: "GET",
+        success: function (result) { apiFsExistsUpdateValidation(inputElement, result); },
+        error: function (result, exception) { apiActionError(result, exception); },
+    });
+}
+
 function fetchApiTableDataPlaceholder(dataTable, placeholderId) {
     tmpRow = dataTable.insertRow(1);
     tmpRow.setAttribute("aw-api-entry", placeholderId);
@@ -429,5 +453,8 @@ $( document ).ready(function() {
         } else {
             apiChoices.innerHTML = ""
         }
+    });
+    $(".aw-main").on("input", ".aw-fs-exists", function(){
+        apiFsExists(jQuery(this));
     });
 });

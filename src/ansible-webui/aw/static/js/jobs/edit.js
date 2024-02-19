@@ -1,7 +1,5 @@
 function getRepositoryToBrowse() {
     let selectedRepository = document.getElementById('id_repository').value;
-    console.log(selectedRepository);
-
     document.getElementById('id_playbook_file').setAttribute("aw-fs-repository", selectedRepository);
     document.getElementById('id_inventory_file').setAttribute("aw-fs-repository", selectedRepository);
 }

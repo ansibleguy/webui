@@ -131,8 +131,7 @@ def get_form_field_input(bf: BoundField, existing: dict) -> str:
 
     elif bf.name.find('_file') != -1:
         field_classes += ' aw-fs-browse'
-        field_attrs += (f' type="text" aw-fs-selector="{bf.name}" aw-fs-type="files"'
-                        f' aw-fs-choices="aw-fs-choices-{bf.name}"')
+        field_attrs += f' type="text" aw-fs-type="files" aw-fs-choices="aw-fs-choices-{bf.name}"'
         if value is None:
             field_attrs += 'pattern="^\\b$"'
 
@@ -140,6 +139,10 @@ def get_form_field_input(bf: BoundField, existing: dict) -> str:
             field_attrs += 'pattern=".*"'
 
         search_choices = f'<ul class="aw-fs-choices" id="aw-fs-choices-{bf.name}"></ul>'
+
+    elif bf.name.find('path_') != -1 or bf.name.find('_path') != -1:
+        field_classes += ' aw-fs-exists'
+        field_attrs += ' type="text"'
 
     return (f'<input class="{field_classes}" {field_attrs} '
             f'{field_value} {get_form_required(bf)}'
