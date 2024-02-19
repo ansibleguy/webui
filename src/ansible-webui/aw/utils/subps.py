@@ -8,7 +8,7 @@ from aw.config.environment import AW_ENV_VARS_SECRET, AW_ENV_VARS
 
 
 def process(cmd: list, timeout_sec: int = None, shell: bool = False, cwd: Path = BASE_DIR, env: dict = None) -> dict:
-    log(msg=f"Executing command: '{' '.join(cmd)} ({cmd})'", level=6)
+    log(msg=f"Executing command: '{' '.join(cmd)}'", level=6)
 
     # merge provided env with current env and hide secrets
     env_full = environ.copy()

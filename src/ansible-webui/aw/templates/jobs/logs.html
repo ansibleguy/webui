@@ -29,8 +29,10 @@
     <div id="aw-api-data-tmpl-logs" hidden="hidden">
         <div>
             <b>LOG FILES</b>:
-            <a href="${LOG_STDOUT_URL}" title="${LOG_STDOUT}" download>Output</a>,
-            <a href="${LOG_STDERR_URL}" title="${LOG_STDERR}" download>Error</a>
+            <a href="${LOG_STDOUT_URL}" title="${LOG_STDOUT}" download>Job Output</a>,
+            <a href="${LOG_STDERR_URL}" title="${LOG_STDERR}" download>Job Error</a>,
+            <a href="${LOG_STDOUT_REPO_URL}" title="${LOG_STDOUT_REPO}" download>Repository Output</a>,
+            <a href="${LOG_STDERR_REPO_URL}" title="${LOG_STDERR_REPO}" download>Repository Error</a>
         </div>
         <div id="aw-execution-logs-${ID}" class="aw-execution-logs"></div>
         <div>

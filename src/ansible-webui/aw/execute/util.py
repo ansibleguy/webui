@@ -3,12 +3,14 @@ from random import choice as random_choice
 from string import digits, ascii_letters, punctuation
 from datetime import datetime
 from os import remove as remove_file
+from re import sub as regex_replace
 
 from aw.config.main import config
 from aw.config.hardcoded import FILE_TIME_FORMAT
-from aw.utils.util import write_file_0600
+from aw.utils.util import write_file_0600, is_null, datetime_w_tz
 from aw.utils.handlers import AnsibleConfigError
-from aw.model.job import JobExecution
+from aw.model.job import JobExecution, Job
+from aw.model.repository import Repository
 
 
 def config_error(msg: str):
@@ -48,9 +50,9 @@ def decode_job_env_vars(env_vars_csv: str, src: str) -> dict:
         return {}
 
 
-def update_execution_status(execution: JobExecution, status: str):
-    execution.status = execution.status_id_from_name(status)
-    execution.save()
+def update_status(obj: (JobExecution, Repository), status: str):
+    obj.status = obj.status_id_from_name(status)
+    obj.save()
 
 
 def is_execution_status(execution: JobExecution, status: str) -> bool:
@@ -75,11 +77,33 @@ def create_dirs(path: (str, Path), desc: str):
         if not isinstance(path, Path):
             path = Path(path)
 
-        if not path.is_dir():
-            if not path.parent.is_dir():
-                path.parent.mkdir(mode=0o775)
-
-            path.mkdir(mode=0o750)
+        path.mkdir(mode=0o750, parents=True, exist_ok=True)
 
     except (OSError, FileNotFoundError):
         raise OSError(f"Unable to created {desc} directory: '{path}'").with_traceback(None) from None
+
+
+def job_logs(job: Job, execution: JobExecution) -> dict:
+    safe_job_name = regex_replace(pattern='[^0-9a-zA-Z-_]+', repl='', string=job.name)
+    if is_null(execution.user):
+        safe_user_name = 'scheduled'
+    else:
+        safe_user_name = execution.user.username.replace('.', '_')
+        safe_user_name = regex_replace(pattern='[^0-9a-zA-Z-_]+', repl='', string=safe_user_name)
+
+    timestamp = datetime_w_tz().strftime(FILE_TIME_FORMAT)
+    log_file = f"{config['path_log']}/{safe_job_name}_{timestamp}_{safe_user_name}"
+
+    log_files = {
+        'stdout': f'{log_file}_stdout.log',
+        'stderr': f'{log_file}_stderr.log',
+        'stdout_repo': f'{log_file}_stdout_repo.log',
+        'stderr_repo': f'{log_file}_stderr_repo.log',
+    }
+
+    execution.log_stdout = log_files['stdout']
+    execution.log_stderr = log_files['stderr']
+    execution.log_stdout_repo = log_files['stdout_repo']
+    execution.log_stderr_repo = log_files['stderr_repo']
+
+    return log_files

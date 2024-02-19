@@ -60,7 +60,7 @@ class PermissionWriteRequest(serializers.ModelSerializer):
 
     @staticmethod
     def create_or_update(validated_data: dict, perm: JobPermission = None):
-        # pylint: disable=R0912
+        # pylint: disable=R0912,R0915
         if 'permission' in validated_data:
             permission = validated_data['permission']
         else:
@@ -70,16 +70,19 @@ class PermissionWriteRequest(serializers.ModelSerializer):
             perm = JobPermission(
                 name=validated_data['name'],
                 permission=permission,
-                jobs_all=validated_data['jobs_all'],
-                credentials_all=validated_data['credentials_all'],
-                repositories_all=validated_data['repositories_all'],
             )
 
         else:
             perm.name = validated_data['name']
             perm.permission = permission
+
+        if 'jobs_all' in validated_data:
             perm.jobs_all = validated_data['jobs_all']
+
+        if 'credentials_all' in validated_data:
             perm.credentials_all = validated_data['credentials_all']
+
+        if 'repositories_all' in validated_data:
             perm.repositories_all = validated_data['repositories_all']
 
         perm.save()

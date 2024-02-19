@@ -229,6 +229,13 @@ class RepositoryForm(forms.ModelForm):
         labels = FORM_LABEL['jobs']['repository']
         help_texts = FORM_HELP['jobs']['repository']
 
+    git_credentials = forms.ChoiceField(
+        required=False,
+        widget=forms.Select,
+        choices=choices_global_credentials,
+        label=FORM_LABEL['jobs']['repository']['git_credentials'],
+    )
+
 
 @login_required
 @ui_endpoint_wrapper_kwargs

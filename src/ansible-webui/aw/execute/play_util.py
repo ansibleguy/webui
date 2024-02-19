@@ -1,6 +1,5 @@
 from pathlib import Path
 from shutil import rmtree
-from re import sub as regex_replace
 from os import symlink
 from os import path as os_path
 from os import remove as remove_file
@@ -8,16 +7,15 @@ from os import remove as remove_file
 from ansible_runner import Runner, RunnerConfig
 
 from aw.config.main import config
-from aw.config.hardcoded import FILE_TIME_FORMAT
-from aw.utils.util import is_set, is_null, datetime_w_tz, write_file_0640
+from aw.utils.util import is_set, datetime_w_tz, write_file_0640
 from aw.model.job import Job, JobExecution, JobExecutionResult, JobExecutionResultHost, JobError
 from aw.model.job_credential import BaseJobCredentials
-from aw.execute.util import update_execution_status, overwrite_and_delete_file, decode_job_env_vars, \
+from aw.execute.util import update_status, overwrite_and_delete_file, decode_job_env_vars, \
     create_dirs, is_execution_status, config_error
 from aw.utils.debug import log
 from aw.execute.play_credentials import get_credentials_to_use, commandline_arguments_credentials, \
     write_pwd_file, get_pwd_file
-from aw.execute.repository import get_project_dir, cleanup_repository
+from aw.execute.repository import cleanup_repository
 
 # see: https://ansible.readthedocs.io/projects/runner/en/latest/intro/
 
@@ -74,7 +72,7 @@ def _execution_or_job(job: Job, execution: JobExecution, attr: str):
     return None
 
 
-def _runner_options(job: Job, execution: JobExecution, path_run: Path) -> dict:
+def _runner_options(job: Job, execution: JobExecution, path_run: Path, project_dir: str) -> dict:
     # merge job + execution env-vars
     env_vars = {}
     if is_set(job.environment_vars.strip()):
@@ -99,7 +97,7 @@ def _runner_options(job: Job, execution: JobExecution, path_run: Path) -> dict:
     cmdline_args = _commandline_arguments(job=job, execution=execution, path_run=path_run)
 
     opts = {
-        'project_dir': get_project_dir(job=job, execution=execution),
+        'project_dir': project_dir,
         'private_data_dir': path_run,
         'limit': _execution_or_job(job, execution, 'limit'),
         'tags': _execution_or_job(job, execution, 'tags'),
@@ -112,10 +110,10 @@ def _runner_options(job: Job, execution: JobExecution, path_run: Path) -> dict:
     return opts
 
 
-def runner_prep(job: Job, execution: JobExecution, path_run: Path) -> dict:
-    update_execution_status(execution, status='Starting')
+def runner_prep(job: Job, execution: JobExecution, path_run: Path, project_dir: str) -> dict:
+    update_status(execution, status='Starting')
 
-    opts = _runner_options(job=job, execution=execution, path_run=path_run)
+    opts = _runner_options(job=job, execution=execution, path_run=path_run, project_dir=project_dir)
     opts['playbook'] = job.playbook_file
     opts['inventory'] = job.inventory_file.split(',')
 
@@ -136,7 +134,7 @@ def runner_prep(job: Job, execution: JobExecution, path_run: Path) -> dict:
     for secret_attr in BaseJobCredentials.SECRET_ATTRS:
         write_pwd_file(credentials, attr=secret_attr, path_run=path_run)
 
-    update_execution_status(execution, status='Running')
+    update_status(execution, status='Running')
     return opts
 
 
@@ -166,38 +164,12 @@ def runner_cleanup(job: Job, execution: JobExecution, path_run: Path):
         overwrite_and_delete_file(get_pwd_file(path_run=path_run, attr=attr))
 
     try:
-        cleanup_repository(job=job, execution=execution, path_run=path_run)
+        cleanup_repository(repository=job.repository, execution=execution, path_run=path_run)
 
     except AttributeError as err:
         log(msg=f'Got error of repository cleanup: {err}')
 
     rmtree(path_run, ignore_errors=True)
-
-
-def job_logs(job: Job, execution: JobExecution) -> dict:
-    safe_job_name = regex_replace(pattern='[^0-9a-zA-Z-_]+', repl='', string=job.name)
-    if is_null(execution.user):
-        safe_user_name = 'scheduled'
-    else:
-        safe_user_name = execution.user.username.replace('.', '_')
-        safe_user_name = regex_replace(pattern='[^0-9a-zA-Z-_]+', repl='', string=safe_user_name)
-
-    timestamp = datetime_w_tz().strftime(FILE_TIME_FORMAT)
-    log_file = f"{config['path_log']}/{safe_job_name}_{timestamp}_{safe_user_name}"
-
-    log_files = {
-        'stdout': f'{log_file}_stdout.log',
-        'stderr': f'{log_file}_stderr.log',
-        'stdout_repo': f'{log_file}_stdout_repo.log',
-        'stderr_repo': f'{log_file}_stderr_repo.log',
-    }
-
-    execution.log_stdout = log_files['stdout']
-    execution.log_stderr = log_files['stderr']
-    execution.log_stdout_repo = log_files['stdout_repo']
-    execution.log_stderr_repo = log_files['stderr_repo']
-
-    return log_files
 
 
 def _run_stats(runner: Runner, result: JobExecutionResult) -> bool:
@@ -236,21 +208,21 @@ def parse_run_result(execution: JobExecution, result: JobExecutionResult, runner
         any_task_failed = _run_stats(runner=runner, result=result)
 
     if result.failed or any_task_failed:
-        update_execution_status(execution, status='Failed')
+        update_status(execution, status='Failed')
 
     else:
         status = 'Finished'
         if is_execution_status(execution, 'Stopping'):
             status = 'Stopped'
 
-        update_execution_status(execution, status=status)
+        update_status(execution, status=status)
 
 
 def failure(
         job: Job, execution: JobExecution, path_run: Path,
         result: JobExecutionResult, error_s: str, error_m: str
 ):
-    update_execution_status(execution, status='Failed')
+    update_status(execution, status='Failed')
     job_error = JobError(
         short=error_s,
         med=error_m,

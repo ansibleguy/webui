@@ -125,3 +125,7 @@ def get_choice_key_by_value(choices: list[tuple], find: any):
             return k
 
     return None
+
+
+def unset_or_null(data: dict, key: str) -> bool:
+    return key not in data or is_null(data[key])

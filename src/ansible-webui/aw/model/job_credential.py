@@ -22,7 +22,7 @@ class BaseJobCredentials(BaseModel):
     }
     SECRET_HIDDEN = '⬤' * 15
 
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, null=False, blank=False)
     connect_user = models.CharField(max_length=100, **DEFAULT_NONE)
     become_user = models.CharField(max_length=100, **DEFAULT_NONE)
     vault_file = models.CharField(max_length=300, **DEFAULT_NONE)

@@ -16,7 +16,7 @@ from aw.api_endpoints.job_util import get_viewable_jobs_serialized, JobReadRespo
     JobExecutionReadResponse, get_viewable_jobs, get_job_execution_serialized
 from aw.utils.permission import has_job_permission, has_credentials_permission
 from aw.execute.queue import queue_add
-from aw.execute.util import update_execution_status, is_execution_status
+from aw.execute.util import update_status, is_execution_status
 from aw.utils.util import is_set
 from aw.base import USERS
 
@@ -341,7 +341,7 @@ class APIJobExecutionItem(APIView):
                 if not is_execution_status(execution, 'Running'):
                     return Response(data={'msg': f"Job execution '{job.name}' is not running"}, status=400)
 
-                update_execution_status(execution, 'Stopping')
+                update_status(execution, 'Stopping')
                 return Response(data={'msg': f"Job execution '{job.name}' stopping"}, status=200)
 
         except ObjectDoesNotExist:
@@ -398,6 +398,7 @@ class APIJobExecutionLogFile(APIView):
     http_method_names = ['get']
     serializer_class = JobExecutionLogReadResponse
     permission_classes = API_PERMISSION
+    valid_logfile_type = ['stdout', 'stderr', 'stdout_repo', 'stderr_repo']
 
     @extend_schema(
         request=None,
@@ -411,7 +412,7 @@ class APIJobExecutionLogFile(APIView):
         parameters=[
             OpenApiParameter(
                 name='type', type=str, default='stdout',
-                description="Type of log-file to download. Either 'stdout' or 'stderr'",
+                description=f"Type of log-file to download. One of {valid_logfile_type}",
                 required=False,
             ),
         ],
@@ -427,7 +428,8 @@ class APIJobExecutionLogFile(APIView):
 
                 logfile = execution.log_stdout
                 if 'type' in request.GET:
-                    logfile = execution.log_stderr if request.GET['type'] == 'stderr' else logfile
+                    logfile_type = request.GET['type'] if request.GET['type'] in self.valid_logfile_type else 'stdout'
+                    logfile = getattr(execution, f'log_{logfile_type}')
 
                 if logfile is None:
                     return Response(data={'msg': f"No logs found for job '{job.name}'"}, status=404)

@@ -96,16 +96,9 @@ WSGI_APPLICATION = 'aw.main.app'
 if deployment_prod():
     DB_FILE = Path(get_aw_env_var_or_default('db'))
 
-    if not DB_FILE.parent.exists():
-        try:
-            DB_FILE.parent.mkdir(mode=0o750)
-
-        except (OSError, FileNotFoundError):
-            raise ValueError(f"Unable to created database directory: '{DB_FILE.parent}'")
-
     if DB_FILE.name.find('.') == -1 and not DB_FILE.exists():
         try:
-            DB_FILE.mkdir(mode=0o750)
+            DB_FILE.mkdir(mode=0o750, parents=True, exist_ok=True)
 
         except (OSError, FileNotFoundError):
             raise ValueError(f"Unable to created database directory: '{DB_FILE}'")

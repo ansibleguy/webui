@@ -1,17 +1,22 @@
 from pathlib import Path
 from shutil import rmtree
 
+from django.utils import timezone
+
 from aw.config.main import config
 from aw.model.job import Job, JobExecution
 from aw.utils.util import is_null, is_set, write_file_0640
 from aw.utils.subps import process
 from aw.execute.play_credentials import write_pwd_file, get_pwd_file
-from aw.execute.util import overwrite_and_delete_file
+from aw.execute.util import overwrite_and_delete_file, update_status, get_path_run, job_logs
 from aw.model.job_credential import BaseJobCredentials
 from aw.utils.handlers import AnsibleRepositoryError
+from aw.model.repository import Repository
+from aw.base import USERS
 
 
-def repo_error(msg: str):
+def repo_error(repository: Repository, msg: str):
+    update_status(repository, status='Failed')
     raise AnsibleRepositoryError(msg).with_traceback(None) from None
 
 
@@ -19,45 +24,36 @@ def get_path_run_repo(path_run: Path) -> Path:
     return path_run / '.repository'
 
 
-def get_path_repo(job: Job, execution: JobExecution) -> Path:
-    if job.repository.rtype_name == 'Static':
-        return job.repository.static_path
+def get_path_repo(repository: Repository, execution: JobExecution) -> Path:
+    if repository.rtype_name == 'Static':
+        return repository.static_path
 
-    path_repo = Path(config['path_run']) / 'repositories' / job.repository.name
-    if not path_repo.parent.is_dir():
-        path_repo.parent.mkdir(mode=0o750)
+    path_repo = Path(config['path_run']) / 'repositories' / repository.name
+    path_repo.mkdir(mode=0o750, parents=True, exist_ok=True)
 
-    if not path_repo.is_dir():
-        path_repo.mkdir(mode=0o750)
-
-    if job.repository.git_isolate:
-        path_repo = path_repo / job.id / execution.id
-
-        if not path_repo.parent.is_dir():
-            path_repo.parent.mkdir(mode=0o750)
-
-        if not path_repo.is_dir():
-            path_repo.mkdir(mode=0o750)
+    if repository.git_isolate:
+        path_repo = path_repo / execution.id
+        path_repo.mkdir(mode=0o750, parents=True, exist_ok=True)
 
     return path_repo
 
 
-def get_path_playbook_base(job: Job, execution: JobExecution) -> Path:
-    path_repo = get_path_repo(job=job, execution=execution)
-    if job.repository.rtype_name == 'Git' and is_set(job.repository.git_playbook_base):
-        path_repo = path_repo / job.repository.git_playbook_base
+def get_path_playbook_base(repository: Repository, execution: JobExecution) -> Path:
+    path_repo = get_path_repo(repository=repository, execution=execution)
+    if repository.rtype_name == 'Git' and is_set(repository.git_playbook_base):
+        path_repo = path_repo / repository.git_playbook_base
 
     return path_repo
 
 
-def get_project_dir(job: Job, execution: JobExecution) -> str:
-    if is_null(job.repository):
+def get_project_dir(repository: Repository, execution: JobExecution) -> str:
+    if is_null(repository):
         return config['path_play']
 
-    return str(get_path_playbook_base(job=job, execution=execution))
+    return str(get_path_playbook_base(repository=repository, execution=execution))
 
 
-def _repo_process(cmd: (str, list), path_repo: Path, env: dict, execution: JobExecution):
+def _repo_process(cmd: (str, list), path_repo: Path, env: dict, execution: JobExecution, repository: Repository):
     if isinstance(cmd, str):
         cmd_str = cmd
         cmd = cmd.split(' ')
@@ -74,24 +70,31 @@ def _repo_process(cmd: (str, list), path_repo: Path, env: dict, execution: JobEx
         content=f"\nCOMMAND: {cmd_str}\n{result['stderr']}"
     )
     if result['rc'] != 0:
-        raise repo_error(
-            f"Repository command failed: '{cmd_str}'\n"
-            f"Got error: '{result['stderr']}'\n"
-            f"Got output: '{result['stdout']}'"
+        repo_error(
+            repository=repository,
+            msg=f"Repository command failed: '{cmd_str}'\n"
+                f"Got error: '{result['stderr']}'\n"
+                f"Got output: '{result['stdout']}'"
         )
 
 
-def _run_repo_config_cmds(cmds: str, path_repo: Path, env: dict, execution: JobExecution):
+def _run_repo_config_cmds(cmds: str, path_repo: Path, env: dict, execution: JobExecution, repository: Repository):
     if is_set(cmds):
         for cmd in cmds.split(','):
-            _repo_process(cmd=cmd, path_repo=path_repo, env=env, execution=execution)
+            _repo_process(
+                cmd=cmd,
+                path_repo=path_repo,
+                env=env,
+                execution=execution,
+                repository=repository,
+            )
 
 
-def _git_origin_with_credentials(job: Job) -> str:
-    origin = job.repository.git_origin
+def _git_origin_with_credentials(repository: Repository) -> str:
+    origin = repository.git_origin
 
-    if is_set(job.repository.git_credentials):
-        credentials = job.repository.git_credentials
+    if is_set(repository.git_credentials):
+        credentials = repository.git_credentials
 
         if origin.find('://') != -1 and origin.find('ssh://') == -1:
             # not ssh
@@ -109,12 +112,12 @@ def _git_origin_with_credentials(job: Job) -> str:
     return origin
 
 
-def _git_env(job: Job, path_run: Path) -> dict:
+def _git_env(repository: Repository, path_run: Path) -> dict:
     env = {}
-    if is_set(job.repository.git_credentials) and is_set(job.repository.git_credentials.ssh_key):
+    if is_set(repository.git_credentials) and is_set(repository.git_credentials.ssh_key):
         path_run_repo = get_path_run_repo(path_run)
-        path_run_repo.mkdir(mode=0o700)
-        write_pwd_file(credentials=job.repository.git_credentials, attr='ssh_key', path_run=path_run_repo)
+        path_run_repo.mkdir(mode=0o700, parents=True, exist_ok=True)
+        write_pwd_file(credentials=repository.git_credentials, attr='ssh_key', path_run=path_run_repo)
         env['GIT_SSH_COMMAND'] = f"ssh -i {get_pwd_file(path_run=path_run_repo, attr='ssh_key')}"
 
     return env
@@ -124,28 +127,29 @@ def _git_cmds_to_str(cmds: list[list[str]]) -> str:
     return '<br>'.join([' '.join(cmd) for cmd in cmds])
 
 
-def create_repository(job: Job, execution: JobExecution, path_repo: Path, env: dict):
-    if is_set(job.repository.git_override_initialize):
-        execution.command_repository = job.repository.git_override_initialize.replace(',', '<br>')
+def create_repository(repository: Repository, execution: JobExecution, path_repo: Path, env: dict):
+    if is_set(repository.git_override_initialize):
+        execution.command_repository = repository.git_override_initialize.replace(',', '<br>')
         execution.save()
         _run_repo_config_cmds(
-            cmds=job.repository.git_override_initialize,
+            cmds=repository.git_override_initialize,
             path_repo=path_repo,
             env=env,
             execution=execution,
+            repository=repository,
         )
         return
 
-    git_clone = ['git', 'clone', '--branch', job.repository.git_branch]
+    git_clone = ['git', 'clone', '--branch', repository.git_branch]
 
-    if is_set(job.repository.git_limit_depth):
-        git_clone.extend(['--depth', job.repository.git_limit_depth])
+    if is_set(repository.git_limit_depth):
+        git_clone.extend(['--depth', repository.git_limit_depth])
 
-    git_clone.extend([_git_origin_with_credentials(job), str(path_repo)])
+    git_clone.extend([_git_origin_with_credentials(repository), str(path_repo)])
 
     git_cmds = [git_clone]
 
-    if job.repository.git_lfs:
+    if repository.git_lfs:
         git_cmds.append(['git', 'lfs', 'fetch'])
         git_cmds.append(['git', 'lfs', 'checkout'])
 
@@ -154,19 +158,25 @@ def create_repository(job: Job, execution: JobExecution, path_repo: Path, env: d
     # execution.save()
 
     for cmd in git_cmds:
-        print(cmd)
-        _repo_process(cmd=cmd, path_repo=path_repo, env=env, execution=execution)
-
-
-def update_repository(job: Job, execution: JobExecution, path_repo: Path, env: dict):
-    if is_set(job.repository.git_override_update):
-        execution.command_repository = job.repository.git_override_update.replace(',', '<br>')
-        execution.save()
-        _run_repo_config_cmds(
-            cmds=job.repository.git_override_update,
+        _repo_process(
+            cmd=cmd,
             path_repo=path_repo,
             env=env,
             execution=execution,
+            repository=repository,
+        )
+
+
+def update_repository(repository: Repository, execution: JobExecution, path_repo: Path, env: dict):
+    if is_set(repository.git_override_update):
+        execution.command_repository = repository.git_override_update.replace(',', '<br>')
+        execution.save()
+        _run_repo_config_cmds(
+            cmds=repository.git_override_update,
+            path_repo=path_repo,
+            env=env,
+            execution=execution,
+            repository=repository,
         )
         return
 
@@ -175,7 +185,7 @@ def update_repository(job: Job, execution: JobExecution, path_repo: Path, env: d
         ['git', 'pull'],
     ]
 
-    if job.repository.git_lfs:
+    if repository.git_lfs:
         git_cmds.append(['git', 'lfs', 'fetch'])
         git_cmds.append(['git', 'lfs', 'checkout'])
 
@@ -184,45 +194,69 @@ def update_repository(job: Job, execution: JobExecution, path_repo: Path, env: d
     # execution.save()
 
     for cmd in git_cmds:
-        _repo_process(cmd=cmd, path_repo=path_repo, env=env, execution=execution)
+        _repo_process(
+            cmd=cmd,
+            path_repo=path_repo,
+            env=env,
+            execution=execution,
+            repository=repository,
+        )
 
 
-def create_or_update_repository(job: Job, execution: JobExecution, path_run: Path):
-    if is_null(job.repository) or job.repository.rtype_name == 'Static':
+def create_or_update_repository(repository: Repository, execution: JobExecution, path_run: Path):
+    if is_null(repository) or repository.rtype_name == 'Static':
         return
 
-    path_repo = get_path_repo(job=job, execution=execution)
+    update_status(repository, status='Running')
+    path_repo = get_path_repo(repository=repository, execution=execution)
 
-    env = _git_env(job=job, path_run=path_run)
+    env = _git_env(repository=repository, path_run=path_run)
 
     _run_repo_config_cmds(
-        cmds=job.repository.git_hook_pre,
+        cmds=repository.git_hook_pre,
         path_repo=path_repo,
         env=env,
         execution=execution,
+        repository=repository,
     )
 
-    if job.repository.git_isolate or not (Path(path_repo) / '.git/HEAD').is_file():
-        create_repository(job=job, execution=execution, path_repo=path_repo, env=env)
+    if repository.git_isolate or not (Path(path_repo) / '.git/HEAD').is_file():
+        create_repository(repository=repository, execution=execution, path_repo=path_repo, env=env)
 
     else:
-        update_repository(job=job, execution=execution, path_repo=path_repo, env=env)
+        update_repository(repository=repository, execution=execution, path_repo=path_repo, env=env)
+
+    repository.time_update = timezone.now()
 
     _run_repo_config_cmds(
-        cmds=job.repository.git_hook_post,
+        cmds=repository.git_hook_post,
         path_repo=path_repo,
         env=env,
         execution=execution,
+        repository=repository,
     )
 
+    update_status(repository, status='Finished')
 
-def cleanup_repository(job: Job, execution: JobExecution, path_run: Path):
-    if is_null(job.repository) or job.repository.rtype_name == 'Static':
+
+def cleanup_repository(repository: Repository, execution: JobExecution, path_run: Path):
+    if is_null(repository) or repository.rtype_name == 'Static':
         return
 
     path_run_repo = get_path_run_repo(path_run)
     for attr in BaseJobCredentials.SECRET_ATTRS:
         overwrite_and_delete_file(get_pwd_file(path_run=path_run_repo, attr=attr))
 
-    if job.repository.git_isolate:
-        rmtree(get_path_repo(job=job, execution=execution), ignore_errors=True)
+    if repository.git_isolate:
+        rmtree(get_path_repo(repository=repository, execution=execution), ignore_errors=True)
+
+
+def api_update_repository(repository: Repository, user: USERS):
+    if is_null(repository) or repository.rtype_name == 'Static' or repository.git_isolate:
+        return
+
+    job = Job(name='')
+    execution = JobExecution(user=user, job=job, comment='Manual Repository Update')
+    job_logs(job=job, execution=execution)
+
+    create_or_update_repository(repository=repository, execution=execution, path_run=get_path_run())

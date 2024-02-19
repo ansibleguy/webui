@@ -81,6 +81,10 @@ function updateApiTableDataJobLogs(row, row2, entry) {
     logsTemplates = logsTemplates.replaceAll('${LOG_STDERR_URL}', entry.log_stderr_url);
     logsTemplates = logsTemplates.replaceAll('${LOG_STDERR}', entry.log_stderr);
     logsTemplates = logsTemplates.replaceAll('${LOG_STDOUT}', entry.log_stdout);
+    logsTemplates = logsTemplates.replaceAll('${LOG_STDOUT_REPO_URL}', entry.log_stdout_repo_url);
+    logsTemplates = logsTemplates.replaceAll('${LOG_STDERR_REPO_URL}', entry.log_stderr_repo_url);
+    logsTemplates = logsTemplates.replaceAll('${LOG_STDERR_REPO}', entry.log_stderr_repo);
+    logsTemplates = logsTemplates.replaceAll('${LOG_STDOUT_REPO}', entry.log_stdout_repo);
     row2.setAttribute("hidden", "hidden");
     row2.setAttribute("id", "aw-spoiler-" + entry.id);
     let row2Col = row2.insertCell(0);

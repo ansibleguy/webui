@@ -1,3 +1,5 @@
+from threading import Thread
+
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.utils import IntegrityError
 from rest_framework.generics import GenericAPIView
@@ -9,8 +11,10 @@ from aw.model.repository import Repository
 from aw.api_endpoints.base import API_PERMISSION, GenericResponse, get_api_user
 from aw.utils.permission import has_manager_privileges, has_repository_permission, get_viewable_repositories
 from aw.model.job import Job
-from aw.utils.util import is_null, is_set
-from aw.model.permission import CHOICE_PERMISSION_READ, CHOICE_PERMISSION_WRITE, CHOICE_PERMISSION_FULL
+from aw.utils.util import unset_or_null, is_set
+from aw.model.permission import CHOICE_PERMISSION_READ, CHOICE_PERMISSION_WRITE, CHOICE_PERMISSION_FULL, \
+    CHOICE_PERMISSION_EXECUTE
+from aw.execute.repository import api_update_repository
 
 
 class RepositoryWriteRequest(serializers.ModelSerializer):
@@ -25,14 +29,11 @@ class RepositoryReadResponse(RepositoryWriteRequest):
         fields = Repository.api_fields_read
 
     rtype_name = serializers.CharField()
+    status_name = serializers.CharField()
 
 
 def repository_in_use(repository: Repository) -> bool:
     return Job.objects.filter(repository=repository).exists()
-
-
-def _unset_or_null(repository: dict, key: str) -> bool:
-    return key not in repository or is_null(repository[key])
 
 
 def validate_repository_types(repository: dict) -> (bool, str):
@@ -45,14 +46,14 @@ def validate_repository_types(repository: dict) -> (bool, str):
         except KeyError:
             pass
 
-        if _unset_or_null(repository, 'git_origin'):
+        if unset_or_null(repository, 'git_origin'):
             return False, 'Git Origin is required'
 
-        if _unset_or_null(repository, 'git_branch'):
+        if unset_or_null(repository, 'git_branch'):
             return False, 'Git Branch is required'
 
     else:
-        if _unset_or_null(repository, 'static_path'):
+        if unset_or_null(repository, 'static_path'):
             return False, 'Static Path is required'
 
     return True, ''
@@ -75,7 +76,9 @@ class APIRepository(GenericAPIView):
         repositories = []
 
         for repository in get_viewable_repositories(user=user):
-            repositories.append(RepositoryReadResponse(instance=repository).data)
+            data = RepositoryReadResponse(instance=repository).data
+            data['time_update'] = repository.time_update_str
+            repositories.append(data)
 
         return Response(data=repositories, status=200)
 
@@ -113,7 +116,7 @@ class APIRepository(GenericAPIView):
 
 
 class APIRepositoryItem(GenericAPIView):
-    http_method_names = ['get', 'put', 'delete']
+    http_method_names = ['get', 'put', 'post', 'delete']
     serializer_class = GenericResponse
     permission_classes = API_PERMISSION
 
@@ -230,6 +233,45 @@ class APIRepositoryItem(GenericAPIView):
 
                 repository.delete()
                 return Response(data={'msg': f"Repository '{repository.name}' deleted"}, status=200)
+
+        except ObjectDoesNotExist:
+            pass
+
+        return Response(data={'msg': f"Repository with ID {repo_id} does not exist"}, status=404)
+
+    @extend_schema(
+        request=None,
+        responses={
+            200: OpenApiResponse(response=GenericResponse, description='Repository update initiated'),
+            403: OpenApiResponse(response=GenericResponse, description='Not privileged to update the repository'),
+            404: OpenApiResponse(response=GenericResponse, description='Repository does not exist'),
+        },
+        summary='Download/Update a repository.',
+        operation_id='repository_update'
+    )
+    def post(self, request, repo_id: int):
+        user = get_api_user(request)
+
+        try:
+            repository = Repository.objects.get(id=repo_id)
+            if repository is not None:
+                if not has_repository_permission(
+                        user=user,
+                        repository=repository,
+                        permission_needed=CHOICE_PERMISSION_EXECUTE,
+                ):
+                    return Response(
+                        data={'msg': f"Not privileged to update the repository '{repository.name}'"},
+                        status=403,
+                    )
+
+                repository_update_thread = Thread(
+                    target=api_update_repository,
+                    kwargs={'repository': repository, 'user': user}
+                )
+                repository_update_thread.start()
+
+                return Response(data={'msg': f"Repository '{repository.name}' update initiated"}, status=200)
 
         except ObjectDoesNotExist:
             pass

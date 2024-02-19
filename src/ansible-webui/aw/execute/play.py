@@ -4,9 +4,9 @@ from ansible_runner import RunnerConfig, Runner
 
 from aw.config.main import config
 from aw.model.job import Job, JobExecution, JobExecutionResult
-from aw.execute.play_util import runner_cleanup, runner_prep, parse_run_result, failure, runner_logs, job_logs
-from aw.execute.util import get_path_run, is_execution_status
-from aw.execute.repository import create_or_update_repository
+from aw.execute.play_util import runner_cleanup, runner_prep, parse_run_result, failure, runner_logs
+from aw.execute.util import get_path_run, is_execution_status, job_logs
+from aw.execute.repository import create_or_update_repository, get_project_dir
 from aw.utils.util import datetime_w_tz, is_null, timed_lru_cache  # get_ansible_versions
 from aw.utils.handlers import AnsibleConfigError
 from aw.utils.debug import log
@@ -38,8 +38,9 @@ def ansible_playbook(job: Job, execution: (JobExecution, None)):
         return is_execution_status(execution, 'Stopping')
 
     try:
-        create_or_update_repository(job=job, execution=execution, path_run=path_run)
-        opts = runner_prep(job=job, execution=execution, path_run=path_run)
+        create_or_update_repository(repository=job.repository, execution=execution, path_run=path_run)
+        project_dir = get_project_dir(repository=job.repository, execution=execution)
+        opts = runner_prep(job=job, execution=execution, path_run=path_run, project_dir=project_dir)
         execution.save()
 
         runner_cfg = AwRunnerConfig(**opts)

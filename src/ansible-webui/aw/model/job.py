@@ -3,12 +3,12 @@ from django.db import models
 from django.core.validators import ValidationError
 from django.utils import timezone
 
-from aw.model.base import BareModel, BaseModel, CHOICES_BOOL, DEFAULT_NONE
+from aw.model.base import BareModel, BaseModel, CHOICES_BOOL, DEFAULT_NONE, CHOICES_JOB_EXEC_STATUS
 from aw.config.hardcoded import SHORT_TIME_FORMAT
 from aw.model.job_credential import JobGlobalCredentials, JobUserCredentials
 from aw.base import USERS
 from aw.model.repository import Repository
-from aw.utils.util import get_choice_key_by_value, get_choice_value_by_key
+from aw.utils.util import get_choice_key_by_value, get_choice_value_by_key, datetime_from_db_str, is_null
 
 
 class JobError(BareModel):
@@ -83,7 +83,7 @@ class Job(BaseJob):
     api_fields_write = api_fields_read.copy()
     api_fields_read.append('next_run')
 
-    name = models.CharField(max_length=150)
+    name = models.CharField(max_length=150, null=False, blank=False)
     inventory_file = models.CharField(max_length=300)  # NOTE: one or multiple comma-separated inventories
     playbook_file = models.CharField(max_length=100)
     schedule_max_len = 50
@@ -122,6 +122,10 @@ class JobExecutionResult(BareModel):
 
         return f"Job execution {self.time_start}: {result}"
 
+    @property
+    def time_fin_str(self) -> str:
+        return datetime_from_db_str(dt=self.time_fin, fmt=SHORT_TIME_FORMAT)
+
 
 class JobExecutionResultHost(BareModel):
     STATS = [
@@ -153,22 +157,12 @@ class JobExecutionResultHost(BareModel):
         return f"Job execution {self.created} of host '{self.hostname}': {result}"
 
 
-CHOICES_JOB_EXEC_STATUS = [
-    (0, 'Waiting'),
-    (1, 'Starting'),
-    (2, 'Running'),
-    (3, 'Failed'),
-    (4, 'Finished'),
-    (5, 'Stopping'),
-    (6, 'Stopped'),
-]
-
-
 class JobExecution(BaseJob):
     api_fields_read = [
         'id', 'job', 'job_name', 'user', 'user_name', 'result', 'status', 'status_name', 'time_start', 'time_fin',
         'failed', 'error_s', 'error_m', 'log_stdout', 'log_stdout_url', 'log_stderr', 'log_stderr_url', 'job_comment',
         'credential_global', 'credential_user', 'command', 'command_repository', 'log_stdout_repo', 'log_stderr_repo',
+        'log_stdout_repo_url', 'log_stderr_repo_url',
     ]
 
     # NOTE: scheduled execution will have no user
@@ -204,8 +198,7 @@ class JobExecution(BaseJob):
         if self.user is not None:
             executor = self.user.username
 
-        timestamp = self.created.strftime(SHORT_TIME_FORMAT)
-        return f"Job '{self.job.name}' execution @ {timestamp} by '{executor}': {self.status_name}"
+        return f"Job '{self.job.name}' execution @ {self.time_created_str} by '{executor}': {self.status_name}"
 
     @property
     def status_name(self) -> str:
@@ -218,6 +211,13 @@ class JobExecution(BaseJob):
     @staticmethod
     def status_id_from_name(name: str) -> int:
         return get_choice_key_by_value(choices=CHOICES_JOB_EXEC_STATUS, find=name)
+
+    @property
+    def time_created_str(self) -> str:
+        if is_null(self.created):
+            return ''
+
+        return datetime_from_db_str(dt=self.created, fmt=SHORT_TIME_FORMAT)
 
 
 class JobQueue(BareModel):

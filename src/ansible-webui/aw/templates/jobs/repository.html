@@ -9,6 +9,7 @@
             <th>Name</th>
             <th>Type</th>
             <th>Path/Origin</th>
+            <th>Status</th>
             <th>Actions</th>
         </tr>
         <tr>
@@ -25,6 +26,7 @@
             <td></td>
             <td></td>
             <td></td>
+            <td class="aw-responsive-med"></td>
             <td></td>
         </tr>
     </table>
@@ -32,6 +34,14 @@
         <a href="/ui/jobs/repository/${ID}">
             <button class="btn btn-warning aw-btn-action" title="Edit">
                 {% include "../button/icon/edit.html" %}
+            </button>
+        </a>
+        <button class="btn btn-success aw-btn-action aw-api-click" title="Download/Update" aw-api-endpoint="repository" aw-api-item="${ID}" aw-api-method="post">
+            {% include "../button/icon/download.html" %}
+        </button>
+        <a href="/ui/jobs/log">
+            <button class="btn btn-info aw-btn-action" title="Logs">
+                <i class="fa-solid fa-scroll fa-2x aw-btn-action-icon"></i>
             </button>
         </a>
         <button class="btn btn-danger aw-btn-action aw-api-click" title="Delete" aw-api-endpoint="repository" aw-api-item="${ID}" aw-api-method="delete">
