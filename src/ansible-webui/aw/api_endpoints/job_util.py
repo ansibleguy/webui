@@ -44,6 +44,7 @@ def get_job_execution_serialized(execution: JobExecution) -> dict:
         'user': execution.user.id if execution.user is not None else None,
         'user_name': execution.user.username if execution.user is not None else 'Scheduled',
         'command': execution.command,
+        'command_repository': execution.command_repository,
         'status': execution.status,
         'status_name': CHOICES_JOB_EXEC_STATUS[execution.status][1],
         'time_start': datetime_from_db_str(execution.created),

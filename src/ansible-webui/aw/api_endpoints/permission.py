@@ -10,7 +10,7 @@ from aw.model.job_credential import JobGlobalCredentials
 from aw.model.job_permission import JobPermission, JobPermissionMapping, JobPermissionMemberUser, \
     JobPermissionMemberGroup, JobCredentialsPermissionMapping
 from aw.api_endpoints.base import API_PERMISSION, GenericResponse, get_api_user
-from aw.utils.permission import get_permission_name
+from aw.utils.permission import has_manager_privileges
 from aw.utils.util import is_set
 from aw.base import USERS, GROUPS
 
@@ -158,7 +158,7 @@ def build_permissions(perm_id_filter: int = None) -> (list, dict):
             'id': permission.id,
             'name': permission.name,
             'permission': permission.permission,
-            'permission_name': get_permission_name(permission.permission),
+            'permission_name': permission.permission_name,
             'jobs': permission_jobs_id[permission.id],
             'credentials': permission_credentials_id[permission.id],
             'users': permission_users_id[permission.id],
@@ -177,11 +177,6 @@ def build_permissions(perm_id_filter: int = None) -> (list, dict):
         return {}
 
     return permissions
-
-
-def has_permission_privileges(user: USERS) -> bool:
-    # todo: create explicit privilege
-    return user.is_staff
 
 
 def permission_in_use(permission: JobPermission) -> bool:
@@ -217,7 +212,7 @@ class APIPermission(GenericAPIView):
         operation_id='permission_create',
     )
     def post(self, request):
-        privileged = has_permission_privileges(get_api_user(request))
+        privileged = has_manager_privileges(get_api_user(request))
         if not privileged:
             return Response(
                 data={'msg': 'Not privileged to manage permissions'},
@@ -272,7 +267,7 @@ class APIPermissionItem(GenericAPIView):
         operation_id='permission_edit',
     )
     def put(self, request, perm_id: int):
-        privileged = has_permission_privileges(get_api_user(request))
+        privileged = has_manager_privileges(get_api_user(request))
         if not privileged:
             return Response(
                 data={'msg': 'Not privileged to manage permissions'},
@@ -318,7 +313,7 @@ class APIPermissionItem(GenericAPIView):
         operation_id='permission_delete'
     )
     def delete(self, request, perm_id: int):
-        privileged = has_permission_privileges(get_api_user(request))
+        privileged = has_manager_privileges(get_api_user(request))
         if not privileged:
             return Response(
                 data={'msg': 'Not privileged to manage permissions'},

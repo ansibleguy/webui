@@ -7,7 +7,7 @@ from django.db.utils import IntegrityError, OperationalError
 from django.core.exceptions import ImproperlyConfigured, AppRegistryNotReady
 
 from aw.config.environment import get_aw_env_var, get_aw_env_var_or_default
-from aw.utils.util_no_config import set_timezone
+from aw.utils.util_no_config import set_timezone, is_set
 from aw.config.defaults import CONFIG_DEFAULTS
 
 
@@ -35,7 +35,7 @@ class Config:
     @staticmethod
     def _from_env_or_db(setting: str) -> any:
         env_var_value = get_aw_env_var(setting)
-        if env_var_value is not None:
+        if is_set(env_var_value):
             return env_var_value
 
         try:
@@ -77,7 +77,7 @@ class Config:
         return str(val).lower() in ['1', 'true', 'y', 'yes']
 
 
-def init_globals():
+def init_config():
     environ.setdefault('DJANGO_SETTINGS_MODULE', 'aw.settings')
     environ['PYTHONIOENCODING'] = 'utf8'
     environ['PYTHONUNBUFFERED'] = '1'

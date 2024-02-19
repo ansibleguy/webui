@@ -1,22 +1,22 @@
 from django.db import models
 
 from aw.model.base import BareModel, BaseModel
-from aw.utils.util import get_choice_by_value
 from aw.model.job import Job
 from aw.model.job_credential import JobGlobalCredentials
 from aw.base import USERS, GROUPS
+from aw.utils.util import get_choice_value_by_key
 
 CHOICE_PERMISSION_READ = 5
 CHOICE_PERMISSION_EXECUTE = 10
 CHOICE_PERMISSION_WRITE = 15
 CHOICE_PERMISSION_FULL = 20
-CHOICES_PERMISSION = (
+CHOICES_PERMISSION = [
     (0, 'None'),
     (CHOICE_PERMISSION_READ, 'Read'),
     (CHOICE_PERMISSION_EXECUTE, 'Execute'),
     (CHOICE_PERMISSION_WRITE, 'Write'),
     (CHOICE_PERMISSION_FULL, 'Full'),
-)
+]
 
 
 class JobPermission(BaseModel):
@@ -49,9 +49,16 @@ class JobPermission(BaseModel):
         through_fields=('permission', 'credentials'),
     )
 
+    @property
+    def permission_name(self) -> str:
+        return self.permission_name_from_id(self.permission)
+
+    @staticmethod
+    def permission_name_from_id(permission) -> str:
+        return get_choice_value_by_key(choices=CHOICES_PERMISSION, find=permission)
+
     def __str__(self) -> str:
-        return (f"Permission '{self.name}' - "
-                f"{get_choice_by_value(choices=CHOICES_PERMISSION, value=self.permission)}")
+        return f"Permission '{self.name}' - {self.permission_name}"
 
     class Meta:
         constraints = [

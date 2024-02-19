@@ -55,6 +55,11 @@ def test_add_locations(location_data_list: list[dict]):
         assert _api_request_ok(loc_data['l'], 'post', loc_data['d'])
 
 
+def test_delete_locations(location_list: list):
+    for loc in location_list:
+        assert _api_request_ok(loc, 'delete')
+
+
 def test_get_locations(locations: list):
     for location in locations:
         assert _api_request_ok(location)
@@ -69,18 +74,33 @@ def test_add():
         }},
         {'l': 'key', 'd': None},
         {'l': 'permission', 'd': {'name': 'perm1', 'jobs': 1, 'credentials': 1}},
+        {'l': 'repository', 'd': {
+            'name': 'gitty1', 'rtype': 2, 'git_origin': 'https://github.com/ansibleguy/ansible-webui.git',
+            'git_branch': 'latest',
+        }},
+        {'l': 'repository', 'd': {'name': 'staticy1', 'rtype': 1, 'static_path': '/etc/ansible/repo'}},
     ])
 
 
 def test_modify():
     test_modify_locations([
         {'l': 'config', 'd': {'run_timeout': 6060}},
+        {'l': 'permission/1', 'd': {'name': 'perm1'}},
     ])
 
 
 def test_list():
     test_get_locations([
-        'credentials', 'job', 'job_exec', 'key', 'permission', 'config',
+        'credentials', 'job', 'job_exec', 'key', 'permission', 'config', 'repository',
+    ])
+
+
+def test_delete():
+    test_delete_locations([
+        'repository/2', 'repository/1',
+        'permission/1',
+        'job/1',
+        'credentials/1',
     ])
 
 
@@ -88,6 +108,7 @@ def main():
     test_add()
     test_list()
     test_modify()
+    test_delete()
 
 
 if __name__ == '__main__':

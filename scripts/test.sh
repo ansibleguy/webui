@@ -10,6 +10,14 @@ echo ''
 
 python3 -m pytest
 
+function failure() {
+  echo ''
+  echo '### FAILED ###'
+  echo ''
+  pkill -f ansible-webui
+  exit 1
+}
+
 echo ''
 echo 'INTEGRATION TESTS WEB-UI'
 echo ''
@@ -19,6 +27,7 @@ then
   echo 'An instance of Ansible-WebUI is already running! Stop it first (pkill -f ansible-webui)'
   exit 1
 fi
+
 
 echo 'Starting Ansible-WebUI..'
 export AW_ENV='dev'
@@ -32,7 +41,11 @@ python3 src/ansible-webui/ >/dev/null 2>/dev/null &
 echo ''
 sleep 5
 
-python3 test/integration/webui/main.py
+set +e
+if ! python3 test/integration/webui/main.py
+then
+  failure
+fi
 
 sleep 1
 
@@ -45,7 +58,10 @@ api_key="$(python3 src/ansible-webui/cli.py -f api-key -a create -p "$AW_ADMIN" 
 export AW_API_KEY="$api_key"
 sleep 1
 
-python3 test/integration/api/main.py
+if ! python3 test/integration/api/main.py
+then
+  failure
+fi
 
 sleep 1
 pkill -f 'ansible-webui'

@@ -17,6 +17,7 @@ from aw.execute.util import update_execution_status, overwrite_and_delete_file, 
 from aw.utils.debug import log
 from aw.execute.play_credentials import get_credentials_to_use, commandline_arguments_credentials, \
     write_pwd_file, get_pwd_file
+from aw.execute.repository import get_project_dir, cleanup_repository
 
 # see: https://ansible.readthedocs.io/projects/runner/en/latest/intro/
 
@@ -98,6 +99,7 @@ def _runner_options(job: Job, execution: JobExecution, path_run: Path) -> dict:
     cmdline_args = _commandline_arguments(job=job, execution=execution, path_run=path_run)
 
     opts = {
+        'project_dir': get_project_dir(job=job, execution=execution),
         'private_data_dir': path_run,
         'limit': _execution_or_job(job, execution, 'limit'),
         'tags': _execution_or_job(job, execution, 'tags'),
@@ -118,16 +120,12 @@ def runner_prep(job: Job, execution: JobExecution, path_run: Path) -> dict:
     opts['inventory'] = job.inventory_file.split(',')
 
     # https://docs.ansible.com/ansible/2.8/user_guide/playbooks_best_practices.html#directory-layout
-    project_dir = config['path_play']
-    if not project_dir.endswith('/'):
-        project_dir += '/'
-
-    ppf = project_dir + opts['playbook']
+    ppf = Path(opts['project_dir']) / opts['playbook']
     if not Path(ppf).is_file():
         config_error(f"Configured playbook not found: '{ppf}'")
 
     for inventory in opts['inventory']:
-        pi = project_dir + inventory
+        pi = Path(opts['project_dir']) / inventory
         if not Path(pi).exists():
             config_error(f"Configured inventory not found: '{pi}'")
 
@@ -161,10 +159,17 @@ def runner_logs(cfg: RunnerConfig, log_files: dict):
             symlink(log_files[log_type], logs_src[log_type])
 
 
-def runner_cleanup(path_run: Path):
+def runner_cleanup(job: Job, execution: JobExecution, path_run: Path):
     overwrite_and_delete_file(f"{path_run}/env/passwords")
+    overwrite_and_delete_file(f"{path_run}/env/ssh_key")
     for attr in BaseJobCredentials.SECRET_ATTRS:
         overwrite_and_delete_file(get_pwd_file(path_run=path_run, attr=attr))
+
+    try:
+        cleanup_repository(job=job, execution=execution, path_run=path_run)
+
+    except AttributeError as err:
+        log(msg=f'Got error of repository cleanup: {err}')
 
     rmtree(path_run, ignore_errors=True)
 
@@ -180,10 +185,19 @@ def job_logs(job: Job, execution: JobExecution) -> dict:
     timestamp = datetime_w_tz().strftime(FILE_TIME_FORMAT)
     log_file = f"{config['path_log']}/{safe_job_name}_{timestamp}_{safe_user_name}"
 
-    return {
+    log_files = {
         'stdout': f'{log_file}_stdout.log',
         'stderr': f'{log_file}_stderr.log',
+        'stdout_repo': f'{log_file}_stdout_repo.log',
+        'stderr_repo': f'{log_file}_stderr_repo.log',
     }
+
+    execution.log_stdout = log_files['stdout']
+    execution.log_stderr = log_files['stderr']
+    execution.log_stdout_repo = log_files['stdout_repo']
+    execution.log_stderr_repo = log_files['stderr_repo']
+
+    return log_files
 
 
 def _run_stats(runner: Runner, result: JobExecutionResult) -> bool:
@@ -233,7 +247,7 @@ def parse_run_result(execution: JobExecution, result: JobExecutionResult, runner
 
 
 def failure(
-        execution: JobExecution, path_run: Path,
+        job: Job, execution: JobExecution, path_run: Path,
         result: JobExecutionResult, error_s: str, error_m: str
 ):
     update_execution_status(execution, status='Failed')
@@ -248,4 +262,4 @@ def failure(
     result.save()
 
     execution.save()
-    runner_cleanup(path_run)
+    runner_cleanup(job=job, execution=execution, path_run=path_run)

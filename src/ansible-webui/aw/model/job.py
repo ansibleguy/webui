@@ -7,6 +7,8 @@ from aw.model.base import BareModel, BaseModel, CHOICES_BOOL, DEFAULT_NONE
 from aw.config.hardcoded import SHORT_TIME_FORMAT
 from aw.model.job_credential import JobGlobalCredentials, JobUserCredentials
 from aw.base import USERS
+from aw.model.repository import Repository
+from aw.utils.util import get_choice_key_by_value, get_choice_value_by_key
 
 
 class JobError(BareModel):
@@ -71,8 +73,8 @@ def validate_cronjob(value):
 
 class Job(BaseJob):
     CHANGE_FIELDS = [
-        'name', 'inventory_file', 'playbook_file', 'schedule', 'enabled', 'limit', 'verbosity', 'mode_diff',
-        'mode_check', 'tags', 'tags_skip', 'verbosity', 'comment', 'environment_vars', 'cmd_args',
+        'name', 'inventory_file', 'playbook_file', 'repository', 'schedule', 'enabled', 'limit', 'verbosity',
+        'mode_diff', 'mode_check', 'tags', 'tags_skip', 'verbosity', 'comment', 'environment_vars', 'cmd_args',
         'credentials_default', 'credentials_needed',
     ]
     form_fields = CHANGE_FIELDS
@@ -92,6 +94,7 @@ class Job(BaseJob):
     credentials_default = models.ForeignKey(
         JobGlobalCredentials, on_delete=models.SET_NULL, related_name='job_fk_creddflt', null=True, blank=True,
     )
+    repository = models.ForeignKey(Repository, on_delete=models.SET_NULL, related_name='job_fk_repo', **DEFAULT_NONE)
 
     def __str__(self) -> str:
         limit = '' if self.limit is None else f' [{self.limit}]'
@@ -165,7 +168,7 @@ class JobExecution(BaseJob):
     api_fields_read = [
         'id', 'job', 'job_name', 'user', 'user_name', 'result', 'status', 'status_name', 'time_start', 'time_fin',
         'failed', 'error_s', 'error_m', 'log_stdout', 'log_stdout_url', 'log_stderr', 'log_stderr_url', 'job_comment',
-        'credential_global', 'credential_user',
+        'credential_global', 'credential_user', 'command', 'command_repository', 'log_stdout_repo', 'log_stderr_repo',
     ]
 
     # NOTE: scheduled execution will have no user
@@ -184,7 +187,10 @@ class JobExecution(BaseJob):
     )
     log_stdout = models.CharField(max_length=300, **DEFAULT_NONE)
     log_stderr = models.CharField(max_length=300, **DEFAULT_NONE)
+    log_stdout_repo = models.CharField(max_length=300, **DEFAULT_NONE)
+    log_stderr_repo = models.CharField(max_length=300, **DEFAULT_NONE)
     command = models.CharField(max_length=1000, **DEFAULT_NONE)
+    command_repository = models.CharField(max_length=1000, **DEFAULT_NONE)
 
     credential_global = models.ForeignKey(
         JobGlobalCredentials, on_delete=models.SET_NULL, related_name='jobexec_fk_credglob', null=True,
@@ -194,13 +200,24 @@ class JobExecution(BaseJob):
     )
 
     def __str__(self) -> str:
-        status_name = CHOICES_JOB_EXEC_STATUS[int(self.status)][1]
         executor = 'scheduled'
         if self.user is not None:
             executor = self.user.username
 
         timestamp = self.created.strftime(SHORT_TIME_FORMAT)
-        return f"Job '{self.job.name}' execution @ {timestamp} by '{executor}': {status_name}"
+        return f"Job '{self.job.name}' execution @ {timestamp} by '{executor}': {self.status_name}"
+
+    @property
+    def status_name(self) -> str:
+        return self.status_name_from_id(self.status)
+
+    @staticmethod
+    def status_name_from_id(rtype) -> str:
+        return get_choice_value_by_key(choices=CHOICES_JOB_EXEC_STATUS, find=rtype)
+
+    @staticmethod
+    def status_id_from_name(name: str) -> int:
+        return get_choice_key_by_value(choices=CHOICES_JOB_EXEC_STATUS, find=name)
 
 
 class JobQueue(BareModel):

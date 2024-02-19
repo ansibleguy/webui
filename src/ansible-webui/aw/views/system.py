@@ -135,6 +135,7 @@ def system_environment(request) -> HttpResponse:
         request, status=200, template_name='system/environment.html',
         context={
             'env_linux': process(['uname', '-a'])['stdout'],
+            'env_git': process(['git', '--version'])['stdout'],
             'env_ansible_core': ansible_version['ansible_core'],
             'env_ansible_runner': ansible_version['ansible_runner'],
             'env_django': python_modules['django']['version'],

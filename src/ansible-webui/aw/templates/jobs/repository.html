@@ -1,0 +1,42 @@
+{% extends "../body.html" %}
+{% load util %}
+{% load static %}
+{% block content %}
+<script src="{% static 'js/jobs/repository.js' %}"></script>
+<div class="table-responsive aw-data">
+    <table class="table table-striped aw-text-responsive" id="aw-api-data-table">
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Path/Origin</th>
+            <th>Actions</th>
+        </tr>
+        <tr>
+            <td colspan="100%">
+                {% include "../button/refresh.html" %}
+                <a href="/ui/jobs/repository/0">
+                    <button class="btn btn-success aw-btn-action" title="Add">
+                        {% include "../button/icon/add.html" %}
+                    </button>
+                </a>
+            </td>
+        </tr>
+        <tr id="aw-api-data-tmpl-row" hidden="hidden">
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+    </table>
+    <div id="aw-api-data-tmpl-actions" hidden="hidden">
+        <a href="/ui/jobs/repository/${ID}">
+            <button class="btn btn-warning aw-btn-action" title="Edit">
+                {% include "../button/icon/edit.html" %}
+            </button>
+        </a>
+        <button class="btn btn-danger aw-btn-action aw-api-click" title="Delete" aw-api-endpoint="repository" aw-api-item="${ID}" aw-api-method="delete">
+            {% include "../button/icon/delete.html" %}
+        </button>
+    </div>
+</div>
+{% endblock %}

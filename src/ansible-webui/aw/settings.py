@@ -6,8 +6,8 @@ try:
 
 except ImportError:
     # pylint-django
-    from aw.config.main import init_globals
-    init_globals()
+    from aw.config.main import init_config
+    init_config()
     from aw.config.main import config, VERSION
 
 

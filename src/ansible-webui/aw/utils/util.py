@@ -40,14 +40,6 @@ def datetime_from_db_str(dt: (datetime, None), fmt: str = SHORT_TIME_FORMAT) -> 
     return dt.strftime(fmt)
 
 
-def get_choice_key_by_value(choices: list[tuple], value):
-    for k, v in choices:
-        if v == value:
-            return k
-
-    return None
-
-
 def get_next_cron_execution_sec(schedule: str) -> float:
     cron = CronTab(schedule)
     set_timezone(str(config.timezone))
@@ -119,10 +111,17 @@ def timed_lru_cache(seconds: int, maxsize: int = 128):
     return wrapper_cache
 
 
-def get_choice_by_value(choices: (tuple, list), value: any) -> (any, None):
-    # tuple[tuple[int, any]]
-    for choice in choices:
-        if choice[0] == value:
-            return choice[1]
+def get_choice_value_by_key(choices: list[tuple], find: any) -> (any, None):
+    for k, v in choices:
+        if k == find:
+            return v
+
+    return None
+
+
+def get_choice_key_by_value(choices: list[tuple], find: any):
+    for k, v in choices:
+        if v == find:
+            return k
 
     return None

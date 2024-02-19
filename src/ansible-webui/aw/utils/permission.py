@@ -1,8 +1,7 @@
 from aw.model.job import Job
 from aw.model.job_permission import JobPermissionMapping, JobPermissionMemberUser, JobPermissionMemberGroup, \
-    CHOICE_PERMISSION_READ, CHOICES_PERMISSION, JobCredentialsPermissionMapping
+    CHOICE_PERMISSION_READ, JobCredentialsPermissionMapping
 from aw.model.job_credential import BaseJobCredentials, JobGlobalCredentials, JobUserCredentials
-from aw.utils.util import get_choice_by_value
 from aw.base import USERS
 
 
@@ -86,5 +85,6 @@ def get_viewable_credentials(user: USERS) -> list[BaseJobCredentials]:
     return credentials_viewable
 
 
-def get_permission_name(perm: int) -> str:
-    return get_choice_by_value(choices=CHOICES_PERMISSION, value=perm)
+def has_manager_privileges(user: USERS) -> bool:
+    # todo: create explicit privilege
+    return user.is_staff

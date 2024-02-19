@@ -4,9 +4,9 @@ from sys import exit as sys_exit
 
 from django import setup as django_setup
 
-from aw.config.main import init_globals
+from aw.config.main import init_config
 
-init_globals()
+init_config()
 
 # pylint: disable=C0413,C0415
 from aw.config.main import config

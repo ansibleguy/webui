@@ -2,6 +2,13 @@
 
 ## Version 0
 
+### 0.0.10
+
+**Features:**
+
+* Git Repository support - `Jobs - Repositories` UI
+
+
 ### 0.0.9
 
 **Features:**

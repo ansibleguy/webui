@@ -7,9 +7,9 @@ from django.db.utils import IntegrityError
 from aw.config.main import config
 from aw.model.system import SystemConfig, get_config_from_db
 from aw.api_endpoints.base import API_PERMISSION, get_api_user, GenericResponse, BaseResponse
-from aw.base import USERS
 from aw.utils.util_no_config import is_set
 from aw.utils.debug import log
+from aw.utils.permission import has_manager_privileges
 
 
 class SystemConfigReadResponse(BaseResponse):
@@ -35,11 +35,6 @@ class SystemConfigWriteRequest(serializers.ModelSerializer):
     class Meta:
         model = SystemConfig
         fields = SystemConfig.api_fields_write
-
-
-def has_permission_config(user: USERS) -> bool:
-    # todo: create explicit privilege
-    return user.is_staff
 
 
 class APISystemConfig(APIView):
@@ -76,7 +71,7 @@ class APISystemConfig(APIView):
         operation_id='system_config_edit',
     )
     def put(self, request):
-        privileged = has_permission_config(get_api_user(request))
+        privileged = has_manager_privileges(get_api_user(request))
         if not privileged:
             return Response(
                 data={'msg': 'Not privileged to manage system config'},

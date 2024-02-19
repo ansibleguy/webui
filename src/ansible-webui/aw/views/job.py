@@ -10,12 +10,13 @@ from aw.utils.http import ui_endpoint_wrapper, ui_endpoint_wrapper_kwargs
 from aw.model.job import Job, JobExecution, JobExecutionResultHost
 from aw.model.job_permission import CHOICE_PERMISSION_WRITE
 from aw.model.job_credential import JobGlobalCredentials, JobUserCredentials
+from aw.model.repository import Repository
 from aw.api_endpoints.job_util import get_viewable_jobs
 from aw.api_endpoints.credentials import are_global_credentials
 from aw.utils.permission import has_job_permission, has_credentials_permission
 from aw.config.form_metadata import FORM_LABEL, FORM_HELP
 from aw.utils.util import get_next_cron_execution_str
-from aw.views.base import choices_global_credentials
+from aw.views.base import choices_global_credentials, choices_repositories
 
 LIMIT_JOB_RESULTS = 10
 LIMIT_JOB_LOG_RESULTS = 50
@@ -70,6 +71,13 @@ class JobForm(forms.ModelForm):
         widget=forms.Select,
         choices=choices_global_credentials,
         label=FORM_LABEL['jobs']['manage']['credentials_default'],
+    )
+
+    repository = forms.ChoiceField(
+        required=False,
+        widget=forms.Select,
+        choices=choices_repositories,
+        label=FORM_LABEL['jobs']['manage']['repository'],
     )
 
     # form not picking up regex-validator
@@ -213,11 +221,61 @@ def job_credentials_edit(request, credentials_id: int = None) -> HttpResponse:
     )
 
 
+class RepositoryForm(forms.ModelForm):
+    class Meta:
+        model = Repository
+        fields = Repository.form_fields
+        field_order = Repository.form_fields
+        labels = FORM_LABEL['jobs']['repository']
+        help_texts = FORM_HELP['jobs']['repository']
+
+
+@login_required
+@ui_endpoint_wrapper_kwargs
+def job_repository(request) -> HttpResponse:
+    return render(request, status=200, template_name='jobs/repository.html', context={'show_update_time': True})
+
+
+@login_required
+@ui_endpoint_wrapper_kwargs
+def job_repository_edit(request, repo_id: int = None) -> HttpResponse:
+    form_method = 'post'
+    form_api = 'repository'
+    repository = {}
+
+    if repo_id is not None and repo_id != 0:
+        # pylint: disable=R0801
+        try:
+            repository = Repository.objects.get(id=repo_id)
+
+        except ObjectDoesNotExist:
+            repository = None
+
+        if repository is None:
+            return redirect(f"/ui/jobs/repository?error=Repository with ID {repo_id} do not exist")
+
+        repository = repository.__dict__
+        form_method = 'put'
+        form_api += f'/{repo_id}'
+
+    repository_form = RepositoryForm()
+    repository_form_html = repository_form.render(
+        template_name='forms/snippet.html',
+        context={'form': repository_form, 'existing': repository},
+    )
+    return render(
+        request, status=200, template_name='jobs/repository_edit.html',
+        context={'form': repository_form_html, 'form_api': form_api, 'form_method': form_method}
+    )
+
+
 urlpatterns_jobs = [
     path('ui/jobs/credentials/<int:credentials_id>', job_credentials_edit),
     path('ui/jobs/credentials', job_credentials),
     path('ui/jobs/log', job_logs),
     path('ui/jobs/manage/job/<int:job_id>', job_edit),
     path('ui/jobs/manage/job', job_edit),
+    path('ui/jobs/repository/<int:repo_id>', job_repository_edit),
+    path('ui/jobs/repository', job_repository),
     path('ui/jobs/manage', manage),
 ]

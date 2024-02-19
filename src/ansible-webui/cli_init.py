@@ -12,13 +12,13 @@ def init_cli():
 
     # pylint: disable=E0401,C0415
     try:
-        from aw.config.main import init_globals
+        from aw.config.main import init_config
 
     except ModuleNotFoundError:
         sys_path.append(os_path.dirname(os_path.abspath(__file__)))
-        from aw.config.main import init_globals
+        from aw.config.main import init_config
 
-    init_globals()
+    init_config()
     from aw.utils.debug import warn_if_development
     warn_if_development()
 

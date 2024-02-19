@@ -65,7 +65,7 @@ See also: [Contributing](https://github.com/ansibleguy/ansible-webui/blob/latest
 
   - [x] Static Playbook-Directory
 
-  - [ ] Git Repository support
+  - [x] Git Repository support
 
 - [ ] Users
 

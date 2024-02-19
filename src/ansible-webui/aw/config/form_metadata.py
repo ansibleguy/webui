@@ -3,6 +3,7 @@ from aw.config.main import config
 FORM_LABEL = {
     'jobs': {
         'manage': {
+            'repository': 'Repository/Playbook-Base',
             'environment_vars': 'Environmental Variables',
             'mode_diff': 'Diff Mode',
             'mode_check': 'Check Mode (Try Run)',
@@ -22,6 +23,21 @@ FORM_LABEL = {
             'vault_pass': 'Vault Password',
             'vault_id': 'Vault ID',
             'ssh_key': 'SSH Private Key',
+        },
+        'repository': {
+            'rtype': 'Repository Type',
+            'static_path': 'Static Repository Path',
+            'git_origin': 'Git Origin',
+            'git_branch': 'Git Branch',
+            'git_credentials': 'Git Credentials',
+            'git_limit_depth': 'Git Limit Depth',
+            'git_lfs': 'Git LFS',
+            'git_playbook_base': 'Git Playbook Base-Directory',
+            'git_isolate': 'Git Isolate Directory',
+            'git_hook_pre': 'Git Pre-Hook',
+            'git_hook_post': 'Git Post-Hook',
+            'git_override_initialize': 'Git Override Initialize-Command',
+            'git_override_update': 'Git Override Update-Command',
         },
     },
     'settings': {
@@ -52,11 +68,14 @@ FORM_HELP = {
     'jobs': {
         'manage': {
             'playbook_file': f"Playbook to execute. Search path: '{config['path_play']}'",
+            # todo: change search-path with repository
             'inventory_file': 'One or multiple inventory files/directories to include for the execution. '
                               'Comma-separated list. For details see: '
                               '<a href="https://docs.ansible.com/ansible/latest/inventory_guide/'
                               'intro_inventory.html">'
                               'Ansible Docs - Inventory</a>',
+            'repository': 'Used to define the static or dynamic source of your playbook directory structure. '
+                          f"Default is '{config['path_play']}'",
             'limit': 'Ansible inventory hosts or groups to limit the execution to.'
                      'For details see: '
                      '<a href="https://docs.ansible.com/ansible/latest/inventory_guide/intro_patterns.html">'
@@ -85,6 +104,26 @@ FORM_HELP = {
                         'vault_managing_passwords.html">'
                         'Ansible Docs - Managing Passwords</a>',
             'ssh_key': 'Provide an unencrypted SSH private key',
+        },
+        'repository': {
+            'static_path': 'Path to the local static repository/playbook-base-directory',
+            'git_origin': "Full URL to the remote repository. "
+                          "Per example: 'https://github.com/ansibleguy/ansible-webui.git'",
+            'git_credentials': "Credentials for connecting to the origin. "
+                               "'Connect User', 'Connect Password' and 'SSH Private Key' are used",
+            'git_playbook_base': 'Relative path to the Playbook base-directory relative from the repository root',
+            'git_lfs': 'En- or disable checkout of Git-LFS files',
+            'git_isolate': 'En- or disable if one clone of the Git-repository should be used for all jobs. '
+                           'If enabled - the repository will be cloned/fetched on every job execution. '
+                           'This will have a negative impact on performance',
+            'git_hook_pre': 'Commands to execute before initializing/updating the repository. '
+                            'Comma-separated list of shell-commands',
+            'git_hook_post': 'Commands to execute after initializing/updating the repository. '
+                             'Comma-separated list of shell-commands',
+            'git_override_initialize': 'Advanced usage! Completely override the command used to initialize '
+                                       '(clone) the repository',
+            'git_override_update': 'Advanced usage! Completely override the command used to update '
+                                   '(pull) the repository',
         },
     },
     'settings': {

@@ -6,9 +6,9 @@ from os import remove as remove_file
 
 from aw.config.main import config
 from aw.config.hardcoded import FILE_TIME_FORMAT
-from aw.utils.util import get_choice_key_by_value, write_file_0600
+from aw.utils.util import write_file_0600
 from aw.utils.handlers import AnsibleConfigError
-from aw.model.job import JobExecution, CHOICES_JOB_EXEC_STATUS
+from aw.model.job import JobExecution
 
 
 def config_error(msg: str):
@@ -49,13 +49,13 @@ def decode_job_env_vars(env_vars_csv: str, src: str) -> dict:
 
 
 def update_execution_status(execution: JobExecution, status: str):
-    execution.status = get_choice_key_by_value(choices=CHOICES_JOB_EXEC_STATUS, value=status)
+    execution.status = execution.status_id_from_name(status)
     execution.save()
 
 
 def is_execution_status(execution: JobExecution, status: str) -> bool:
     is_status = JobExecution.objects.get(id=execution.id).status
-    check_status = get_choice_key_by_value(choices=CHOICES_JOB_EXEC_STATUS, value=status)
+    check_status = execution.status_id_from_name(status)
     return is_status == check_status
 
 

@@ -9,7 +9,7 @@ from aw.utils.debug import log
 from aw.config.hardcoded import THREAD_JOIN_TIMEOUT
 from aw.model.job import Job, JobExecution
 from aw.execute.play import ansible_playbook
-from aw.utils.handlers import AnsibleConfigError
+from aw.utils.handlers import AnsibleConfigError, AnsibleRepositoryError
 from aw.utils.util import get_next_cron_execution_sec, get_next_cron_execution_str, is_set
 
 
@@ -98,7 +98,7 @@ class Workload(Thread):
                     self.run_playbook()
                     break
 
-        except (AnsibleConfigError, OSError) as err:
+        except (AnsibleConfigError, AnsibleRepositoryError, OSError) as err:
             self.config_invalid += 1
             log(
                 msg=f"Got invalid config/environment for job {self.log_name} "

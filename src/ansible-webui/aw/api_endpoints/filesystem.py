@@ -21,7 +21,7 @@ class APIFsBrowse(APIView):
     http_method_names = ['get']
     serializer_class = FileSystemReadResponse
     permission_classes = API_PERMISSION
-    BROWSE_SELECTORS = {
+    BROWSE_SELECTORS = {  # todo: switch with repository
         'playbook_file': config['path_play'],
         'inventory_file': config['path_play'],
     }
