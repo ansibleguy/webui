@@ -6,6 +6,7 @@ from django.core.validators import RegexValidator
 
 from aw.model.job_credential import BaseJobCredentials
 from aw.utils.util import is_set
+from aw.views.validation import AW_VALIDATIONS
 
 register = template.Library()
 
@@ -129,7 +130,7 @@ def get_form_field_input(bf: BoundField, existing: dict) -> str:
     if bf.name.find('_pass') != -1 or bf.name.find('_key') != -1:
         field_attrs += ' type="password"'
 
-    elif bf.name.find('_file') != -1:
+    elif bf.name in AW_VALIDATIONS['file_system_browse']:
         field_classes += ' aw-fs-browse'
         field_attrs += f' type="text" aw-fs-type="files" aw-fs-choices="aw-fs-choices-{bf.name}"'
         if value is None:
@@ -140,7 +141,7 @@ def get_form_field_input(bf: BoundField, existing: dict) -> str:
 
         search_choices = f'<ul class="aw-fs-choices" id="aw-fs-choices-{bf.name}"></ul>'
 
-    elif bf.name.find('path_') != -1 or bf.name.find('_path') != -1:
+    elif bf.name in AW_VALIDATIONS['file_system_exists']:
         field_classes += ' aw-fs-exists'
         field_attrs += ' type="text"'
 

@@ -4,24 +4,21 @@ function updateApiTableDataPermission(row, entry) {
     row.cells[1].innerText = entry.permission_name;
     if (entry.jobs_all) {
         row.cells[2].innerText = 'All';
-    }
-    else if (entry.jobs_name.length == 0) {
+    } else if (entry.jobs_name.length == 0) {
         row.cells[2].innerText = '-';
     } else {
         row.cells[2].innerText = entry.jobs_name.join(', ');
     }
     if (entry.credentials_all) {
         row.cells[3].innerText = 'All';
-    }
-    if (entry.credentials_name.length == 0) {
+    } else if (entry.credentials_name.length == 0) {
         row.cells[3].innerText = '-';
     } else {
         row.cells[3].innerText = entry.credentials_name.join(', ');
     }
     if (entry.repositories_all) {
         row.cells[4].innerText = 'All';
-    }
-    if (entry.repositories_name.length == 0) {
+    } else if (entry.repositories_name.length == 0) {
         row.cells[4].innerText = '-';
     } else {
         row.cells[4].innerText = entry.repositories_name.join(', ');

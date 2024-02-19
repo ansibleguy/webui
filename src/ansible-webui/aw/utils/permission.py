@@ -4,6 +4,7 @@ from aw.model.permission import JobPermissionMapping, JobPermissionMemberUser, J
 from aw.model.job_credential import BaseJobCredentials, JobGlobalCredentials
 from aw.model.repository import Repository
 from aw.base import USERS
+from aw.utils.debug import log
 
 
 def get_job_if_allowed(user: USERS, job: Job, permission_needed: int) -> (Job, None):
@@ -48,11 +49,19 @@ def _has_permission(
     # 'all' permissions
     for permission in JobPermission.objects.filter(**{permission_attr_all: True}):
         if _evaluate_permission(permission=permission, user=user, permission_needed=permission_needed):
+            log(
+                msg=f"User '{user}' privileged ({permission_needed}) through permission {permission.name}",
+                level=7,
+            )
             return True
 
     # lined permissions
     for link in permission_links:
         if _evaluate_permission(permission=link.permission, user=user, permission_needed=permission_needed):
+            log(
+                msg=f"User '{user}' privileged ({permission_needed}) through permission {link.permission.name}",
+                level=7,
+            )
             return True
 
     return False

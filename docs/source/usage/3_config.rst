@@ -23,7 +23,7 @@ Getting Started
 You have to:
 
 * Set the :code:`AW_SECRET` environmental variable with a length of at least 30 characters!
-* Set the :code:`AW_PATH_PLAY` to your Playbook base-directory (env or via WebUI)
+* Create :ref:`a Repository <usage_repositories>` or just set the :code:`AW_PATH_PLAY` to your Playbook base-directory (env or via WebUI)
 
 ----
 

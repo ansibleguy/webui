@@ -7,6 +7,9 @@
 **Features:**
 
 * Git Repository support - `Jobs - Repositories` UI
+* Form-Validation enhancements
+  * Checking if provided file/directory exists
+  * Enhanced job-file file-browsing
 
 
 ### 0.0.9
