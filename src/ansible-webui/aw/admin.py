@@ -3,7 +3,7 @@ from rest_framework_api_key.admin import APIKey
 
 from aw.model.api import AwAPIKey
 from aw.model.job import Job, JobExecution, JobExecutionResult, JobError, JobExecutionResultHost
-from aw.model.job_permission import JobPermission, JobPermissionMemberUser, JobPermissionMemberGroup, \
+from aw.model.permission import JobPermission, JobPermissionMemberUser, JobPermissionMemberGroup, \
     JobPermissionMapping
 from aw.model.job_credential import JobGlobalCredentials, JobUserCredentials
 

@@ -7,7 +7,7 @@ from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiParamet
 
 from aw.model.job import Job, JobExecution
 from aw.model.job_credential import BaseJobCredentials, JobUserCredentials, JobGlobalCredentials
-from aw.model.job_permission import CHOICE_PERMISSION_READ, CHOICE_PERMISSION_WRITE, CHOICE_PERMISSION_FULL
+from aw.model.permission import CHOICE_PERMISSION_READ, CHOICE_PERMISSION_WRITE, CHOICE_PERMISSION_FULL
 from aw.api_endpoints.base import API_PERMISSION, get_api_user, GenericResponse, BaseResponse
 from aw.utils.permission import has_credentials_permission
 from aw.utils.util import is_null

@@ -8,7 +8,7 @@ from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiParamet
 
 from aw.config.hardcoded import JOB_EXECUTION_LIMIT
 from aw.model.job import Job, JobExecution
-from aw.model.job_permission import CHOICE_PERMISSION_READ, CHOICE_PERMISSION_EXECUTE, \
+from aw.model.permission import CHOICE_PERMISSION_READ, CHOICE_PERMISSION_EXECUTE, \
     CHOICE_PERMISSION_WRITE, CHOICE_PERMISSION_FULL
 from aw.model.job_credential import JobGlobalCredentials
 from aw.api_endpoints.base import API_PERMISSION, get_api_user, BaseResponse, GenericResponse

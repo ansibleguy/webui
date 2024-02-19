@@ -1,8 +1,9 @@
 from django.db import models
 
-from aw.model.base import BareModel, BaseModel
+from aw.model.base import BareModel, BaseModel, CHOICES_BOOL
 from aw.model.job import Job
 from aw.model.job_credential import JobGlobalCredentials
+from aw.model.repository import Repository
 from aw.base import USERS, GROUPS
 from aw.utils.util import get_choice_value_by_key
 
@@ -20,7 +21,10 @@ CHOICES_PERMISSION = [
 
 
 class JobPermission(BaseModel):
-    form_fields = ['name', 'permission', 'jobs', 'credentials', 'users', 'groups']
+    form_fields = [
+        'name', 'permission', 'users', 'groups', 'jobs', 'jobs_all', 'credentials', 'credentials_all',
+        'repositories', 'repositories_all',
+    ]
     api_fields_write = form_fields
     api_fields_read = ['permission_name', 'jobs_name', 'credentials_name', 'users_name', 'groups_name']
     api_fields_read.extend(form_fields)
@@ -43,11 +47,19 @@ class JobPermission(BaseModel):
         through='JobPermissionMapping',
         through_fields=('permission', 'job'),
     )
+    jobs_all = models.BooleanField(choices=CHOICES_BOOL, default=False)
     credentials = models.ManyToManyField(
         JobGlobalCredentials,
         through='JobCredentialsPermissionMapping',
         through_fields=('permission', 'credentials'),
     )
+    credentials_all = models.BooleanField(choices=CHOICES_BOOL, default=False)
+    repositories = models.ManyToManyField(
+        Repository,
+        through='JobRepositoryPermissionMapping',
+        through_fields=('permission', 'repository'),
+    )
+    repositories_all = models.BooleanField(choices=CHOICES_BOOL, default=False)
 
     @property
     def permission_name(self) -> str:
@@ -89,6 +101,19 @@ class JobCredentialsPermissionMapping(BareModel):
     class Meta:
         constraints = [
             models.UniqueConstraint(fields=['credentials', 'permission'], name='jobcredpermmap_unique')
+        ]
+
+
+class JobRepositoryPermissionMapping(BareModel):
+    repository = models.ForeignKey(Repository, on_delete=models.CASCADE)
+    permission = models.ForeignKey(JobPermission, on_delete=models.CASCADE)
+
+    def __str__(self) -> str:
+        return f"Permission '{self.permission.name}' linked to repository '{self.repository.name}'"
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['repository', 'permission'], name='jobrepopermmap_unique')
         ]
 
 

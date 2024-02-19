@@ -8,7 +8,7 @@ from django.core.exceptions import ObjectDoesNotExist
 
 from aw.utils.http import ui_endpoint_wrapper, ui_endpoint_wrapper_kwargs
 from aw.model.job import Job, JobExecution, JobExecutionResultHost
-from aw.model.job_permission import CHOICE_PERMISSION_WRITE
+from aw.model.permission import CHOICE_PERMISSION_WRITE
 from aw.model.job_credential import JobGlobalCredentials, JobUserCredentials
 from aw.model.repository import Repository
 from aw.api_endpoints.job_util import get_viewable_jobs

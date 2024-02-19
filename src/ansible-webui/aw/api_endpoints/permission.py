@@ -7,12 +7,13 @@ from drf_spectacular.utils import extend_schema, OpenApiResponse
 
 from aw.model.job import Job
 from aw.model.job_credential import JobGlobalCredentials
-from aw.model.job_permission import JobPermission, JobPermissionMapping, JobPermissionMemberUser, \
-    JobPermissionMemberGroup, JobCredentialsPermissionMapping
+from aw.model.permission import JobPermission, JobPermissionMapping, JobPermissionMemberUser, \
+    JobPermissionMemberGroup, JobCredentialsPermissionMapping, JobRepositoryPermissionMapping
 from aw.api_endpoints.base import API_PERMISSION, GenericResponse, get_api_user
 from aw.utils.permission import has_manager_privileges
 from aw.utils.util import is_set
 from aw.base import USERS, GROUPS
+from aw.model.repository import Repository
 
 
 class PermissionReadResponse(serializers.ModelSerializer):
@@ -41,6 +42,7 @@ class PermissionWriteRequest(serializers.ModelSerializer):
 
     jobs = serializers.MultipleChoiceField(allow_blank=True, choices=[])
     credentials = serializers.MultipleChoiceField(allow_blank=True, choices=[])
+    repositories = serializers.MultipleChoiceField(allow_blank=True, choices=[])
     users = serializers.MultipleChoiceField(allow_blank=True, choices=[])
     groups = serializers.MultipleChoiceField(allow_blank=True, choices=[])
 
@@ -49,6 +51,9 @@ class PermissionWriteRequest(serializers.ModelSerializer):
         self.fields['jobs'] = serializers.MultipleChoiceField(choices=[job.id for job in Job.objects.all()])
         self.fields['credentials'] = serializers.MultipleChoiceField(
             choices=[creds.id for creds in JobGlobalCredentials.objects.all()]
+        )
+        self.fields['repositories'] = serializers.MultipleChoiceField(
+            choices=[repo.id for repo in Repository.objects.all()]
         )
         self.fields['users'] = serializers.MultipleChoiceField(choices=[user.id for user in USERS.objects.all()])
         self.fields['groups'] = serializers.MultipleChoiceField(choices=[group.id for group in GROUPS.objects.all()])
@@ -65,11 +70,17 @@ class PermissionWriteRequest(serializers.ModelSerializer):
             perm = JobPermission(
                 name=validated_data['name'],
                 permission=permission,
+                jobs_all=validated_data['jobs_all'],
+                credentials_all=validated_data['credentials_all'],
+                repositories_all=validated_data['repositories_all'],
             )
 
         else:
             perm.name = validated_data['name']
             perm.permission = permission
+            perm.jobs_all = validated_data['jobs_all']
+            perm.credentials_all = validated_data['credentials_all']
+            perm.repositories_all = validated_data['repositories_all']
 
         perm.save()
 
@@ -94,6 +105,17 @@ class PermissionWriteRequest(serializers.ModelSerializer):
                     continue
 
             perm.credentials.set(credentials)
+
+        if 'repositories' in validated_data and is_set(validated_data['repositories']):
+            repositories = []
+            for repo_id in validated_data['repositories']:
+                try:
+                    repositories.append(Repository.objects.get(id=repo_id))
+
+                except ObjectDoesNotExist:
+                    continue
+
+            perm.repositories.set(repositories)
 
         if 'users' in validated_data and is_set(validated_data['users']):
             users = []
@@ -126,6 +148,8 @@ def build_permissions(perm_id_filter: int = None) -> (list, dict):
     permission_jobs_name = {permission.id: [] for permission in permissions_raw}
     permission_credentials_id = {permission.id: [] for permission in permissions_raw}
     permission_credentials_name = {permission.id: [] for permission in permissions_raw}
+    permission_repositories_id = {permission.id: [] for permission in permissions_raw}
+    permission_repositories_name = {permission.id: [] for permission in permissions_raw}
     permission_users_id = {permission.id: [] for permission in permissions_raw}
     permission_users_name = {permission.id: [] for permission in permissions_raw}
     permission_groups_id = {permission.id: [] for permission in permissions_raw}
@@ -138,6 +162,10 @@ def build_permissions(perm_id_filter: int = None) -> (list, dict):
     for mapping in JobCredentialsPermissionMapping.objects.all():
         permission_credentials_id[mapping.permission.id].append(mapping.credentials.id)
         permission_credentials_name[mapping.permission.id].append(mapping.credentials.name)
+
+    for mapping in JobRepositoryPermissionMapping.objects.all():
+        permission_repositories_id[mapping.permission.id].append(mapping.repository.id)
+        permission_repositories_name[mapping.permission.id].append(mapping.repository.name)
 
     for mapping in JobPermissionMemberUser.objects.all():
         permission_users_id[mapping.permission.id].append(mapping.user.id)
@@ -160,11 +188,16 @@ def build_permissions(perm_id_filter: int = None) -> (list, dict):
             'permission': permission.permission,
             'permission_name': permission.permission_name,
             'jobs': permission_jobs_id[permission.id],
+            'jobs_all': permission.jobs_all,
             'credentials': permission_credentials_id[permission.id],
+            'credentials_all': permission.credentials_all,
+            'repositories': permission_repositories_id[permission.id],
+            'repositories_all': permission.repositories_all,
             'users': permission_users_id[permission.id],
             'groups': permission_groups_id[permission.id],
             'jobs_name': permission_jobs_name[permission.id],
             'credentials_name': permission_credentials_name[permission.id],
+            'repositories_name': permission_repositories_name[permission.id],
             'users_name': permission_users_name[permission.id],
             'groups_name': permission_groups_name[permission.id],
         })

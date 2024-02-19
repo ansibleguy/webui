@@ -41,7 +41,11 @@ FORM_LABEL = {
         },
     },
     'settings': {
-        'permissions': {},
+        'permissions': {
+            'jobs_all': 'All jobs',
+            'credentials_all': 'All credentials',
+            'repositories_all': 'All repositories',
+        },
     },
     'system': {
         'config': {
@@ -127,7 +131,11 @@ FORM_HELP = {
         },
     },
     'settings': {
-        'permissions': {},
+        'permissions': {
+            'jobs_all': 'Match permission to all existing jobs (present and future)',
+            'credentials_all': 'Match permission to all existing credentials (present and future)',
+            'repositories_all': 'Match permission to all existing repositories (present and future)',
+        },
     },
     'system': {
         'config': {

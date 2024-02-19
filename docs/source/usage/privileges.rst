@@ -33,11 +33,11 @@ To allow a user to create jobs, permissions and global-credentials you need to a
 Permissions
 ***********
 
-The UI at :code:`Settings - Permissions` allows you to create job & credential permissions and link them to users and groups.
+The UI at :code:`Settings - Permissions` allows you to create job, credential & repository permissions and link them to users and groups.
 
 |perm_ui|
 
-Each job & credential can have multiple permissions linked to it.
+Each job, credential & repository can have multiple permissions linked to it.
 
 **Permission types:**
 

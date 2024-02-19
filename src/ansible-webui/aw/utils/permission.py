@@ -1,7 +1,8 @@
 from aw.model.job import Job
-from aw.model.job_permission import JobPermissionMapping, JobPermissionMemberUser, JobPermissionMemberGroup, \
-    CHOICE_PERMISSION_READ, JobCredentialsPermissionMapping
-from aw.model.job_credential import BaseJobCredentials, JobGlobalCredentials, JobUserCredentials
+from aw.model.permission import JobPermissionMapping, JobPermissionMemberUser, JobPermissionMemberGroup, \
+    CHOICE_PERMISSION_READ, JobCredentialsPermissionMapping, JobRepositoryPermissionMapping, JobPermission
+from aw.model.job_credential import BaseJobCredentials, JobGlobalCredentials
+from aw.model.repository import Repository
 from aw.base import USERS
 
 
@@ -18,30 +19,40 @@ def get_job_if_allowed(user: USERS, job: Job, permission_needed: int) -> (Job, N
     return None
 
 
+def _evaluate_permission(permission: JobPermission, user: USERS, permission_needed: int) -> bool:
+    # ignore permission if access-level is too low
+    if permission.permission < permission_needed:
+        return False
+
+    # if one of the permissions allows the user
+    if JobPermissionMemberUser.objects.filter(user=user, permission=permission).exists():
+        return True
+
+    # if one of the permissions allows a group that the user is a member of
+    links = JobPermissionMemberGroup.objects.filter(permission=permission)
+    if links.exists() and user.groups.filter(name__in=[
+        link.group.name for link in links
+    ]).exists():
+        return True
+
+    return False
+
+
 def _has_permission(
         permission_links: (JobPermissionMapping, JobCredentialsPermissionMapping), permission_needed: int,
-        user: USERS,
+        user: USERS, permission_attr_all: str,
 ) -> bool:
     if user.is_superuser:
         return True
 
-    if not permission_links.exists():
-        return True
-
-    for link in permission_links:
-        # ignore permission if access-level is too low
-        if link.permission.permission < permission_needed:
-            continue
-
-        # if one of the permissions allows the user
-        if JobPermissionMemberUser.objects.filter(user=user, permission=link.permission).exists():
+    # 'all' permissions
+    for permission in JobPermission.objects.filter(**{permission_attr_all: True}):
+        if _evaluate_permission(permission=permission, user=user, permission_needed=permission_needed):
             return True
 
-        # if one of the permissions allows a group that the user is a member of
-        links = JobPermissionMemberGroup.objects.filter(permission=link.permission)
-        if links.exists() and user.groups.filter(name__in=[
-            link.group.name for link in links
-        ]).exists():
+    # lined permissions
+    for link in permission_links:
+        if _evaluate_permission(permission=link.permission, user=user, permission_needed=permission_needed):
             return True
 
     return False
@@ -51,6 +62,7 @@ def has_job_permission(user: USERS, job: Job, permission_needed: int) -> bool:
     return _has_permission(
         permission_links=JobPermissionMapping.objects.filter(job=job),
         permission_needed=permission_needed,
+        permission_attr_all='jobs_all',
         user=user,
     )
 
@@ -61,6 +73,18 @@ def has_credentials_permission(
     return _has_permission(
         permission_links=JobCredentialsPermissionMapping.objects.filter(credentials=credentials),
         permission_needed=permission_needed,
+        permission_attr_all='credentials_all',
+        user=user,
+    )
+
+
+def has_repository_permission(
+        user: USERS, repository: Repository, permission_needed: int,
+) -> bool:
+    return _has_permission(
+        permission_links=JobRepositoryPermissionMapping.objects.filter(repository=repository),
+        permission_needed=permission_needed,
+        permission_attr_all='repositories_all',
         user=user,
     )
 
@@ -76,13 +100,23 @@ def get_viewable_jobs(user: USERS) -> list[Job]:
 
 
 def get_viewable_credentials(user: USERS) -> list[BaseJobCredentials]:
-    credentials_viewable = JobUserCredentials.objects.filter(user=user)
+    credentials_viewable = []
 
     for credentials in JobGlobalCredentials.objects.all():
         if has_credentials_permission(user=user, credentials=credentials, permission_needed=CHOICE_PERMISSION_READ):
             credentials_viewable.append(credentials)
 
     return credentials_viewable
+
+
+def get_viewable_repositories(user: USERS) -> list[Repository]:
+    repositories_viewable = []
+
+    for repository in Repository.objects.all():
+        if has_repository_permission(user=user, repository=repository, permission_needed=CHOICE_PERMISSION_READ):
+            repositories_viewable.append(repository)
+
+    return repositories_viewable
 
 
 def has_manager_privileges(user: USERS) -> bool:

@@ -5,9 +5,9 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 
 from aw.utils.http import ui_endpoint_wrapper, ui_endpoint_wrapper_kwargs
-from aw.model.job_permission import JobPermission
+from aw.model.permission import JobPermission
 from aw.config.form_metadata import FORM_LABEL, FORM_HELP
-from aw.views.base import choices_global_credentials, choices_job, choices_user, choices_group
+from aw.views.base import choices_global_credentials, choices_job, choices_user, choices_group, choices_repositories
 
 
 @login_required
@@ -30,6 +30,16 @@ class SettingPermissionForm(forms.ModelForm):
         labels = FORM_LABEL['settings']['permissions']
         help_texts = FORM_HELP['settings']['permissions']
 
+    users = forms.MultipleChoiceField(
+        required=False,
+        widget=forms.SelectMultiple,
+        choices=choices_user,
+    )
+    groups = forms.MultipleChoiceField(
+        required=False,
+        widget=forms.SelectMultiple,
+        choices=choices_group,
+    )
     jobs = forms.MultipleChoiceField(
         required=False,
         widget=forms.SelectMultiple,
@@ -40,15 +50,10 @@ class SettingPermissionForm(forms.ModelForm):
         widget=forms.SelectMultiple,
         choices=choices_global_credentials,
     )
-    users = forms.MultipleChoiceField(
+    repositories = forms.MultipleChoiceField(
         required=False,
         widget=forms.SelectMultiple,
-        choices=choices_user,
-    )
-    groups = forms.MultipleChoiceField(
-        required=False,
-        widget=forms.SelectMultiple,
-        choices=choices_group,
+        choices=choices_repositories,
     )
 
 

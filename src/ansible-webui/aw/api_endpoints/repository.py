@@ -7,9 +7,10 @@ from drf_spectacular.utils import extend_schema, OpenApiResponse
 
 from aw.model.repository import Repository
 from aw.api_endpoints.base import API_PERMISSION, GenericResponse, get_api_user
-from aw.utils.permission import has_manager_privileges
+from aw.utils.permission import has_manager_privileges, has_repository_permission, get_viewable_repositories
 from aw.model.job import Job
 from aw.utils.util import is_null, is_set
+from aw.model.permission import CHOICE_PERMISSION_READ, CHOICE_PERMISSION_WRITE, CHOICE_PERMISSION_FULL
 
 
 class RepositoryWriteRequest(serializers.ModelSerializer):
@@ -70,10 +71,10 @@ class APIRepository(GenericAPIView):
         operation_id='repository_list',
     )
     def get(request):
-        del request
+        user = get_api_user(request)
         repositories = []
 
-        for repository in Repository.objects.all():
+        for repository in get_viewable_repositories(user=user):
             repositories.append(RepositoryReadResponse(instance=repository).data)
 
         return Response(data=repositories, status=200)
@@ -127,9 +128,21 @@ class APIRepositoryItem(GenericAPIView):
         operation_id='repository_get'
     )
     def get(request, repo_id: int):
-        del request
+        user = get_api_user(request)
+
         try:
-            return Response(data=RepositoryReadResponse(instance=Repository.objects.get(id=repo_id)).data, status=200)
+            repository = Repository.objects.get(id=repo_id)
+            if not has_repository_permission(
+                    user=user,
+                    repository=repository,
+                    permission_needed=CHOICE_PERMISSION_READ
+            ):
+                return Response(
+                    data={'msg': f"Not privileged to view the repository '{repository.name}'"},
+                    status=403,
+                )
+
+            return Response(data=RepositoryReadResponse(instance=repository).data, status=200)
 
         except ObjectDoesNotExist:
             return Response(data={'msg': f"Repository with ID {repo_id} does not exist"}, status=404)
@@ -146,12 +159,9 @@ class APIRepositoryItem(GenericAPIView):
         operation_id='repository_edit',
     )
     def put(self, request, repo_id: int):
-        privileged = has_manager_privileges(get_api_user(request))
-        if not privileged:
-            return Response(data={'msg': 'Not privileged to manage repositories'}, status=403)
+        user = get_api_user(request)
 
         serializer = RepositoryWriteRequest(data=request.data)
-
         if not serializer.is_valid():
             return Response(data={'msg': f"Provided repository data is not valid: '{serializer.errors}'"}, status=400)
 
@@ -167,6 +177,16 @@ class APIRepositoryItem(GenericAPIView):
 
         if repository is None:
             return Response(data={'msg': f"Repository with ID {repo_id} does not exist"}, status=404)
+
+        if not has_repository_permission(
+                user=user,
+                repository=repository,
+                permission_needed=CHOICE_PERMISSION_WRITE
+        ):
+            return Response(
+                data={'msg': f"Not privileged to modify the repository '{repository.name}'"},
+                status=403,
+            )
 
         try:
             Repository.objects.filter(id=repo_id).update(**serializer.data)
@@ -187,13 +207,21 @@ class APIRepositoryItem(GenericAPIView):
         operation_id='repository_delete'
     )
     def delete(self, request, repo_id: int):
-        privileged = has_manager_privileges(get_api_user(request))
-        if not privileged:
-            return Response(data={'msg': 'Not privileged to manage repositories'}, status=403)
+        user = get_api_user(request)
 
         try:
             repository = Repository.objects.get(id=repo_id)
             if repository is not None:
+                if not has_repository_permission(
+                        user=user,
+                        repository=repository,
+                        permission_needed=CHOICE_PERMISSION_FULL
+                ):
+                    return Response(
+                        data={'msg': f"Not privileged to delete the repository '{repository.name}'"},
+                        status=403,
+                    )
+
                 if repository_in_use(repository):
                     return Response(
                         data={'msg': f"Repository '{repository.name}' cannot be deleted as it is still in use"},
