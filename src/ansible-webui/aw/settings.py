@@ -21,6 +21,22 @@ TEMPLATE_DIRS = [
 ]
 
 DEBUG = deployment_dev() or config['debug']
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'ERROR',
+        },
+    },
+}
+
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 X_FRAME_OPTIONS = 'SAMEORIGIN'
 

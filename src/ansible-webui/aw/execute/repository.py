@@ -1,5 +1,6 @@
 from pathlib import Path
 from shutil import rmtree
+from re import sub as regex_replace
 
 from django.utils import timezone
 
@@ -207,7 +208,8 @@ def get_path_repo_wo_isolate(repository: Repository) -> Path:
     if repository.rtype_name == 'Static':
         return repository.static_path
 
-    path_repo = Path(config['path_run']) / 'repositories' / repository.name
+    safe_repo_name = regex_replace(pattern='[^0-9a-zA-Z-_]+', repl='', string=repository.name)
+    path_repo = Path(config['path_run']) / 'repositories' / safe_repo_name
     path_repo.mkdir(mode=0o750, parents=True, exist_ok=True)
     return path_repo
 
