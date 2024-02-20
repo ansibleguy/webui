@@ -105,6 +105,13 @@ function hashString(data) {
     return hash;
 }
 
+function jsonToClipboard(jsonElement) {
+    // to create json dump element: '{{ <dict>|json_script:"<jsonElement>" }}'
+    let versionsJson = document.getElementById(jsonElement).innerText;
+    console.log('Copied: ', versionsJson);
+    navigator.clipboard.writeText(versionsJson);
+}
+
 // API CALLS
 const CSRF_TOKEN = getCookie('csrftoken');
 

@@ -16,6 +16,7 @@ from aw.config.form_metadata import FORM_LABEL, FORM_HELP
 from aw.config.main import config
 from aw.config.environment import AW_ENV_VARS, AW_ENV_VARS_SECRET
 from aw.model.system import SystemConfig
+from aw.utils.deployment import deployment_docker
 
 
 def _parsed_ansible_collections() -> dict:
@@ -131,24 +132,32 @@ def system_environment(request) -> HttpResponse:
     python_modules = _parsed_python_modules()
     ansible_version = _parsed_ansible_version(python_modules)
 
+    system_versions = process(['uname', '-a'])['stdout']
+    if deployment_docker():
+        system_versions += ' (dockerized)'
+
+    env_system = {
+        'env_linux': system_versions,
+        'env_git': process(['git', '--version'])['stdout'],
+        'env_ansible_core': ansible_version['ansible_core'],
+        'env_ansible_runner': ansible_version['ansible_runner'],
+        'env_django': python_modules['django']['version'],
+        'env_django_api': python_modules['djangorestframework']['version'],
+        'env_gunicorn': python_modules['gunicorn']['version'],
+        'env_jinja': ansible_version['jinja'],
+        'env_libyaml': ansible_version['libyaml'],
+    }
     return render(
         request, status=200, template_name='system/environment.html',
         context={
-            'env_linux': process(['uname', '-a'])['stdout'],
-            'env_git': process(['git', '--version'])['stdout'],
-            'env_ansible_core': ansible_version['ansible_core'],
-            'env_ansible_runner': ansible_version['ansible_runner'],
-            'env_django': python_modules['django']['version'],
-            'env_django_api': python_modules['djangorestframework']['version'],
-            'env_gunicorn': python_modules['gunicorn']['version'],
-            'env_jinja': ansible_version['jinja'],
-            'env_libyaml': ansible_version['libyaml'],
+            **env_system,
+            'env_system': env_system,
             'env_python': f"{version_info.major}.{version_info.minor}.{version_info.micro}",
             'env_python_modules': python_modules,
             'env_ansible_config': _parsed_ansible_config(),
             # 'env_ansible_roles': get_role_list(),
             'env_ansible_collections': _parsed_ansible_collections(),
-        }
+        },
     )
 
 
