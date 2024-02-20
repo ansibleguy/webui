@@ -22,6 +22,7 @@ Read into the [Troubleshooting Guide](https://ansible-webui.readthedocs.io/en/la
 ## Know How
 
 * Do not commit [database migrations](https://docs.djangoproject.com/en/5.0/topics/migrations/#module-django.db.migrations) - they will be created on release.
+* As we mainly use SQLite as database we should keep the DB writes to a minimum, so we do not run into locking issues (`OperationalError: database is locked`)
 
 ----
 

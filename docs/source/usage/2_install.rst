@@ -43,6 +43,15 @@ Install
 Start
 *****
 
+**TLDR**:
+
+.. code-block:: bash
+
+    cd $PLAYBOOK_DIR
+    python3 -m ansible-webui
+
+**Details**:
+
 .. code-block:: bash
 
     # change into your ansible-directory
@@ -75,31 +84,6 @@ Now you can open the Ansible-WebUI in your browser: `http://localhost:8000 <http
     docker run -d --name ansible-webui --publish 127.0.0.1:8000:8000 --volume $(pwd)/ansible/data:/data --volume $(pwd)/ansible/play:/play ansible-webui:<VERSION>
     # find initial password
     docker logs ansible-webui
-
-----
-
-Install Unstable Version
-************************
-
-.. code-block:: bash
-
-    # download
-    git clone https://github.com/ansibleguy/ansible-webui
-
-    # install dependencies (venv recommended)
-    cd ansible-webui
-    python3 -m pip install --upgrade requirements.txt
-    bash scripts/update_version.sh
-
-    # run
-    python3 src/ansible-webui/
-
-**Using docker**:
-
-.. code-block:: bash
-
-    docker image pull ansible0guy/ansible-webui:unstable
-    docker run -it --name ansible-webui-dev --publish 127.0.0.1:8000:8000 --volume /tmp/awdata:/data ansible0guy/ansible-webui:unstable
 
 ----
 
