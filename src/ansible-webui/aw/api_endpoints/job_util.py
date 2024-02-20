@@ -1,7 +1,10 @@
+from pathlib import Path
+
+from django.shortcuts import HttpResponse
 from rest_framework import serializers
 
 from aw.config.hardcoded import JOB_EXECUTION_LIMIT
-from aw.model.job import Job, CHOICES_JOB_EXEC_STATUS, JobExecution
+from aw.model.job import Job, JobExecution
 from aw.utils.permission import get_viewable_jobs
 from aw.utils.util import get_next_cron_execution_str
 from aw.base import USERS
@@ -40,31 +43,18 @@ class JobExecutionReadResponse(serializers.ModelSerializer):
 
 
 def get_job_execution_serialized(execution: JobExecution) -> dict:
-    serialized = {
-        'id': execution.id,
-        'job': execution.job.id,
-        'job_name': execution.job.name,
-        'job_comment': execution.job.comment,
-        'user': execution.user.id if execution.user is not None else None,
-        'user_name': execution.user.username if execution.user is not None else 'Scheduled',
-        'command': execution.command,
-        'command_repository': execution.command_repository,
-        'status': execution.status,
-        'status_name': CHOICES_JOB_EXEC_STATUS[execution.status][1],
-        'time_start': execution.time_created_str,
-        'time_fin': None,
-        'failed': None,
-        'error_s': None,
-        'error_m': None,
-        'log_stdout': execution.log_stdout,
-        'log_stdout_url': f"/api/job/{execution.job.id}/{execution.id}/log",
-        'log_stderr': execution.log_stderr,
-        'log_stderr_url': f"/api/job/{execution.job.id}/{execution.id}/log?type=stderr",
-        'log_stdout_repo': execution.log_stdout_repo,
-        'log_stdout_repo_url': f"/api/job/{execution.job.id}/{execution.id}/log?type=stdout_repo",
-        'log_stderr_repo': execution.log_stderr_repo,
-        'log_stderr_repo_url': f"/api/job/{execution.job.id}/{execution.id}/log?type=stderr_repo",
-    }
+    serialized = JobExecutionReadResponse(instance=execution).data
+    serialized['job'] = execution.job.id
+    serialized['job_name'] = execution.job.name
+    serialized['job_comment'] = execution.job.comment
+    serialized['user'] = execution.user.id if execution.user is not None else None
+    serialized['user_name'] = execution.user.username if execution.user is not None else 'Scheduled'
+    serialized['time_start'] = execution.time_created_str
+    serialized['time_fin'] = None
+    serialized['failed'] = None
+    serialized['error_s'] = None
+    serialized['error_m'] = None
+
     if execution.result is not None:
         serialized['time_fin'] = execution.result.time_fin_str
         serialized['failed'] = execution.result.failed
@@ -106,3 +96,15 @@ def get_viewable_jobs_serialized(
         serialized.append(job_serialized)
 
     return serialized
+
+
+def get_log_file_content(logfile: (str, Path)) -> HttpResponse:
+    with open(logfile, 'rb') as _logfile:
+        content_b = _logfile.read()
+        if content_b == b'':
+            return HttpResponse(content_b, content_type='text/plain', status=404)
+
+        response = HttpResponse(content_b, content_type='text/plain', status=200)
+
+    response['Content-Disposition'] = f"inline; filename={logfile.rsplit('/', 1)[1]}"
+    return response

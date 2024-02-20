@@ -19,13 +19,19 @@ class Repository(BaseModel):
         'git_playbook_base',
     ]
     api_fields_read = form_fields.copy()
-    api_fields_read.extend(['id', 'rtype_name', 'time_update', 'status', 'status_name',])
+    api_fields_read.extend([
+        'id', 'rtype_name', 'time_update', 'status', 'status_name', 'log_stdout', 'log_stdout_url',
+        'log_stderr', 'log_stderr_url',
+
+    ])
     api_fields_write = form_fields
 
     name = models.CharField(max_length=100, null=False, blank=False)
     rtype = models.PositiveSmallIntegerField(choices=CHOICES_REPOSITORY)
     time_update = models.DateTimeField(**DEFAULT_NONE)
     status = models.PositiveSmallIntegerField(default=0, choices=CHOICES_JOB_EXEC_STATUS)
+    log_stdout = models.CharField(max_length=300, **DEFAULT_NONE)
+    log_stderr = models.CharField(max_length=300, **DEFAULT_NONE)
 
     static_path = models.CharField(max_length=500, blank=True, null=True, default=config['path_play'])
 
@@ -70,6 +76,14 @@ class Repository(BaseModel):
     def status_id_from_name(name: str) -> int:
         return get_choice_key_by_value(choices=CHOICES_JOB_EXEC_STATUS, find=name)
 
+    @property
+    def log_stdout_url(self) -> str:
+        return f"/api/repository/log/{self.id}?type=stdout"
+
+    @property
+    def log_stderr_url(self) -> str:
+        return f"/api/repository/log/{self.id}?type=stderr"
+
     def __str__(self) -> str:
         if self.rtype_name == 'Git':
             isolated = 'isolated ' if self.git_isolate else ''
@@ -79,5 +93,5 @@ class Repository(BaseModel):
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=['name'], name='repo_name_unique')
+            models.UniqueConstraint(fields=['name'], name='repo_name_unique'),
         ]

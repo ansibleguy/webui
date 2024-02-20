@@ -51,3 +51,7 @@ class GroupSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = USERS
+
+
+class LogDownloadResponse(BaseResponse):
+    binary = serializers.CharField()

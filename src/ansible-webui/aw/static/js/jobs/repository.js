@@ -15,9 +15,15 @@ function updateApiTableDataRepository(row, entry) {
         }
         row.cells[3].innerHTML += '<b>Status</b>: <span class="aw-job-status aw-job-status-' + entry.status_name.toLowerCase() + '">' +
                                    entry.status_name + '</span>';
+        let statusTemplate = document.getElementById("aw-api-data-tmpl-status").innerHTML;
+        statusTemplate = statusTemplate.replaceAll('${LOG_STDERR}', entry.log_stderr);
+        statusTemplate = statusTemplate.replaceAll('${LOG_STDERR_URL}', entry.log_stderr_url);
+        statusTemplate = statusTemplate.replaceAll('${LOG_STDOUT}', entry.log_stdout);
+        statusTemplate = statusTemplate.replaceAll('${LOG_STDOUT_URL}', entry.log_stdout_url);
+        row.cells[3].innerHTML += '<br>' + statusTemplate;
     }
 
-    actionsTemplate = document.getElementById("aw-api-data-tmpl-actions").innerHTML;
+    let actionsTemplate = document.getElementById("aw-api-data-tmpl-actions").innerHTML;
     row.cells[4].innerHTML = actionsTemplate.replaceAll('${ID}', entry.id);
 }
 

@@ -48,5 +48,10 @@
             {% include "../button/icon/delete.html" %}
         </button>
     </div>
+    <div id="aw-api-data-tmpl-status" hidden="hidden">
+        <b>Logs</b>:
+        <a href="${LOG_STDOUT_URL}" title="${LOG_STDOUT}" download>Output</a>,
+        <a href="${LOG_STDERR_URL}" title="${LOG_STDERR}" download>Error</a>
+    </div>
 </div>
 {% endblock %}

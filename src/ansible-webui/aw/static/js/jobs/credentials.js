@@ -50,13 +50,13 @@ function updateApiTableDataCreds(row, entry) {
 
 function updateApiTableDataUserCreds(row, entry) {
     updateApiTableDataCreds(row, entry);
-    actionsTemplate = document.getElementById("aw-api-data1-tmpl-actions").innerHTML;
+    let actionsTemplate = document.getElementById("aw-api-data1-tmpl-actions").innerHTML;
     row.cells[4].innerHTML = actionsTemplate.replaceAll('${ID}', entry.id);
 }
 
 function updateApiTableDataGlobalCreds(row, entry) {
     updateApiTableDataCreds(row, entry);
-    actionsTemplate = document.getElementById("aw-api-data2-tmpl-actions").innerHTML;
+    let actionsTemplate = document.getElementById("aw-api-data2-tmpl-actions").innerHTML;
     row.cells[4].innerHTML = actionsTemplate.replaceAll('${ID}', entry.id);
 }
 

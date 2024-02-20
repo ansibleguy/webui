@@ -5,16 +5,17 @@ from django.db.utils import IntegrityError
 from rest_framework.generics import GenericAPIView
 from rest_framework import serializers
 from rest_framework.response import Response
-from drf_spectacular.utils import extend_schema, OpenApiResponse
+from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiParameter
 
 from aw.model.repository import Repository
-from aw.api_endpoints.base import API_PERMISSION, GenericResponse, get_api_user
+from aw.api_endpoints.base import API_PERMISSION, GenericResponse, get_api_user, LogDownloadResponse
 from aw.utils.permission import has_manager_privileges, has_repository_permission, get_viewable_repositories
 from aw.model.job import Job
 from aw.utils.util import unset_or_null, is_set
 from aw.model.permission import CHOICE_PERMISSION_READ, CHOICE_PERMISSION_WRITE, CHOICE_PERMISSION_FULL, \
     CHOICE_PERMISSION_EXECUTE
 from aw.execute.repository import api_update_repository
+from aw.api_endpoints.job_util import get_log_file_content
 
 
 class RepositoryWriteRequest(serializers.ModelSerializer):
@@ -30,6 +31,8 @@ class RepositoryReadResponse(RepositoryWriteRequest):
 
     rtype_name = serializers.CharField()
     status_name = serializers.CharField()
+    log_stdout_url = serializers.CharField()
+    log_stderr_url = serializers.CharField()
 
 
 def repository_in_use(repository: Repository) -> bool:
@@ -59,6 +62,12 @@ def validate_repository_types(repository: dict) -> (bool, str):
     return True, ''
 
 
+def build_repository(repository: Repository) -> dict:
+    data = RepositoryReadResponse(instance=repository).data
+    data['time_update'] = repository.time_update_str
+    return data
+
+
 class APIRepository(GenericAPIView):
     http_method_names = ['get', 'post']
     serializer_class = RepositoryReadResponse
@@ -76,9 +85,7 @@ class APIRepository(GenericAPIView):
         repositories = []
 
         for repository in get_viewable_repositories(user=user):
-            data = RepositoryReadResponse(instance=repository).data
-            data['time_update'] = repository.time_update_str
-            repositories.append(data)
+            repositories.append(build_repository(repository))
 
         return Response(data=repositories, status=200)
 
@@ -145,7 +152,7 @@ class APIRepositoryItem(GenericAPIView):
                     status=403,
                 )
 
-            return Response(data=RepositoryReadResponse(instance=repository).data, status=200)
+            return Response(data=build_repository(repository), status=200)
 
         except ObjectDoesNotExist:
             return Response(data={'msg': f"Repository with ID {repo_id} does not exist"}, status=404)
@@ -277,3 +284,60 @@ class APIRepositoryItem(GenericAPIView):
             pass
 
         return Response(data={'msg': f"Repository with ID {repo_id} does not exist"}, status=404)
+
+
+class APIRepositoryLogFile(GenericAPIView):
+    http_method_names = ['get']
+    serializer_class = LogDownloadResponse
+    permission_classes = API_PERMISSION
+    valid_logfile_type = ['stdout', 'stderr']
+
+    @extend_schema(
+        request=None,
+        responses={
+            200: OpenApiResponse(GenericResponse, description='Download repository log-file'),
+            403: OpenApiResponse(GenericResponse, description='Not privileged to view the repository logs'),
+            404: OpenApiResponse(GenericResponse, description='Repository or log-file dos not exist'),
+        },
+        summary='Download log-file of the last repository update.',
+        operation_id='repository_logfile',
+        parameters=[
+            OpenApiParameter(
+                name='type', type=str, default='stdout',
+                description=f"Type of log-file to download. One of {valid_logfile_type}",
+                required=False,
+            ),
+        ],
+    )
+    def get(self, request, repo_id: int):
+        user = get_api_user(request)
+        try:
+            repository = Repository.objects.get(id=repo_id)
+            if repository is not None:
+                if not has_repository_permission(
+                        user=user,
+                        repository=repository,
+                        permission_needed=CHOICE_PERMISSION_READ,
+                ):
+                    return Response(
+                        data={'msg': f"Not privileged to view logs of the repository '{repository.name}'"},
+                        status=403,
+                    )
+
+                logfile = repository.log_stdout
+                if 'type' in request.GET:
+                    logfile_type = request.GET['type'] if request.GET['type'] in self.valid_logfile_type else 'stdout'
+                    logfile = getattr(repository, f'log_{logfile_type}')
+
+                if logfile is None:
+                    return Response(data={'msg': f"No logs found for repository '{repository.name}'"}, status=404)
+
+                return get_log_file_content(logfile)
+
+        except (ObjectDoesNotExist, FileNotFoundError):
+            pass
+
+        return Response(
+            data={'msg': f"Repository with ID '{repo_id}' or log-file does not exist"},
+            status=404,
+        )

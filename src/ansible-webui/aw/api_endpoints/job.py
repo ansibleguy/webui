@@ -1,6 +1,5 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.utils import IntegrityError
-from django.shortcuts import HttpResponse
 from rest_framework.views import APIView
 from rest_framework import serializers
 from rest_framework.response import Response
@@ -11,9 +10,10 @@ from aw.model.job import Job, JobExecution
 from aw.model.permission import CHOICE_PERMISSION_READ, CHOICE_PERMISSION_EXECUTE, \
     CHOICE_PERMISSION_WRITE, CHOICE_PERMISSION_FULL
 from aw.model.job_credential import JobGlobalCredentials
-from aw.api_endpoints.base import API_PERMISSION, get_api_user, BaseResponse, GenericResponse
+from aw.api_endpoints.base import API_PERMISSION, get_api_user, BaseResponse, GenericResponse, \
+    LogDownloadResponse
 from aw.api_endpoints.job_util import get_viewable_jobs_serialized, JobReadResponse, get_job_executions_serialized, \
-    JobExecutionReadResponse, get_viewable_jobs, get_job_execution_serialized
+    JobExecutionReadResponse, get_viewable_jobs, get_job_execution_serialized, get_log_file_content
 from aw.utils.permission import has_job_permission, has_credentials_permission
 from aw.execute.queue import queue_add
 from aw.execute.util import update_status, is_execution_status
@@ -396,7 +396,7 @@ class APIJobExecutionLogs(APIView):
 
 class APIJobExecutionLogFile(APIView):
     http_method_names = ['get']
-    serializer_class = JobExecutionLogReadResponse
+    serializer_class = LogDownloadResponse
     permission_classes = API_PERMISSION
     valid_logfile_type = ['stdout', 'stderr', 'stdout_repo', 'stderr_repo']
 
@@ -434,14 +434,7 @@ class APIJobExecutionLogFile(APIView):
                 if logfile is None:
                     return Response(data={'msg': f"No logs found for job '{job.name}'"}, status=404)
 
-                with open(logfile, 'rb') as _logfile:
-                    content_b = _logfile.read()
-                    if content_b == b'':
-                        return Response(data={'msg': f"Job log-file is empty: '{logfile}'"}, status=404)
-
-                    response = HttpResponse(content_b, content_type='text/plain', status=200)
-                    response['Content-Disposition'] = f"inline; filename={logfile.rsplit('/', 1)[1]}"
-                    return response
+                return get_log_file_content(logfile)
 
         except (ObjectDoesNotExist, FileNotFoundError):
             pass

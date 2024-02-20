@@ -7,8 +7,16 @@ from aw.utils.debug import log
 from aw.config.environment import AW_ENV_VARS_SECRET, AW_ENV_VARS
 
 
-def process(cmd: list, timeout_sec: int = None, shell: bool = False, cwd: Path = BASE_DIR, env: dict = None) -> dict:
-    log(msg=f"Executing command: '{' '.join(cmd)}'", level=6)
+# pylint: disable=R0914
+def process(
+        cmd: (str, list), timeout_sec: int = None, shell: bool = False,
+        cwd: Path = BASE_DIR, env: dict = None,
+) -> dict:
+    cmd_str = cmd
+    if isinstance(cmd, list):
+        cmd_str = ' '.join(cmd)
+
+    log(msg=f"Executing command: '{cmd_str}'", level=6)
 
     # merge provided env with current env and hide secrets
     env_full = environ.copy()

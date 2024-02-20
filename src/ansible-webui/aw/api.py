@@ -8,7 +8,7 @@ from aw.api_endpoints.permission import APIPermission, APIPermissionItem
 from aw.api_endpoints.credentials import APIJobCredentials, APIJobCredentialsItem
 from aw.api_endpoints.filesystem import APIFsBrowse, APIFsExists
 from aw.api_endpoints.system import APISystemConfig
-from aw.api_endpoints.repository import APIRepository, APIRepositoryItem
+from aw.api_endpoints.repository import APIRepository, APIRepositoryItem, APIRepositoryLogFile
 
 urlpatterns_api = [
     path('api/key/<str:token>', APIKeyItem.as_view()),
@@ -23,6 +23,7 @@ urlpatterns_api = [
     path('api/permission', APIPermission.as_view()),
     path('api/credentials/<int:credentials_id>', APIJobCredentialsItem.as_view()),
     path('api/credentials', APIJobCredentials.as_view()),
+    path('api/repository/log/<int:repo_id>', APIRepositoryLogFile.as_view()),
     path('api/repository/<int:repo_id>', APIRepositoryItem.as_view()),
     path('api/repository', APIRepository.as_view()),
     path('api/config', APISystemConfig.as_view()),

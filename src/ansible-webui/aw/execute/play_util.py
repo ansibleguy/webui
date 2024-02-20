@@ -15,7 +15,7 @@ from aw.execute.util import update_status, overwrite_and_delete_file, decode_job
 from aw.utils.debug import log
 from aw.execute.play_credentials import get_credentials_to_use, commandline_arguments_credentials, \
     write_pwd_file, get_pwd_file
-from aw.execute.repository import cleanup_repository
+from aw.execute.repository import ExecuteRepository
 
 # see: https://ansible.readthedocs.io/projects/runner/en/latest/intro/
 
@@ -157,14 +157,14 @@ def runner_logs(cfg: RunnerConfig, log_files: dict):
             symlink(log_files[log_type], logs_src[log_type])
 
 
-def runner_cleanup(job: Job, execution: JobExecution, path_run: Path):
+def runner_cleanup(path_run: Path, exec_repo: ExecuteRepository):
     overwrite_and_delete_file(f"{path_run}/env/passwords")
     overwrite_and_delete_file(f"{path_run}/env/ssh_key")
     for attr in BaseJobCredentials.SECRET_ATTRS:
         overwrite_and_delete_file(get_pwd_file(path_run=path_run, attr=attr))
 
     try:
-        cleanup_repository(repository=job.repository, execution=execution, path_run=path_run)
+        exec_repo.cleanup_repository()
 
     except AttributeError as err:
         log(msg=f'Got error of repository cleanup: {err}')
@@ -219,7 +219,7 @@ def parse_run_result(execution: JobExecution, result: JobExecutionResult, runner
 
 
 def failure(
-        job: Job, execution: JobExecution, path_run: Path,
+        execution: JobExecution, exec_repo: ExecuteRepository, path_run: Path,
         result: JobExecutionResult, error_s: str, error_m: str
 ):
     update_status(execution, status='Failed')
@@ -234,4 +234,4 @@ def failure(
     result.save()
 
     execution.save()
-    runner_cleanup(job=job, execution=execution, path_run=path_run)
+    runner_cleanup(path_run=path_run, exec_repo=exec_repo)

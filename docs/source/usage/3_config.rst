@@ -211,9 +211,12 @@ Normal users will not have to use these.
 
    .. code-block:: bash
 
-       python3 -m ansible-webui.manage makemigrations
-       python3 -m ansible-webui.manage makemigrations aw
-       python3 -m ansible-webui.manage migrate
+        # if running non-release version
+        python3 -m ansible-webui.manage makemigrations
+        python3 -m ansible-webui.manage makemigrations aw
+
+        # all
+        python3 -m ansible-webui.manage migrate
 
 
 * **AW_ENV**

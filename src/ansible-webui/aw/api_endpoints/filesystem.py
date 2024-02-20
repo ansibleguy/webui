@@ -48,16 +48,13 @@ class APIFsBrowse(APIView):
         description="This endpoint is mainly used for form auto-completion when selecting job-files",
         parameters=[
             OpenApiParameter(
-                name='repository', type=int, default=None, required=False,
-                description='Repository to query',
-            ),
-            OpenApiParameter(
                 name='base', type=str, default='/', description='Relative directory to query',
                 required=False,
             ),
         ],
     )
     def get(cls, request, repository: int = None):
+        # pylint: disable=R0912
         browse_root = Path(config['path_play'])
         items = {'files': [], 'directories': []}
 
@@ -86,7 +83,7 @@ class APIFsBrowse(APIView):
                 return Response(data={'msg': 'Provided repository does not exist'}, status=404)
 
         if not browse_root.is_dir():
-            return Response(data={'msg': 'Base directory does not exist'}, status=404)
+            return Response(data={'msg': f"Base directory '{browse_root}' does not exist"}, status=404)
 
         if 'base' not in request.GET:
             base = '/'
@@ -96,10 +93,15 @@ class APIFsBrowse(APIView):
         if base.find('..') != -1:
             return Response(data={'msg': 'Traversal not allowed'}, status=403)
 
-        raw_items = cls._listdir(browse_root / base)
+        browse_root = browse_root / base
+
+        if not browse_root.is_dir():
+            return Response(data={'msg': f"Base directory '{browse_root}' does not exist"}, status=404)
+
+        raw_items = cls._listdir(browse_root)
 
         for item in raw_items:
-            item_path = browse_root / base / item
+            item_path = browse_root / item
             if item_path.is_file():
                 items['files'].append(item)
             elif item_path.is_dir():

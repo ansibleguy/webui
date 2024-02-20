@@ -6,7 +6,7 @@ from aw.config.main import config
 from aw.model.job import Job, JobExecution, JobExecutionResult
 from aw.execute.play_util import runner_cleanup, runner_prep, parse_run_result, failure, runner_logs
 from aw.execute.util import get_path_run, is_execution_status, job_logs
-from aw.execute.repository import create_or_update_repository, get_project_dir
+from aw.execute.repository import ExecuteRepository
 from aw.utils.util import datetime_w_tz, is_null, timed_lru_cache  # get_ansible_versions
 from aw.utils.handlers import AnsibleConfigError
 from aw.utils.debug import log
@@ -37,9 +37,10 @@ def ansible_playbook(job: Job, execution: (JobExecution, None)):
     def _cancel_job() -> bool:
         return is_execution_status(execution, 'Stopping')
 
+    exec_repo = ExecuteRepository(repository=job.repository, execution=execution, path_run=path_run)
     try:
-        create_or_update_repository(repository=job.repository, execution=execution, path_run=path_run)
-        project_dir = get_project_dir(repository=job.repository, execution=execution)
+        exec_repo.create_or_update_repository()
+        project_dir = exec_repo.get_project_dir()
         opts = runner_prep(job=job, execution=execution, path_run=path_run, project_dir=project_dir)
         execution.save()
 
@@ -61,12 +62,12 @@ def ansible_playbook(job: Job, execution: (JobExecution, None)):
         )
         del runner
 
-        runner_cleanup(job=job, execution=execution, path_run=path_run)
+        runner_cleanup(path_run=path_run, exec_repo=exec_repo)
 
     except (OSError, AnsibleConfigError) as err:
         tb = traceback.format_exc(limit=1024)
         failure(
-            job=Job, execution=execution, path_run=path_run, result=result,
+            execution=execution, exec_repo=exec_repo, path_run=path_run, result=result,
             error_s=str(err), error_m=tb,
         )
         raise
