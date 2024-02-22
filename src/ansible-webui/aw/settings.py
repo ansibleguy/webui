@@ -1,5 +1,7 @@
 from pathlib import Path
 from os import environ
+from sqlite3 import connect as db_connect
+from sqlite3 import OperationalError
 
 try:
     from aw.config.main import config, VERSION
@@ -20,7 +22,6 @@ TEMPLATE_DIRS = [
     BASE_DIR / 'aw' / 'templates/'
 ]
 
-DEBUG = deployment_dev() or config['debug']
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -65,6 +66,61 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django_auto_logout.middleware.auto_logout',
 ]
+
+# Database
+if deployment_prod():
+    DB_FILE = Path(get_aw_env_var_or_default('db'))
+
+    if DB_FILE.name.find('.') == -1 and not DB_FILE.exists():
+        try:
+            DB_FILE.mkdir(mode=0o750, parents=True, exist_ok=True)
+
+        except (OSError, FileNotFoundError):
+            raise ValueError(f"Unable to created database directory: '{DB_FILE}'")
+
+    if DB_FILE.is_dir():
+        DB_FILE = DB_FILE / 'aw.db'
+
+else:
+    dev_db_file = 'aw.dev.db' if deployment_dev() else 'aw.staging.db'
+    if 'AW_DB' in environ:
+        DB_FILE = Path(get_aw_env_var_or_default('db'))
+        if DB_FILE.is_dir():
+            DB_FILE = DB_FILE / dev_db_file
+
+    else:
+        DB_FILE = dev_db_file
+        DB_FILE = BASE_DIR / DB_FILE
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': DB_FILE,
+        'OPTIONS': {
+            'timeout': 3,  # kill buggy requests fast; do not block whole application
+        }
+    }
+}
+
+
+def debug_mode() -> bool:
+    # NOTE: only gets checked on startup
+    if deployment_dev():
+        return True
+
+    try:
+        with db_connect(DB_FILE) as conn:
+            return conn.execute('SELECT debug FROM aw_systemconfig').fetchall()[0][0] == 1
+
+    except (IndexError, OperationalError, FileNotFoundError):
+        pass
+
+    return False
+
+
+DEBUG = debug_mode()
+
+# WEB BASICS
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost',
     f'http://localhost:{PORT_WEB}',
@@ -107,41 +163,6 @@ TEMPLATES = [
     },
 ]
 WSGI_APPLICATION = 'aw.main.app'
-
-# Database
-if deployment_prod():
-    DB_FILE = Path(get_aw_env_var_or_default('db'))
-
-    if DB_FILE.name.find('.') == -1 and not DB_FILE.exists():
-        try:
-            DB_FILE.mkdir(mode=0o750, parents=True, exist_ok=True)
-
-        except (OSError, FileNotFoundError):
-            raise ValueError(f"Unable to created database directory: '{DB_FILE}'")
-
-    if DB_FILE.is_dir():
-        DB_FILE = DB_FILE / 'aw.db'
-
-else:
-    dev_db_file = 'aw.dev.db' if deployment_dev() else 'aw.staging.db'
-    if 'AW_DB' in environ:
-        DB_FILE = Path(get_aw_env_var_or_default('db'))
-        if DB_FILE.is_dir():
-            DB_FILE = DB_FILE / dev_db_file
-
-    else:
-        DB_FILE = dev_db_file
-        DB_FILE = BASE_DIR / DB_FILE
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': DB_FILE,
-        'OPTIONS': {
-            'timeout': 10,
-        }
-    }
-}
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [

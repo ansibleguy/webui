@@ -18,6 +18,8 @@ You are able to create multiple Repositories that act as Ansible-Playbook base-d
 
 |repo_ui|
 
+----
+
 Static
 ******
 

@@ -55,7 +55,7 @@ def test_main_pages():
         'ui/jobs/manage', 'ui/jobs/log', 'ui/jobs/credentials',
         'ui/settings/api_keys', 'ui/settings/permissions',
         'ui/system/admin/', 'ui/system/api_docs', 'ui/system/environment', 'ui/system/config',
-        '/a/password_change/',
+        'a/password_change/',
     ])
 
 

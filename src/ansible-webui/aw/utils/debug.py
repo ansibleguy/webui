@@ -3,6 +3,7 @@ from sys import stderr, stdout
 from inspect import stack as inspect_stack
 from inspect import getfile as inspect_getfile
 
+from aw.config.main import config
 from aw.utils.util import datetime_w_tz
 from aw.utils.deployment import deployment_dev, deployment_staging
 from aw.config.hardcoded import LOG_TIME_FORMAT
@@ -27,13 +28,13 @@ def _log_prefix() -> str:
 
 
 def log(msg: str, level: int = 3):
-    dev = deployment_dev()
+    debug = deployment_dev() or config['debug']
     prefix_caller = ''
 
-    if level > 5 and not dev:
+    if level > 5 and not debug:
         return
 
-    if dev:
+    if debug:
         caller = inspect_getfile(inspect_stack()[1][0]).rsplit('/', 1)[1].rsplit('.', 1)[0]
         prefix_caller = f'[{caller}] '
 
