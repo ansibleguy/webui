@@ -100,7 +100,7 @@ class APIRepository(GenericAPIView):
         operation_id='repository_create',
     )
     def post(self, request):
-        privileged = has_manager_privileges(get_api_user(request))
+        privileged = has_manager_privileges(user=get_api_user(request), kind='repository')
         if not privileged:
             return Response(data={'msg': 'Not privileged to manage repositories'}, status=403)
 

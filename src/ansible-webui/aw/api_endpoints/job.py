@@ -14,7 +14,7 @@ from aw.api_endpoints.base import API_PERMISSION, get_api_user, BaseResponse, Ge
     LogDownloadResponse
 from aw.api_endpoints.job_util import get_viewable_jobs_serialized, JobReadResponse, get_job_executions_serialized, \
     JobExecutionReadResponse, get_viewable_jobs, get_job_execution_serialized, get_log_file_content
-from aw.utils.permission import has_job_permission, has_credentials_permission
+from aw.utils.permission import has_job_permission, has_credentials_permission, has_manager_privileges
 from aw.execute.queue import queue_add
 from aw.execute.util import update_status, is_execution_status
 from aw.utils.util import is_set
@@ -135,7 +135,7 @@ class APIJob(APIView):
     )
     def post(self, request):
         user = get_api_user(request)
-        if not user.is_staff:
+        if not has_manager_privileges(user=user, kind='job'):
             return Response(data={'msg': 'Not privileged to create jobs'}, status=403)
 
         serializer = JobWriteRequest(data=request.data)

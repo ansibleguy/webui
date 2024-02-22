@@ -10,6 +10,7 @@
 * Form-Validation enhancements
   * Checking if provided file/directory exists
   * Enhanced job-file file-browsing
+* Privilege System - Manager Groups
 
 
 ### 0.0.9

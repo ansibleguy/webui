@@ -40,10 +40,11 @@ def main():
 
     django_setup()
 
-    from db import create_first_superuser
+    from db import create_first_superuser, create_privileged_groups
     from webserver import init_webserver
     from aw.execute.scheduler import init_scheduler
 
     create_first_superuser()
+    create_privileged_groups()
     init_scheduler()
     init_webserver()

@@ -11,7 +11,7 @@ from aw.settings import DB_FILE
 from aw.utils.subps import process
 from aw.utils.debug import log, log_error, log_warn
 from aw.utils.deployment import deployment_prod
-from aw.config.hardcoded import FILE_TIME_FORMAT
+from aw.config.hardcoded import FILE_TIME_FORMAT, GRP_MANAGER
 from aw.config.environment import check_aw_env_var_true, get_aw_env_var, check_aw_env_var_is_set
 
 DB_BACKUP_EXT = '.auto.bak'
@@ -125,3 +125,10 @@ def create_first_superuser():
             log(msg=f"Generated user: '{name}'", level=3)
             log(msg=f"Generated pwd: '{pwd}'", level=3)
             log_warn('Make sure to change the password!')
+
+
+def create_privileged_groups():
+    # pylint: disable=C0415
+    from django.contrib.auth.models import Group
+    for grp in GRP_MANAGER.values():
+        Group.objects.get_or_create(name=grp)

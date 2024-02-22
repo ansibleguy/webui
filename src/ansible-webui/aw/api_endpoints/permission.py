@@ -248,7 +248,7 @@ class APIPermission(GenericAPIView):
         operation_id='permission_create',
     )
     def post(self, request):
-        privileged = has_manager_privileges(get_api_user(request))
+        privileged = has_manager_privileges(user=get_api_user(request), kind='permission')
         if not privileged:
             return Response(
                 data={'msg': 'Not privileged to manage permissions'},
@@ -303,7 +303,7 @@ class APIPermissionItem(GenericAPIView):
         operation_id='permission_edit',
     )
     def put(self, request, perm_id: int):
-        privileged = has_manager_privileges(get_api_user(request))
+        privileged = has_manager_privileges(user=get_api_user(request), kind='permission')
         if not privileged:
             return Response(
                 data={'msg': 'Not privileged to manage permissions'},
@@ -349,7 +349,7 @@ class APIPermissionItem(GenericAPIView):
         operation_id='permission_delete'
     )
     def delete(self, request, perm_id: int):
-        privileged = has_manager_privileges(get_api_user(request))
+        privileged = has_manager_privileges(user=get_api_user(request), kind='permission')
         if not privileged:
             return Response(
                 data={'msg': 'Not privileged to manage permissions'},

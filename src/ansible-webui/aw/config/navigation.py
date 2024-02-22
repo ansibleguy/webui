@@ -19,6 +19,7 @@ NAVIGATION = {
             'API Docs': '/ui/system/api_docs',
             'Config': '/ui/system/config',
             'Environment': '/ui/system/environment',
+            'Password': '/a/password_change/',
         },
     },
     'right': {

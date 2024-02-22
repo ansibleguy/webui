@@ -5,6 +5,7 @@ from aw.model.job_credential import BaseJobCredentials, JobGlobalCredentials
 from aw.model.repository import Repository
 from aw.base import USERS
 from aw.utils.debug import log
+from aw.config.hardcoded import GRP_MANAGER
 
 
 def get_job_if_allowed(user: USERS, job: Job, permission_needed: int) -> (Job, None):
@@ -41,9 +42,13 @@ def _evaluate_permission(permission: JobPermission, user: USERS, permission_need
 
 def _has_permission(
         permission_links: (JobPermissionMapping, JobCredentialsPermissionMapping), permission_needed: int,
-        user: USERS, permission_attr_all: str,
+        user: USERS, permission_attr_all: str, manager: str = None,
 ) -> bool:
     if user.is_superuser:
+        return True
+
+    if manager is not None and permission_needed <= CHOICE_PERMISSION_READ and \
+            has_manager_privileges(user=user, kind=manager):
         return True
 
     # 'all' permissions
@@ -73,6 +78,7 @@ def has_job_permission(user: USERS, job: Job, permission_needed: int) -> bool:
         permission_needed=permission_needed,
         permission_attr_all='jobs_all',
         user=user,
+        manager='job',
     )
 
 
@@ -84,6 +90,7 @@ def has_credentials_permission(
         permission_needed=permission_needed,
         permission_attr_all='credentials_all',
         user=user,
+        manager='credentials',
     )
 
 
@@ -95,6 +102,7 @@ def has_repository_permission(
         permission_needed=permission_needed,
         permission_attr_all='repositories_all',
         user=user,
+        manager='repository',
     )
 
 
@@ -128,6 +136,8 @@ def get_viewable_repositories(user: USERS) -> list[Repository]:
     return repositories_viewable
 
 
-def has_manager_privileges(user: USERS) -> bool:
-    # todo: create explicit privilege
-    return user.is_staff
+def has_manager_privileges(user: USERS, kind: str) -> bool:
+    if user.is_superuser:
+        return True
+
+    return user.groups.filter(name=GRP_MANAGER[kind]).exists()

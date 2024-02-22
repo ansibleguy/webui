@@ -24,9 +24,30 @@ Users & Groups
 
 The :code:`System - Admin - Users/Groups` admin-page allows you to create new users and manage group memberships.
 
-To allow a user to create jobs, permissions and global-credentials you need to activate the :code:`Staff status`.
+Users can change their own password at :code:`System - Password`
+
+The :code:`Superuser` flag can be used to grant all privileges to a user.
 
 |perm_users_groups|
+
+----
+
+Managers
+********
+
+To allow a users to perform management actions - add them to the corresponding system-group.
+
+Available ones are:
+
+* :code:`AW Job Managers` - create new jobs and view all existing ones
+
+* :code:`AW Permission Managers` - create, update and delete permissions
+
+* :code:`AW Repository Managers` - create new repositories and view all existing ones
+
+* :code:`AW Credentials Managers` - create new global credentials and view all existing ones
+
+* :code:`AW System Managers` - configure system settings
 
 ----
 

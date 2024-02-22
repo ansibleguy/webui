@@ -71,7 +71,7 @@ class APISystemConfig(APIView):
         operation_id='system_config_edit',
     )
     def put(self, request):
-        privileged = has_manager_privileges(get_api_user(request))
+        privileged = has_manager_privileges(user=get_api_user(request), kind='system')
         if not privileged:
             return Response(
                 data={'msg': 'Not privileged to manage system config'},

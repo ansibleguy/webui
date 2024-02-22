@@ -9,7 +9,7 @@ from aw.model.job import Job, JobExecution
 from aw.model.job_credential import BaseJobCredentials, JobUserCredentials, JobGlobalCredentials
 from aw.model.permission import CHOICE_PERMISSION_READ, CHOICE_PERMISSION_WRITE, CHOICE_PERMISSION_FULL
 from aw.api_endpoints.base import API_PERMISSION, get_api_user, GenericResponse, BaseResponse
-from aw.utils.permission import has_credentials_permission
+from aw.utils.permission import has_credentials_permission, has_manager_privileges
 from aw.utils.util import is_null
 from aw.base import USERS
 
@@ -166,7 +166,7 @@ class APIJobCredentials(APIView):
         user = get_api_user(request)
         are_global = are_global_credentials(request)
 
-        if are_global and not user.is_staff:
+        if are_global and not has_manager_privileges(user=user, kind='credentials'):
             return Response(data={'msg': 'Not privileged to create global credentials'}, status=403)
 
         if are_global:
