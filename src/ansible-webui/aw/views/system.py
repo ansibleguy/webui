@@ -132,12 +132,12 @@ def system_environment(request) -> HttpResponse:
     python_modules = _parsed_python_modules()
     ansible_version = _parsed_ansible_version(python_modules)
 
-    system_versions = process(['uname', '-a'])['stdout']
+    linux_versions = process(['uname', '-a'])['stdout']
     if deployment_docker():
-        system_versions += ' (dockerized)'
+        linux_versions += ' (dockerized)'
 
     env_system = {
-        'env_linux': system_versions,
+        'env_linux': linux_versions,
         'env_git': process(['git', '--version'])['stdout'],
         'env_ansible_core': ansible_version['ansible_core'],
         'env_ansible_runner': ansible_version['ansible_runner'],
