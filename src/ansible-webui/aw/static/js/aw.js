@@ -177,6 +177,7 @@ function apiBrowseDirFilteredChoices(choices, userInputCurrent, allowEmpty = fal
     if (!allowEmpty && choicesFiltered.length == 0) {
         choicesFiltered = choices;
     }
+    choicesFiltered.sort();
     return choicesFiltered;
 }
 
