@@ -40,6 +40,7 @@ body.light {
     --borderError: #f5c6cb;
     --tcError: #721c24;
     --awLogs: #404040;
+    --link: #0000EE;
 }
 
 body.dark {
@@ -60,6 +61,7 @@ body.dark {
     --borderError: #404040;
     --tcError: #721c24;
     --awLogs: #282828;
+    --link: #66B2F5;
 }
 
 /* START basic */
@@ -141,7 +143,7 @@ iframe {
 
 a {
   text-decoration: none;
-  color: #66B2F5;
+  color: var(--link);
 }
 
 a:visited {
