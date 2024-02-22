@@ -125,18 +125,18 @@ def _parsed_python_modules() -> dict:
     return modules
 
 
-@login_required
-@ui_endpoint_wrapper
-def system_environment(request) -> HttpResponse:
-    # todo: allow to check for updates (pypi, ansible-galaxy & github api)
-    python_modules = _parsed_python_modules()
-    ansible_version = _parsed_ansible_version(python_modules)
+def get_system_versions(python_modules: dict = None, ansible_version: dict = None) -> dict:
+    if python_modules is None:
+        python_modules = _parsed_python_modules()
+
+    if ansible_version is None:
+        ansible_version = _parsed_ansible_version(python_modules)
 
     linux_versions = process(['uname', '-a'])['stdout']
     if deployment_docker():
         linux_versions += ' (dockerized)'
 
-    env_system = {
+    return {
         'env_linux': linux_versions,
         'env_git': process(['git', '--version'])['stdout'],
         'env_ansible_core': ansible_version['ansible_core'],
@@ -146,13 +146,23 @@ def system_environment(request) -> HttpResponse:
         'env_gunicorn': python_modules['gunicorn']['version'],
         'env_jinja': ansible_version['jinja'],
         'env_libyaml': ansible_version['libyaml'],
+        'env_python': f"{version_info.major}.{version_info.minor}.{version_info.micro}",
     }
+
+
+@login_required
+@ui_endpoint_wrapper
+def system_environment(request) -> HttpResponse:
+    # todo: allow to check for updates (pypi, ansible-galaxy & github api)
+    python_modules = _parsed_python_modules()
+    ansible_version = _parsed_ansible_version(python_modules)
+    env_system = get_system_versions(python_modules=python_modules, ansible_version=ansible_version)
+
     return render(
         request, status=200, template_name='system/environment.html',
         context={
             **env_system,
             'env_system': env_system,
-            'env_python': f"{version_info.major}.{version_info.minor}.{version_info.micro}",
             'env_python_modules': python_modules,
             'env_ansible_config': _parsed_ansible_config(),
             # 'env_ansible_roles': get_role_list(),

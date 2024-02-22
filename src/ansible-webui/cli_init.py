@@ -1,6 +1,7 @@
 from os import environ
 from os import path as os_path
 from sys import path as sys_path
+from importlib.metadata import version, PackageNotFoundError
 
 from django import setup as django_setup
 
@@ -8,7 +9,11 @@ from django import setup as django_setup
 def init_cli():
     # workaround for CI
     if 'AW_VERSION' not in environ:
-        environ['AW_VERSION'] = '0.0.0'
+        try:
+            environ['AW_VERSION'] = version('ansible-webui')
+
+        except PackageNotFoundError:
+            environ['AW_VERSION'] = '0.0.0'
 
     # pylint: disable=E0401,C0415
     try:

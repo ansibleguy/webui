@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 
 from sys import exit as sys_exit
+from sys import argv as sys_argv
 from os import geteuid
 from os import stat
 from os import path
 from argparse import ArgumentParser
+from json import dumps as json_dumps
 
 from aw.config.hardcoded import KEY_TIME_FORMAT
 
@@ -29,6 +31,15 @@ def _api_key(action: str, username: str):
     sys_exit(1)
 
 
+def _print_version():
+    # python3 -m ansible-webui.cli --version
+    from aw.templatetags.util import get_version
+    from aw.views.system import get_system_versions
+
+    print(f'Version: {get_version()}\n{json_dumps(get_system_versions(), indent=4)}')
+    sys_exit(0)
+
+
 def main():
     file_owner_uid = stat(path.dirname(path.abspath(__file__))).st_uid
     if geteuid() not in [0, file_owner_uid]:
@@ -36,6 +47,10 @@ def main():
         sys_exit(1)
 
     init_cli()
+
+    if len(sys_argv) > 1:
+        if sys_argv[1] in ['-v', '--version']:
+            _print_version()
 
     parser = ArgumentParser()
     parser.add_argument(

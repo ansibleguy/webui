@@ -35,6 +35,15 @@ You might need to restart the application to apply this setting.
 
 ----
 
+Versions
+********
+
+You can find the versions of software packages in use at the :code:`System - Environment` page.
+
+Alternatively you can check it from the cli: :code:`python3 -m ansible-webui.cli --version`
+
+----
+
 Job Execution
 *************
 
