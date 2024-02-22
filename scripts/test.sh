@@ -67,5 +67,23 @@ sleep 1
 pkill -f 'ansible-webui'
 
 echo ''
+echo 'TESTING TO INITIALIZE AW-DB'
+echo ''
+
+# shellcheck disable=SC2155
+TMP_DIR="/tmp/aw_$(date +%s)"
+mkdir -p "$TMP_DIR"
+cp -r ./* "$TMP_DIR"
+cd "$TMP_DIR"
+rm -rf ./src/ansible-webui/aw/migrations/*
+export AW_DB="${TMP_DIR}/aw.db"
+timeout 10 python3 src/ansible-webui
+ec="$?"
+if [[ "$ec" != "124" ]]
+then
+  exit 1
+fi
+
+echo ''
 echo '### FINISHED ###'
 echo ''

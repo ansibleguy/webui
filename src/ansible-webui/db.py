@@ -24,6 +24,7 @@ DB_BACKUP_RETENTION = DB_BACKUP_RETENTION_DAYS * 24 * 60 * 60
 
 
 def install_or_migrate_db():
+    log(msg=f"Using DB: {DB_FILE}", level=4)
     if not Path(DB_FILE).is_file():
         return install()
 
@@ -76,7 +77,7 @@ def migrate():
     _clean_old_db_backups()
     migration_needed = _make_migrations()
 
-    if migration_needed and check_aw_env_var_true('db_migrate'):
+    if migration_needed and check_aw_env_var_true(var='db_migrate', fallback=True):
         backup = f"{DB_FILE}.{datetime.now().strftime(FILE_TIME_FORMAT)}{DB_BACKUP_EXT}"
         log(msg=f"Creating database backup: '{backup}'", level=6)
         copy(src=DB_FILE, dst=backup)

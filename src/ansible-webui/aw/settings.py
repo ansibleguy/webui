@@ -109,10 +109,11 @@ def debug_mode() -> bool:
         return True
 
     try:
-        with db_connect(DB_FILE) as conn:
-            return conn.execute('SELECT debug FROM aw_systemconfig').fetchall()[0][0] == 1
+        if Path(DB_FILE).is_file():
+            with db_connect(DB_FILE) as conn:
+                return conn.execute('SELECT debug FROM aw_systemconfig').fetchall()[0][0] == 1
 
-    except (IndexError, OperationalError, FileNotFoundError):
+    except (IndexError, OperationalError):
         pass
 
     return False
