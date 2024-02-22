@@ -11,6 +11,7 @@
   * Checking if provided file/directory exists
   * Enhanced job-file file-browsing
 * Privilege System - Manager Groups
+* Password-Change UI
 
 
 ### 0.0.9

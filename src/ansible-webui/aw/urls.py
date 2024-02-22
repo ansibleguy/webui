@@ -2,6 +2,7 @@
 from django.urls import path, re_path
 from django.conf.urls import include
 from django.contrib import admin
+from django.contrib.auth import views as auth_views
 
 from web_serve_static import urlpatterns_static
 from aw.api import urlpatterns_api
@@ -18,6 +19,7 @@ urlpatterns += urlpatterns_api
 urlpatterns += [
     # auth
     path('a/', include('django.contrib.auth.urls')),  # login page
+    path('a/password_change/', auth_views.PasswordChangeView.as_view()),
     path('_admin/', admin.site.urls),  # admin page
     path('o/', logout),
 ]
