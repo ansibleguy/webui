@@ -25,7 +25,7 @@ body:
       description: |
         Provide your system versions.
         You can find it at `System - Environment`
-        Copy & paste all versions in the `System version` table.
+        Click the copy-button below the `System version` table and paste them here.
     validations:
       required: true
 
