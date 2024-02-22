@@ -35,10 +35,10 @@ def _commandline_arguments(job: Job, execution: JobExecution, path_run: Path) ->
     if is_set(execution.cmd_args):
         cmd_arguments.append(execution.cmd_args)
 
-    if execution.mode_check:
+    if execution.mode_check or job.mode_check:
         cmd_arguments.append('--check')
 
-    if execution.mode_diff:
+    if execution.mode_diff or job.mode_diff:
         cmd_arguments.append('--diff')
 
     credentials = get_credentials_to_use(job=job, execution=execution)
