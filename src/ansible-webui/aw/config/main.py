@@ -42,7 +42,7 @@ class Config:
             if 'AW_INIT' in environ and environ['AW_INIT'] == '1':
                 raise AppRegistryNotReady
 
-            # pylint: disable = C0415
+            # pylint: disable=C0415
             from aw.model.system import get_config_from_db
             return getattr(get_config_from_db(), str(setting))
 
