@@ -6,6 +6,7 @@ from django.core.validators import RegexValidator
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
 
+from aw.config.main import config
 from aw.utils.http import ui_endpoint_wrapper, ui_endpoint_wrapper_kwargs
 from aw.model.job import Job, JobExecution, JobExecutionResultHost
 from aw.model.permission import CHOICE_PERMISSION_WRITE
@@ -228,6 +229,8 @@ class RepositoryForm(forms.ModelForm):
         field_order = Repository.form_fields
         labels = FORM_LABEL['jobs']['repository']
         help_texts = FORM_HELP['jobs']['repository']
+
+    static_path = forms.CharField(max_length=500, initial=config['path_play'], required=False)
 
     git_credentials = forms.ChoiceField(
         required=False,

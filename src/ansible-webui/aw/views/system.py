@@ -2,6 +2,7 @@ from os import environ
 from pathlib import Path
 from getpass import getuser
 
+from pytz import all_timezones
 from django import forms
 from django.urls import path
 from django.shortcuts import HttpResponse
@@ -10,12 +11,14 @@ from django.contrib.auth.decorators import login_required
 from ansible_runner.interface import get_ansible_config
 
 from aw.config.main import config
+from aw.config.defaults import CONFIG_DEFAULTS
 from aw.utils.http import ui_endpoint_wrapper
 from aw.utils.subps import process_cache
 from aw.config.form_metadata import FORM_LABEL, FORM_HELP
 from aw.config.environment import AW_ENV_VARS, AW_ENV_VARS_SECRET
 from aw.model.system import SystemConfig
 from aw.utils.version import get_system_versions, parsed_ansible_version, parsed_python_modules
+from aw.utils.deployment import deployment_dev
 
 
 def _parsed_ansible_collections() -> dict:
@@ -117,6 +120,23 @@ class SystemConfigForm(forms.ModelForm):
         field_order = SystemConfig.form_fields
         labels = FORM_LABEL['system']['config']
         help_texts = FORM_HELP['system']['config']
+
+    path_run = forms.CharField(max_length=500, initial=CONFIG_DEFAULTS['path_run'], required=True)
+    path_play = forms.CharField(max_length=500, initial=CONFIG_DEFAULTS['path_play'], required=True)
+    path_log = forms.CharField(max_length=500, initial=CONFIG_DEFAULTS['path_log'], required=True)
+    path_ansible_config = forms.CharField(
+        max_length=500, initial=CONFIG_DEFAULTS['path_ansible_config'], required=False,
+    )
+    path_ssh_known_hosts = forms.CharField(
+        max_length=500, initial=CONFIG_DEFAULTS['path_ssh_known_hosts'], required=False,
+    )
+    timezone = forms.ChoiceField(
+        required=False,
+        widget=forms.Select,
+        choices=[(tz, tz) for tz in sorted(all_timezones)],
+        label=FORM_LABEL['system']['config']['timezone'],
+    )
+    debug = forms.BooleanField(initial=CONFIG_DEFAULTS['debug'] or deployment_dev())
 
 
 @login_required

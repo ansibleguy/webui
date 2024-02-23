@@ -44,7 +44,9 @@ class Config:
 
             # pylint: disable=C0415
             from aw.model.system import get_config_from_db
-            return getattr(get_config_from_db(), str(setting))
+            value = getattr(get_config_from_db(), str(setting))
+            if value is not None:
+                return value
 
         except (IntegrityError, OperationalError, ImproperlyConfigured, AppRegistryNotReady, ImportError,
                 AttributeError):
@@ -52,7 +54,7 @@ class Config:
             if setting not in CONFIG_DEFAULTS:
                 return None
 
-            return CONFIG_DEFAULTS[setting]
+        return CONFIG_DEFAULTS[setting]
 
     def get(self, setting: str) -> any:
         return self._from_env_or_db(setting)

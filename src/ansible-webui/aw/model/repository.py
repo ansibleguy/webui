@@ -1,6 +1,5 @@
 from django.db import models
 
-from aw.config.main import config
 from aw.config.hardcoded import SHORT_TIME_FORMAT
 from aw.model.base import BaseModel, DEFAULT_NONE, CHOICES_BOOL, CHOICES_JOB_EXEC_STATUS
 from aw.model.job_credential import JobGlobalCredentials
@@ -33,7 +32,7 @@ class Repository(BaseModel):
     log_stdout = models.CharField(max_length=300, **DEFAULT_NONE)
     log_stderr = models.CharField(max_length=300, **DEFAULT_NONE)
 
-    static_path = models.CharField(max_length=500, blank=True, null=True, default=config['path_play'])
+    static_path = models.CharField(max_length=500, **DEFAULT_NONE)
 
     git_origin = models.CharField(max_length=100, **DEFAULT_NONE)
     git_branch = models.CharField(max_length=100, **DEFAULT_NONE)
