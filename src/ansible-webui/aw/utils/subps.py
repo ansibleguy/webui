@@ -1,6 +1,7 @@
 import subprocess
 from pathlib import Path
 from os import environ
+from functools import cache
 
 from aw.settings import BASE_DIR
 from aw.utils.debug import log
@@ -49,3 +50,12 @@ def process(
         'stderr': stderr,
         'rc': rc,
     }
+
+
+@cache
+def process_cache(
+        cmd: str, timeout_sec: int = None, shell: bool = False,
+        cwd: Path = BASE_DIR, env: dict = None,
+) -> dict:
+    # read-only commands which results can be cached
+    return process(cmd=cmd.split(' '), timeout_sec=timeout_sec, shell=shell, cwd=cwd, env=env)

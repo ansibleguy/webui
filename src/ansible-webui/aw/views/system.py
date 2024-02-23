@@ -1,7 +1,6 @@
-from sys import version_info
-from importlib import metadata
 from os import environ
-from collections import OrderedDict
+from pathlib import Path
+from getpass import getuser
 
 from django import forms
 from django.urls import path
@@ -10,17 +9,17 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from ansible_runner.interface import get_ansible_config
 
-from aw.utils.http import ui_endpoint_wrapper
-from aw.utils.subps import process
-from aw.config.form_metadata import FORM_LABEL, FORM_HELP
 from aw.config.main import config
+from aw.utils.http import ui_endpoint_wrapper
+from aw.utils.subps import process_cache
+from aw.config.form_metadata import FORM_LABEL, FORM_HELP
 from aw.config.environment import AW_ENV_VARS, AW_ENV_VARS_SECRET
 from aw.model.system import SystemConfig
-from aw.utils.deployment import deployment_docker
+from aw.utils.version import get_system_versions, parsed_ansible_version, parsed_python_modules
 
 
 def _parsed_ansible_collections() -> dict:
-    result = process(['ansible-galaxy', 'collection', 'list'])
+    result = process_cache('ansible-galaxy collection list')
     if result['rc'] != 0:
         return {}
 
@@ -81,88 +80,28 @@ def _parsed_ansible_config() -> dict:
     return dict(sorted(ansible_config.items()))
 
 
-def _parsed_ansible_version(python_modules) -> dict:
-    versions = {'ansible': None, 'jinja': None, 'libyaml': None, 'ansible_runner': None}
-    try:
-        ansible_version = process(['ansible', '--version'])['stdout'].split('\n')
-        versions['ansible_core'] = ansible_version[0].strip()
-        versions['jinja'] = ansible_version[-2].split('=')[1].strip()
-        versions['libyaml'] = ansible_version[-1].split('=')[1].strip()
+def _aws_ssm() -> (str, None):
+    if Path('/usr/bin/session-manager-plugin').is_file():
+        return process_cache('/usr/bin/session-manager-plugin --version')['stdout']
 
-        if 'ansible-runner' in python_modules:
-            versions['ansible_runner'] = python_modules['ansible-runner']['version']
-
-        if 'ansible' in python_modules:
-            versions['ansible'] = python_modules['ansible']['version']
-
-    except IndexError:
-        pass
-
-    return versions
-
-
-def _parsed_python_modules() -> dict:
-    modules = OrderedDict()
-    try:
-        module_list = [m[0] for m in metadata.packages_distributions().values()]
-
-        for module in sorted(module_list):
-            modules[module.lower()] = {'name': module, 'version': metadata.distribution(module).version}
-
-    except (ImportError, AttributeError):
-        result = process(['pip', 'list'])
-        if result['rc'] != 0:
-            return {}
-
-        for line in result['stdout'].split('\n'):
-            if line.find('.') == -1:
-                continue
-
-            name, version = line.split(' ', 1)
-            name = name.strip()
-            modules[name.lower()] = {'name': name, 'version': version.strip()}
-
-    return modules
-
-
-def get_system_versions(python_modules: dict = None, ansible_version: dict = None) -> dict:
-    if python_modules is None:
-        python_modules = _parsed_python_modules()
-
-    if ansible_version is None:
-        ansible_version = _parsed_ansible_version(python_modules)
-
-    linux_versions = process(['uname', '-a'])['stdout']
-    if deployment_docker():
-        linux_versions += ' (dockerized)'
-
-    return {
-        'env_linux': linux_versions,
-        'env_git': process(['git', '--version'])['stdout'],
-        'env_ansible_core': ansible_version['ansible_core'],
-        'env_ansible_runner': ansible_version['ansible_runner'],
-        'env_django': python_modules['django']['version'],
-        'env_django_api': python_modules['djangorestframework']['version'],
-        'env_gunicorn': python_modules['gunicorn']['version'],
-        'env_jinja': ansible_version['jinja'],
-        'env_libyaml': ansible_version['libyaml'],
-        'env_python': f"{version_info.major}.{version_info.minor}.{version_info.micro}",
-    }
+    return None
 
 
 @login_required
 @ui_endpoint_wrapper
 def system_environment(request) -> HttpResponse:
     # todo: allow to check for updates (pypi, ansible-galaxy & github api)
-    python_modules = _parsed_python_modules()
-    ansible_version = _parsed_ansible_version(python_modules)
+    python_modules = parsed_python_modules()
+    ansible_version = parsed_ansible_version(python_modules)
     env_system = get_system_versions(python_modules=python_modules, ansible_version=ansible_version)
 
     return render(
         request, status=200, template_name='system/environment.html',
         context={
             **env_system,
+            'env_user': getuser(),
             'env_system': env_system,
+            'env_aws_ssm': _aws_ssm(),
             'env_python_modules': python_modules,
             'env_ansible_config': _parsed_ansible_config(),
             # 'env_ansible_roles': get_role_list(),

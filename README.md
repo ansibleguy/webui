@@ -53,7 +53,7 @@ Login: User `demo`, Password `Ansible1337`
 
 Feel free to contribute to this project using [pull-requests](https://github.com/ansibleguy/ansible-webui/pulls), [issues](https://github.com/ansibleguy/ansible-webui/issues) and [discussions](https://github.com/ansibleguy/ansible-webui/discussions)!
 
-Testers are also very welcome! Please [give feedback](https://github.com/ansibleguy/ansible-webui/issues)
+Testers are also very welcome! Please [give feedback](https://github.com/ansibleguy/ansible-webui/discussions)
 
 See also: [Contributing](https://github.com/ansibleguy/ansible-webui/blob/latest/CONTRIBUTE.md)
 

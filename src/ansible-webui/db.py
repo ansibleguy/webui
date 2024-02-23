@@ -11,6 +11,7 @@ from aw.settings import DB_FILE
 from aw.utils.subps import process
 from aw.utils.debug import log, log_error, log_warn
 from aw.utils.deployment import deployment_prod
+from aw.config.main import VERSION
 from aw.config.hardcoded import FILE_TIME_FORMAT, GRP_MANAGER
 from aw.config.environment import check_aw_env_var_true, get_aw_env_var, check_aw_env_var_is_set
 
@@ -23,8 +24,22 @@ if not deployment_prod():
 DB_BACKUP_RETENTION = DB_BACKUP_RETENTION_DAYS * 24 * 60 * 60
 
 
+def _check_if_writable():
+    try:
+        test_file = DB_FILE.parent / '.awtest'
+        with open(test_file, 'w', encoding='utf-8') as _file:
+            _file.write('TEST')
+
+        remove(test_file)
+
+    except PermissionError:
+        log(msg=f"Error: DB directory is not writable: '{DB_FILE.parent}'")
+        sys_exit(1)
+
+
 def install_or_migrate_db():
     log(msg=f"Using DB: {DB_FILE}", level=4)
+    _check_if_writable()
     if not Path(DB_FILE).is_file():
         return install()
 
@@ -87,6 +102,12 @@ def migrate():
 
 
 def _make_migrations() -> bool:
+    if VERSION not in ['dev', 'staging', 'latest', '0.0.0'] and \
+            VERSION.find('dev') == -1 and VERSION.find('staging') == -1 and \
+            VERSION.find('latest') == -1:
+        # stable versions should only have released migrations
+        return False
+
     changed = False
 
     for stdout in [

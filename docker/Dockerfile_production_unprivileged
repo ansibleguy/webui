@@ -1,0 +1,33 @@
+FROM python:3.10-alpine
+
+# BUILD CMD: docker build -f Dockerfile_production -t ansible-webui:<VERSION> --build-arg "AW_VERSION=<VERSION>" --no-cache .
+# RUN:
+#   sudo useradd ansible-webui --shell /usr/sbin/nologin --uid 8785 --user-group
+#   mkdir ${YOUR_DATA_DIR} && chown -R ansible-webui ${YOUR_DATA_DIR}
+#   docker run -d --name ansible-webui --publish 127.0.0.1:8000:8000 --volume ${YOUR_DATA_DIR}:/data --volume $(pwd)/ansible/play:/play ansible-webui:<VERSION>
+
+ARG AW_VERSION
+ARG AW_UID=8785
+ARG AW_USER=aw
+
+RUN apk add --no-cache git git-lfs ansible-core openssh-client sshpass && \
+    pip install --no-cache-dir --upgrade pip 2>/dev/null && \
+    pip install --no-cache-dir "git+https://github.com/ansibleguy/ansible-webui.git@${AW_VERSION}" && \
+    adduser --uid ${AW_UID} --home /home/ansible-webui --shell /usr/sbin/nologin --disabled-password ${AW_USER} ${AW_USER} && \
+    mkdir -p /play /data/log && \
+    chown -R ${AW_USER}:${AW_USER} /data /play
+
+
+ENV AW_VERSION=${AW_VERSION} \
+    AW_DOCKER=1 \
+    PYTHONUNBUFFERED=1 \
+    AW_DB=/data/aw.db \
+    AW_PATH_LOG=/data/log \
+    AW_PATH_PLAY=/play
+WORKDIR /play
+USER ${AW_USER}
+EXPOSE 8000
+
+COPY --chmod=0755 entrypoint_production.sh /entrypoint.sh
+COPY --chmod=0755 requirements.sh /entrypoint_requirements.sh
+ENTRYPOINT ["/entrypoint.sh"]

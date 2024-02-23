@@ -1,34 +1,16 @@
-from pathlib import Path
-from datetime import datetime
 from functools import cache
 
 from django import template
 
-from aw.config.main import VERSION
 from aw.config.navigation import NAVIGATION
-from aw.utils.subps import process
-from aw.config.hardcoded import LOG_TIME_FORMAT
+from aw.utils.version import get_version as get_version_util
 
 register = template.Library()
 
 
-@cache
 @register.simple_tag
 def get_version() -> str:
-    if VERSION == 'latest' or VERSION.find('dev') != -1 or VERSION.find('staging') != -1:
-        this_file = Path(__file__)
-        repo_base = this_file.resolve().parent.parent.parent.parent.parent
-        if (repo_base / '.git').is_dir():
-            commit = process(cmd=['git', 'rev-parse', '--short', 'HEAD'], cwd=repo_base)['stdout'].strip()
-            if commit != '':
-                return f'{VERSION} ({commit})'
-
-        else:
-            mod_time = this_file.stat().st_mtime
-            mod_time = datetime.fromtimestamp(mod_time).strftime(LOG_TIME_FORMAT)
-            return f'{VERSION} ({mod_time})'
-
-    return VERSION
+    return get_version_util()
 
 
 @register.simple_tag

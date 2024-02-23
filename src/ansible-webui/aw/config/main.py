@@ -11,7 +11,7 @@ from aw.utils.util_no_config import set_timezone, is_set
 from aw.config.defaults import CONFIG_DEFAULTS
 
 
-def get_version() -> str:
+def __get_module_version() -> str:
     env_version = get_aw_env_var_or_default('version')
     if env_version is not None:
         return env_version
@@ -25,7 +25,7 @@ def get_version() -> str:
         return '0.0.0'
 
 
-VERSION = get_version()
+VERSION = __get_module_version()
 
 
 class Config:

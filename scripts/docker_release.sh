@@ -13,6 +13,8 @@ set -u
 VERSION="$1"
 IMAGE_BASE="ansible0guy/ansible-webui"
 image="${IMAGE_BASE}:${VERSION}"
+image_unpriv="${IMAGE_BASE}-unprivileged:${VERSION}"
+image_aws="${IMAGE_BASE}-aws:${VERSION}"
 image_latest="${IMAGE_BASE}:latest"
 
 if ! docker image ls | grep "$IMAGE_BASE" | grep -q "$VERSION"
@@ -24,6 +26,8 @@ fi
 echo ''
 echo "### RELEASING IMAGE ${image} ###"
 docker push "$image"
+docker push "$image_unpriv"
+docker push "$image_aws"
 
 echo ''
 read -r -p "Release version ${VERSION} as latest? [y/N] " -n 1

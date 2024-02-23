@@ -61,9 +61,19 @@
                 <td>{{ env_libyaml }}</td>
             </tr>
 {% endif %}
+{% if env_aws_ssm is not none %}
+            <tr>
+                <td>AWS Session Manager Plugin</td>
+                <td>{{ env_aws_ssm }}</td>
+            </tr>
+{% endif %}
             <tr>
                 <td>Git</td>
                 <td>{{ env_git }}</td>
+            </tr>
+            <tr>
+                <td>Running User</td>
+                <td>{{ env_user }}</td>
             </tr>
             <tr>
                 <td>Linux</td>

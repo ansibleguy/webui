@@ -1,0 +1,25 @@
+ARG AW_VERSION
+
+# references:
+#   https://github.com/ansibleguy/ansible-webui/discussions/5
+#   https://github.com/aws/session-manager-plugin/issues/12#issuecomment-972880203
+#   https://github.com/aws/session-manager-plugin/blob/mainline/Dockerfile
+
+FROM public.ecr.aws/docker/library/golang:1.17 as ssm-builder
+# https://hub.docker.com/_/golang/tags?page=1&name=1.15
+
+ARG SSM_VERSION=1.2.553.0
+# ssm version: https://github.com/aws/session-manager-plugin/releases
+
+RUN apt -y update && apt -y upgrade && apt -y install rpm tar gzip wget zip && apt clean all && \
+    curl -sLO https://github.com/aws/session-manager-plugin/archive/${SSM_VERSION}.tar.gz && \
+    mkdir -p /go/src/github.com && \
+    tar xzf ${SSM_VERSION}.tar.gz && \
+    mv session-manager-plugin-${SSM_VERSION} /go/src/github.com/session-manager-plugin && \
+    cd /go/src/github.com/session-manager-plugin && \
+    make release && \
+    /go/src/github.com/session-manager-plugin/bin/linux_amd64_plugin/session-manager-plugin --version
+
+FROM ansible0guy/ansible-webui-unprivileged:${AW_VERSION}
+RUN apk add py3-boto3 aws-cli
+COPY --from=ssm-builder /go/src/github.com/session-manager-plugin/bin/linux_amd64_plugin/session-manager-plugin /usr/bin/

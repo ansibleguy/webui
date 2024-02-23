@@ -34,6 +34,8 @@ Most system configuration can be managed using the WebUI :code:`System - Config`
 
 |cnf_sys|
 
+----
+
 Jobs
 ====
 
@@ -41,12 +43,21 @@ Jobs can be managed at the :code:`Jobs - Manage` page.
 
 |cnf_jobs|
 
+----
 
 Permissions, Users, Groups
 ==========================
 
 See: :ref:`Usage - Privileges <usage_permission>`
 
+----
+
+Repositories
+============
+
+See: :ref:`Usage - Repositories <usage_repositories>`
+
+----
 
 Administration
 ==============
