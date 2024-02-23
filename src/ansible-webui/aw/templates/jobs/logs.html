@@ -19,6 +19,13 @@
         </tr>
     </table>
     <div id="aw-api-data-tmpl-actions" hidden="hidden">
+        <button class="btn btn-primary aw-btn-action aw-api-click" title="Restart Job" aw-api-endpoint="job" aw-api-item="${JOB_ID}" aw-api-method="post">
+            {% include "../button/icon/run.html" %}
+        </button>
+        <button class="btn btn-danger aw-btn-action aw-api-click" title="Stop Execution" aw-api-endpoint="job"
+                aw-api-item="${JOB_ID}/${ID}" aw-api-method="delete">
+            {% include "../button/icon/stop.html" %}
+        </button>
         <button class="btn btn-info aw-btn-action aw-btn-expand aw-log-read" title="Show Logs"
                 aw-expand="aw-spoiler-${ID}" aw-log="aw-execution-logs-${ID}"
                 aw-job="${JOB_ID}" aw-exec="${ID}" aw-log-line="0"
@@ -39,6 +46,10 @@
             <button type="submit" title="Collapse" class="btn btn-info aw-btn-action aw-btn-collapse" aw-collapse="aw-spoiler-${ID}"
             id="aw-log-end-${ID}">
                 {% include "../button/icon/collapse.html" %}
+            </button>
+            <button class="btn btn-danger aw-btn-action aw-api-click" title="Stop Execution" aw-api-endpoint="job"
+                    aw-api-item="${JOB_ID}/${ID}" aw-api-method="delete">
+                {% include "../button/icon/stop.html" %}
             </button>
         </div>
     </div>

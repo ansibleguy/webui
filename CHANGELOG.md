@@ -12,6 +12,10 @@
   * Enhanced job-file file-browsing
 * Privilege System - Manager Groups
 * Password-Change UI
+* Docker
+  * Support to [run as unprivileged user](https://ansible-webui.readthedocs.io/en/latest/usage/docker.html#unprivileged)
+  * [Image with AWS-CLI support](https://ansible-webui.readthedocs.io/en/latest/usage/docker.html#aws-cli-support)
+* Enhanced handling of [SQLite Write-Locks](https://github.com/ansibleguy/ansible-webui/issues/6)
 
 
 ### 0.0.9
