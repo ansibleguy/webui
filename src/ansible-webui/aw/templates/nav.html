@@ -73,9 +73,18 @@
                 {% set_var 'right'|get_nav as nav_right %}
                 {% for nav_item in nav_right.values %}
                     {% if not nav_item.login or user.is_authenticated %}
-                        <li class="nav-item aw-nav-right-li">
-                            <a class="nav-link" href="{{ nav_item.url }}">{{ nav_item.element | safe }}</a>
-                        </li>
+                        {% if 'method' in nav_item %}
+                            <li class="nav-item aw-nav-right-li">
+                                <form action="{{ nav_item.url }}" method="{{ nav_item.method }}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="nav-link">{{ nav_item.element | safe }}</button>
+                                </form>
+                            </li>
+                        {% else %}
+                            <li class="nav-item aw-nav-right-li">
+                                <a class="nav-link" href="{{ nav_item.url }}">{{ nav_item.element | safe }}</a>
+                            </li>
+                        {% endif %}
                     {% endif %}
                 {% endfor %}
             </ul>

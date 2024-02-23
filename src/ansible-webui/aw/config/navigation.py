@@ -47,6 +47,7 @@ NAVIGATION = {
             'element': '<i class="fas fa-sign-out-alt fa-2x aw-nav-right-icon aw-nav-right-icon-logout" '
                        'title="Logout"></i>',
             'url': LOGOUT_PATH,
+            'method': 'post',
             'login': True,
         },
     }

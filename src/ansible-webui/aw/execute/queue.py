@@ -15,5 +15,4 @@ def queue_get() -> (tuple[Job, USERS], None):
 
 def queue_add(job: Job, user: USERS):
     log(msg=f"Job '{job.name}' added to execution queue", level=4)
-    queue_item = JobQueue(job=job, user=user)
-    queue_item.save()
+    JobQueue(job=job, user=user).save()

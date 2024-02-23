@@ -7,6 +7,7 @@ from django import setup as django_setup
 
 
 def init_cli():
+    environ.setdefault('AW_INIT', '1')
     # workaround for CI
     if 'AW_VERSION' not in environ:
         try:
