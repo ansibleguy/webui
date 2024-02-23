@@ -15,7 +15,7 @@ class SystemConfig(BaseModel):
     api_fields_write = form_fields
     api_fields_read_only = ['db', 'db_migrate', 'serve_static', 'deployment', 'version']
 
-    path_run = models.CharField(max_length=500, default=None)
+    path_run = models.CharField(max_length=500, default='/tmp/ansible-webui')
     path_play = models.CharField(max_length=500, default=None)
     path_log = models.CharField(max_length=500, default=None)
     timezone = models.CharField(max_length=300, default=CONFIG_DEFAULTS['timezone'])
@@ -41,7 +41,10 @@ def get_config_from_db() -> SystemConfig:
             raise ObjectDoesNotExist()
 
     except ObjectDoesNotExist:
-        config_db = SystemConfig()
+        config_db = SystemConfig(
+            path_play=CONFIG_DEFAULTS['path_play'],
+            path_log=CONFIG_DEFAULTS['path_log'],
+        )
         config_db.save()
 
     return config_db

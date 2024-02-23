@@ -84,7 +84,7 @@ def test_add():
 
 def test_modify():
     test_modify_locations([
-        {'l': 'config', 'd': {'run_timeout': 6060}},
+        {'l': 'config', 'd': {'run_timeout': 6060, 'path_play': '/etc/play', 'path_log': '/var/log'}},
         {'l': 'permission/1', 'd': {'name': 'perm1'}},
     ])
 
