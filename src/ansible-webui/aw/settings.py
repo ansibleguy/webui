@@ -94,11 +94,15 @@ else:
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
+        'ENGINE': 'aw.db_sqlite_patched',
+        # 'ENGINE': 'django.db.backends.sqlite3',  # todo: remove once feature is available natively in django 5.1
         'NAME': DB_FILE,
         'OPTIONS': {
-            'timeout': 3,  # kill buggy requests fast; do not block whole application
-        }
+            'timeout': 3,  # kill long-running write-requests fast; do not block whole application
+            # 'transaction_mode': 'IMMEDIATE',  # waiting for django 5.1 :(
+            # 'database is locked'; https://code.djangoproject.com/ticket/29280
+        },
+        'ATOMIC_REQUESTS': False,  # default
     }
 }
 
@@ -240,6 +244,7 @@ SPECTACULAR_SETTINGS = {
     'SWAGGER_UI_SETTINGS': {
         'displayOperationId': False,
     },
+    'POSTPROCESSING_HOOKS': []
 }
 
 if deployment_dev():

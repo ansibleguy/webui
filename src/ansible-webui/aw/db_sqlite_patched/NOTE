@@ -1,0 +1,3 @@
+NOTE: quick-patch for https://github.com/django/django/commit/a0204ac183ad6bca71707676d994d5888cf966aa
+
+todo: remove once feature is available natively in django 5.1
