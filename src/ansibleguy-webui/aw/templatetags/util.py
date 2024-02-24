@@ -1,9 +1,9 @@
 from functools import cache
 
 from django import template
-from django.conf import settings
 
 from aw.config.main import config
+from aw.settings import STATIC_URL
 from aw.config.navigation import NAVIGATION
 from aw.utils.version import get_version as get_version_util
 
@@ -19,7 +19,7 @@ def get_version() -> str:
 def get_logo() -> str:
     url = config['logo_url']
     if not url.startswith('http'):
-        return f"{settings.STATIC_URL}{url}"
+        return f"{STATIC_URL}{url}"
 
     return config['logo_url']
 

@@ -1,11 +1,11 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
-from django.conf import settings
 from django.contrib.auth.views import logout_then_login
 from django.shortcuts import HttpResponse
 from django.urls import path, re_path
 
 from aw.config.hardcoded import LOGIN_PATH
+from aw.settings import LOGIN_REDIRECT_URL
 from aw.utils.http import ui_endpoint_wrapper
 from aw.views.settings import urlpatterns_settings
 from aw.views.job import urlpatterns_jobs
@@ -41,7 +41,7 @@ def not_implemented(request) -> HttpResponse:
 @ui_endpoint_wrapper
 def catchall(request) -> HttpResponse:
     if request.user.is_authenticated:
-        return redirect(settings.LOGIN_REDIRECT_URL)
+        return redirect(LOGIN_REDIRECT_URL)
 
     return redirect(LOGIN_PATH)
 

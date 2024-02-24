@@ -1,5 +1,5 @@
 import signal
-from os import getpid
+from os import environ
 from os import kill as os_kill
 from sys import exit as sys_exit
 from threading import Thread, ThreadError
@@ -7,7 +7,9 @@ from time import sleep, time
 
 from gunicorn.arbiter import Arbiter
 from django.core.validators import ValidationError
+from django.db.utils import OperationalError, IntegrityError
 
+from aw.settings import DB_FILE
 from aw.execute.threader import ThreadManager
 from aw.utils.debug import log
 from aw.utils.util import is_null
@@ -37,7 +39,7 @@ class Scheduler:
             log('Finished!')
 
             # else gunicorn will not know it should die
-            os_kill(getpid(), signal.SIGTERM)
+            os_kill(int(environ['MAINPID']), signal.SIGTERM)
 
             # just in case
             if error or signum is not None:
@@ -56,8 +58,17 @@ class Scheduler:
     def start(self):
         log('Starting..', level=3)
         log('Starting job-threads', level=4)
-        self.reload()
-        self._run()
+        try:
+            self.reload()
+            self._run()
+
+        except (OperationalError, IntegrityError) as err:
+            log(
+                "Database has an unexpected state! "
+                f"If you are fine with losing the existing config - delete the database file: {DB_FILE}\n"
+                f"Error: {err}"
+            )
+            self.stop()
 
     def _run(self):
         # pylint: disable=W0718
@@ -199,7 +210,7 @@ def init_scheduler():
     def signal_exit(signum=None, stack=None):
         del stack
         scheduler.stop(signum)
-        os_kill(getpid(), signal.SIGQUIT)  # trigger 'Arbiter.stop'
+        os_kill(int(environ['MAINPID']), signal.SIGQUIT)  # trigger 'Arbiter.stop'
         sleep(3)
         sys_exit(1)
 
