@@ -1,7 +1,7 @@
 FROM python:3.10-alpine
 
-# BUILD: docker build -f Dockerfile_unstable_unprivileged -t ansible-webui-unprivileged:unstable --no-cache .
-# RUN: docker run -it --name ansible-webui-unstable --publish 127.0.0.1:8000:8000 ansible-webui-unprivileged:unstable
+# BUILD: docker build -f Dockerfile_unstable_unprivileged -t ansible0guy/webui-unprivileged:unstable --no-cache .
+# RUN: docker run -it --name ansible-webui-unstable --publish 127.0.0.1:8000:8000 ansible0guy/webui-unprivileged:unstable
 # RUN WITH PERSISTENT DB:
 #   sudo useradd ansible-webui --shell /usr/sbin/nologin --uid 8785 --user-group
 #   mkdir ${YOUR_DATA_DIR} && chown -R ansible-webui ${YOUR_DATA_DIR}

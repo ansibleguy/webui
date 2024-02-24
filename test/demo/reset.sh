@@ -4,16 +4,20 @@ set -e
 
 AW_ADMIN='USER'
 AW_ADMIN_PWD='PWD'
+DIR_DATA='/var/local/ansible-webui/'
+DIR_MIG="${DIR_DATA}migrations/"
+DIR_PLAY="${DIR_DATA}play/"
+DIR_LOG="${DIR_DATA}log/"
+AW_USER='ansible-webui'
+IMAGE='ansible0guy/webui-unprivileged:latest'
+
+# useradd $AW_USER --shell /usr/sbin/nologin --uid 8785 --user-group
 
 echo '### REMOVING EXISTING ###'
 if docker ps -a | grep -q ansible-webui
 then
   docker stop ansible-webui
   docker rm ansible-webui
-fi
-if docker image ls | grep -q ansible-webui
-then
-  docker image rm ansible-webui:latest
 fi
 
 echo '### CLEANUP ###'
@@ -25,16 +29,15 @@ then
   cp -r /var/local/ansible-webui/migrations "${BAK_DIR}/"
 fi
 
-cp /var/local/ansible-webui/aw.db.bak /var/local/ansible-webui/aw.db
+cp "${DIR_DATA}/aw.db.bak" "${DIR_DATA}/aw.db"
+chown "$AW_USER" "$DIR_DATA" "${DIR_DATA}/aw.db"
+chown -R "$AW_USER" "$DIR_MIG" "$DIR_LOG"
+chown -R root:"$AW_USER" "$DIR_PLAY"
 
-rm -f /var/local/ansible-webui/log/*
+# rm -f /var/local/ansible-webui/log/*
 
-echo '### BUILDING LATEST ###'
-cd /tmp
-rm -rf /tmp/webui
-git clone https://github.com/ansibleguy/webui.git
-cd /tmp/webui/docker
-docker build -f Dockerfile_production -t ansible-webui:latest --build-arg "AW_VERSION=latest" --no-cache .
+echo '### UPDATING ###'
+docker pull "$IMAGE"
 
 echo '### STARTING ###'
-docker run -d --restart unless-stopped --name ansible-webui --publish 8000:8000 --volume /var/local/ansible-webui/:/data --volume /var/local/ansible-webui/play/:/play --volume /var/local/ansible-webui/migrations/:/usr/local/lib/python3.10/site-packages/ansible-webui/aw/migrations --env AW_ADMIN_PWD="$AW_ADMIN_PWD" --env AW_ADMIN="$AW_ADMIN" --env AW_HOSTNAMES=demo.webui.ansibleguy.net --env AW_PROXY=1 ansible-webui:latest
+docker run -d --restart unless-stopped --name ansible-webui --publish 8000:8000 --volume "$DIR_DATA":/data --volume "$DIR_PLAY":/play --volume "$DIR_MIG":/usr/local/lib/python3.10/site-packages/ansible-webui/aw/migrations --env AW_ADMIN_PWD="$AW_ADMIN_PWD" --env AW_ADMIN="$AW_ADMIN" --env AW_HOSTNAMES=demo.webui.ansibleguy.net --env AW_PROXY=1 "$IMAGE"

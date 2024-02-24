@@ -1,12 +1,12 @@
 #!/bin/sh
 
 echo 'INSTALLING/UPGRADING DEFAULT ANSIBLE DEPENDENCIES..'
-pip install --no-warn-script-location --upgrade jmespath netaddr passlib pywinrm requests cryptography >/dev/null
+pip install --upgrade jmespath netaddr passlib pywinrm requests cryptography --root-user-action=ignore --no-warn-script-location >/dev/null
 
 if [ -f '/play/requirements.txt' ]
 then
   echo 'INSTALLING/UPGRADING PYTHON MODULES..'
-  pip install --upgrade -r '/play/requirements.txt' >/dev/null
+  pip install --upgrade -r '/play/requirements.txt' --root-user-action=ignore --no-warn-script-location >/dev/null
 fi
 
 if [ -f '/play/requirements.yml' ]

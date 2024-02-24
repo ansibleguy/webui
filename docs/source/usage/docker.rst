@@ -59,7 +59,7 @@ Basic example:
 AWS CLI Support
 ***************
 
-There is also an image that has `AWS-CLI support <https://github.com/aws/session-manager-plugin>`_ pre-enabled: :code:`ansible0guy/webui-aws:latest`
+There is also an image that has `AWS-CLI support <https://github.com/aws/session-manager-plugin>`_ pre-enabled: :code:`ansible0guy/webui-aws:latest` (needed for :code:`community.aws.*` modules)
 
 Its base-image is :code:`ansible0guy/webui-unprivileged:latest`
 

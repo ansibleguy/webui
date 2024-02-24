@@ -112,3 +112,29 @@ Python Module not installed
   You could also find and install the module using your systems package manager: :code:`sudo apt install python3-<MODULE>` (NOTE: these packages are older versions)
 
 * If you are using Docker, you can create and mount a :code:`requirements.txt` and restart your container. See also: :ref:`Usage - Docker <usage_docker>`
+
+----
+
+Connection in use
+=================
+
+**Error**: While starting AW you see: :code:` Connection in use: ('127.0.0.1', 8000)`
+
+**Problem**
+
+* Make sure no other process is binding to port 8000: :code:`netstat -tulpn | grep 8000`
+
+* The app failed last time. There is still an old process running. If this happens repeatedly - open an issue!
+
+  You can find and kill it:
+
+  .. code-block:: bash
+
+      # find it
+      pgrep -f ansibleguy-webui
+      netstat -tulpn | grep 8000
+      ps -aux | grep ansibleguy-webui | grep -v grep
+
+      # kill it
+      pkill -f ansibleguy-webui
+      kill -9 <PID>

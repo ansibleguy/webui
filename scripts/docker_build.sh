@@ -45,18 +45,18 @@ cleanup_container
 
 if docker image ls | grep "$IMAGE_REPO" | grep -q "$VERSION"
 then
-  docker image rm "$image"
-  docker image rm "$image_unpriv"
-  docker image rm "$image_aws"
+  docker image rm "$image" || true
+  docker image rm "$image_unpriv" || true
+  docker image rm "$image_aws" || true
 fi
 
 if [[ "$REPLY" =~ ^[Yy]$ ]]
 then
   if docker image ls | grep "$IMAGE_REPO" | grep -q 'latest'
   then
-    docker image rm "$image_latest"
-    docker image rm "$image_unpriv_latest"
-    docker image rm "$image_aws_latest"
+    docker image rm "$image_latest" || true
+    docker image rm "$image_unpriv_latest" || true
+    docker image rm "$image_aws_latest" || true
   fi
 fi
 
@@ -80,20 +80,31 @@ fi
 
 echo ''
 echo "### BUILDING IMAGE ${image_aws} ###"
-docker build -f Dockerfile_production_aws -t "$image_aws" --build-arg "AW_VERSION=${VERSION}" --no-cache .
+docker build -f Dockerfile_production_aws -t "$image_aws" --build-arg "AW_VERSION=${VERSION}" --no-cache --progress=plain .
 
 if [[ "$REPLY" =~ ^[Yy]$ ]]
 then
   docker build -f Dockerfile_production_aws -t "$image_aws_latest" --build-arg "AW_VERSION=${VERSION}" .
 fi
 
+set +e
 echo ''
 echo "### STARTING IMAGE ${image} FOR TEST ###"
-docker run -it --name "$container" --publish 127.0.0.1:8000:8000 "$image"
+timeout 10 docker run -it --name "$container" --publish 127.0.0.1:8000:8000 "$image"
+ec="$?"
+if [[ "$ec" != "124" ]]
+then
+  exit 1
+fi
 
 echo ''
 echo "### STARTING IMAGE ${image_unpriv} FOR TEST ###"
 cleanup_container
-docker run -it --name "$container" --publish 127.0.0.1:8000:8000 "$image_unpriv"
+timeout 10 docker run -it --name "$container" --publish 127.0.0.1:8000:8000 "$image_unpriv"
+ec="$?"
+if [[ "$ec" != "124" ]]
+then
+  exit 1
+fi
 
 cleanup_container

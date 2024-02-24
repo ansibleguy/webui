@@ -1,28 +1,40 @@
 ARG AW_VERSION
-ARG AW_USER=aw
+
+# BUILD: docker build -f Dockerfile_production_aws -t "ansible0guy/webui-aws:<VERSION>" --build-arg "AW_VERSION=<VERSION>" --no-cache --progress=plain .
 
 # references:
 #   https://github.com/ansibleguy/webui/discussions/5
 #   https://github.com/aws/session-manager-plugin/issues/12#issuecomment-972880203
 #   https://github.com/aws/session-manager-plugin/blob/mainline/Dockerfile
+#   https://github.com/aws/session-manager-plugin/blob/mainline/makefile
 
-FROM public.ecr.aws/docker/library/golang:1.17 as ssm-builder
+FROM public.ecr.aws/docker/library/golang:1.17-alpine as ssm-builder
 # https://hub.docker.com/_/golang/tags?page=1&name=1.15
 
 ARG SSM_VERSION=1.2.553.0
 # ssm version: https://github.com/aws/session-manager-plugin/releases
 
-RUN apt -y update && apt -y upgrade && apt -y install rpm tar gzip wget zip && apt clean all && \
+RUN apk add --no-cache make git gcc libc-dev curl bash zip && \
     curl -sLO https://github.com/aws/session-manager-plugin/archive/${SSM_VERSION}.tar.gz && \
     mkdir -p /go/src/github.com && \
     tar xzf ${SSM_VERSION}.tar.gz && \
     mv session-manager-plugin-${SSM_VERSION} /go/src/github.com/session-manager-plugin && \
+    echo -n ${SSM_VERSION} > /go/src/github.com/session-manager-plugin/VERSION && \
     cd /go/src/github.com/session-manager-plugin && \
-    make release && \
-    /go/src/github.com/session-manager-plugin/bin/linux_amd64_plugin/session-manager-plugin --version
+    make pre-build && \
+    make pre-release && \
+    make build-linux-amd64 && \
+    make prepack-linux-amd64
+
+# debugging - check if executables exist and are working:
+#    /go/src/github.com/session-manager-plugin/bin/linux_amd64_plugin/session-manager-plugin --version &&
+#    /go/src/github.com/session-manager-plugin/bin/linux_amd64/ssmcli help
 
 FROM ansible0guy/webui-unprivileged:${AW_VERSION}
+ARG AW_USER=aw
+
 USER root
-RUN apk add py3-boto3 aws-cli
-COPY --from=ssm-builder /go/src/github.com/session-manager-plugin/bin/linux_amd64_plugin/session-manager-plugin /usr/bin/
+COPY --from=ssm-builder /go/src/github.com/session-manager-plugin/bin/linux_amd64_plugin/session-manager-plugin \
+                        /go/src/github.com/session-manager-plugin/bin/linux_amd64/ssmcli \
+                        /usr/bin/
 USER ${AW_USER}
