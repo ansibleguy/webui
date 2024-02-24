@@ -2,6 +2,14 @@
 
 ## Version 0
 
+### 0.0.12
+
+* Better [Trademark compliance](https://github.com/ansible/logos/blob/main/TRADEMARKS.md#53-unpermitted-uses-we-consider-infringing)
+* Support for custom Logo
+* Minor fixes
+
+----
+
 ### 0.0.10 / 0.0.11
 
 **Features:**

@@ -4,7 +4,7 @@ set -e
 
 cd "$(dirname "$0")/.."
 path_repo="$(pwd)"
-tmp_venv="/tmp/ansible-webui-venv/$(date +%s)"
+tmp_venv="/tmp/aw-venv/$(date +%s)"
 
 echo ''
 echo 'Installing requirements'

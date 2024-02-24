@@ -30,7 +30,7 @@ Install Unstable Version
     git clone https://github.com/ansibleguy/webui
 
     # install dependencies (venv recommended)
-    cd ansible-webui
+    cd webui
     python3 -m pip install --upgrade requirements.txt
     bash scripts/update_version.sh
 

@@ -31,9 +31,9 @@ rm -f /var/local/ansible-webui/log/*
 
 echo '### BUILDING LATEST ###'
 cd /tmp
-rm -rf /tmp/ansible-webui
+rm -rf /tmp/webui
 git clone https://github.com/ansibleguy/webui.git
-cd /tmp/ansible-webui/docker
+cd /tmp/webui/docker
 docker build -f Dockerfile_production -t ansible-webui:latest --build-arg "AW_VERSION=latest" --no-cache .
 
 echo '### STARTING ###'

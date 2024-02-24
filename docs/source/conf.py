@@ -1,7 +1,7 @@
 from datetime import datetime
 
 # pylint: disable=W0622
-_logo = 'https://raw.githubusercontent.com/ansibleguy/webui/latest/src/ansibleguy-webui/aw/static/img/ansible.svg'
+_logo = 'https://raw.githubusercontent.com/ansibleguy/webui/latest/src/ansibleguy-webui/aw/static/img/logo.svg'
 
 project = 'AnsibleGuy WebUI'
 copyright = f'{datetime.now().year}, AnsibleGuy'

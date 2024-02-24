@@ -36,7 +36,7 @@ Read into the [Troubleshooting Guide](https://webui.ansibleguy.net/en/latest/usa
 git clone https://github.com/ansibleguy/webui
 
 # install dependencies (venv recommended)
-cd ansible-webui
+cd webui
 python3 -m pip install --upgrade -r requirements.txt
 bash scripts/update_version.sh
 export AW_VERSION="$(cat VERSION)"

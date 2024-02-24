@@ -35,7 +35,7 @@ jobs:
         run: |
           cd /tmp
           echo 'CREATING TMP VENV'
-          tmp_venv="/tmp/ansible-webui-venv/$(date +%s)"
+          tmp_venv="/tmp/aw-venv/$(date +%s)"
           python3 -m virtualenv "$tmp_venv" >/dev/null
           source "${tmp_venv}/bin/activate"
 

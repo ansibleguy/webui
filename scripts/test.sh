@@ -14,7 +14,7 @@ function failure() {
   echo ''
   echo '### FAILED ###'
   echo ''
-  pkill -f ansible-webui
+  pkill -f ansibleguy-webui
   exit 1
 }
 
@@ -22,14 +22,14 @@ echo ''
 echo 'INTEGRATION TESTS WEB-UI'
 echo ''
 
-if pgrep -f 'ansible-webui'
+if pgrep -f 'ansibleguy-webui'
 then
-  echo 'An instance of Ansible-WebUI is already running! Stop it first (pkill -f ansible-webui)'
+  echo 'An instance of Ansible-WebUI is already running! Stop it first (pkill -f ansibleguy-webui)'
   exit 1
 fi
 
 
-echo 'Starting Ansible-WebUI..'
+echo 'Starting AnsibleGuy-WebUI..'
 export AW_ENV='dev'
 # shellcheck disable=SC2155
 export AW_DB="/tmp/$(date +%s).aw.db"
@@ -64,7 +64,7 @@ then
 fi
 
 sleep 1
-pkill -f 'ansible-webui'
+pkill -f 'ansibleguy-webui'
 
 echo ''
 echo 'TESTING TO INITIALIZE AW-DB'
