@@ -34,6 +34,7 @@ FROM ansible0guy/webui-unprivileged:${AW_VERSION}
 ARG AW_USER=aw
 
 USER root
+RUN apk add py3-boto3 aws-cli
 COPY --from=ssm-builder /go/src/github.com/session-manager-plugin/bin/linux_amd64_plugin/session-manager-plugin \
                         /go/src/github.com/session-manager-plugin/bin/linux_amd64/ssmcli \
                         /usr/bin/

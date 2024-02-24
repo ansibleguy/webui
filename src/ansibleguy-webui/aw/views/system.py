@@ -83,11 +83,15 @@ def _parsed_ansible_config() -> dict:
     return dict(sorted(ansible_config.items()))
 
 
-def _aws_ssm() -> (str, None):
+def _parsed_aws_versions() -> dict:
+    versions = {}
     if Path('/usr/bin/session-manager-plugin').is_file():
-        return process_cache('/usr/bin/session-manager-plugin --version')['stdout']
+        versions['session-manager-plugin'] = process_cache('/usr/bin/session-manager-plugin --version')['stdout']
 
-    return None
+    if Path('/usr/bin/aws').is_file():
+        versions['aws-cli'] = process_cache('/usr/bin/aws --version')['stdout']
+
+    return versions
 
 
 @login_required
@@ -104,7 +108,7 @@ def system_environment(request) -> HttpResponse:
             **env_system,
             'env_user': getuser(),
             'env_system': env_system,
-            'env_aws_ssm': _aws_ssm(),
+            'env_aws': _parsed_aws_versions(),
             'env_python_modules': python_modules,
             'env_ansible_config': _parsed_ansible_config(),
             # 'env_ansible_roles': get_role_list(),

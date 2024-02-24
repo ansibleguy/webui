@@ -55,16 +55,10 @@
                 <td>{{ env_jinja }}</td>
             </tr>
 {% endif %}
-{% if env_libyaml is not none %}
+{% if env_aws | length > 0 %}
             <tr>
-                <td>Using libyaml</td>
-                <td>{{ env_libyaml }}</td>
-            </tr>
-{% endif %}
-{% if env_aws_ssm is not none %}
-            <tr>
-                <td>AWS Session Manager Plugin</td>
-                <td>{{ env_aws_ssm }}</td>
+                <td>AWS Tools</td>
+                <td>{% for tool, version in env_aws.items %}{{ tool }}: {{ version }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
             </tr>
 {% endif %}
             <tr>
