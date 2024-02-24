@@ -222,7 +222,7 @@ SPECTACULAR_SETTINGS = {
     'VERSION': VERSION,
     'SERVE_INCLUDE_SCHEMA': False,
     'SERVE_PERMISSIONS': ['rest_framework.permissions.IsAuthenticated'],
-    'SWAGGER_UI_FAVICON_HREF': STATIC_URL + 'img/ansible.svg',
+    'SWAGGER_UI_FAVICON_HREF': config['logo_url'],
     'APPEND_COMPONENTS': {
         'securitySchemes': {
             'apiKey': {

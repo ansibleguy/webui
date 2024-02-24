@@ -33,7 +33,7 @@ echo 'Starting app'
 echo ''
 
 cd /tmp
-python3 -m ansible-webui
+python3 -m ansibleguy-webui
 
 echo ''
 echo "Removing virtualenv ${tmp_venv}"

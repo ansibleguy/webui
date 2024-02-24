@@ -1,10 +1,10 @@
-# Ansible WebUI
+# Basic WebUI for using Ansible
 
-[![Documentation](https://readthedocs.org/projects/ansible-webui/badge/?version=latest)](https://ansible-webui.readthedocs.io/en/latest/?badge=latest)
-[![Lint](https://github.com/ansibleguy/ansible-webui/actions/workflows/lint.yml/badge.svg?branch=latest)](https://github.com/ansibleguy/ansible-webui/actions/workflows/lint.yml)
-[![Test](https://github.com/ansibleguy/ansible-webui/actions/workflows/test.yml/badge.svg?branch=latest)](https://github.com/ansibleguy/ansible-webui/actions/workflows/test.yml)
+[![Documentation](https://readthedocs.org/projects/ansible-webui/badge/?version=latest)](https://webui.ansibleguy.net/en/latest/?badge=latest)
+[![Lint](https://github.com/ansibleguy/webui/actions/workflows/lint.yml/badge.svg?branch=latest)](https://github.com/ansibleguy/webui/actions/workflows/lint.yml)
+[![Test](https://github.com/ansibleguy/webui/actions/workflows/test.yml/badge.svg?branch=latest)](https://github.com/ansibleguy/webui/actions/workflows/test.yml)
 
-
+**DISCLAIMER**: This is an **unofficial community project**! Do not confuse it with the vanilla [Ansible](https://ansible.com/) product!
 
 The goal is to allow users to quickly install & run a WebUI for using Ansible locally.
 
@@ -20,17 +20,17 @@ Keep it simple.
 
 ```bash
 # install
-python3 -m pip install ansible-webui
+python3 -m pip install ansibleguy-webui
 
 # run
-python3 -m ansible-webui
+python3 -m ansibleguy-webui
 ```
 
 ### Docker
 
 ```bash
-docker image pull ansible0guy/ansible-webui:latest
-docker run -d --name ansible-webui --publish 127.0.0.1:8000:8000 --volume $(pwd)/ansible/data:/data --volume $(pwd)/ansible/play:/play ansible-webui:latest
+docker image pull ansible0guy/webui:latest
+docker run -d --name ansible-webui --publish 127.0.0.1:8000:8000 --volume $(pwd)/ansible/data:/data --volume $(pwd)/ansible/play:/play ansible0guy/webui:latest
 ```
 
 ----
@@ -45,17 +45,17 @@ Login: User `demo`, Password `Ansible1337`
 
 ## Usage
 
-[Documentation](http://ansible-webui.readthedocs.io/)
+[Documentation](http://webui.ansibleguy.net/)
 
 ----
 
 ## Contribute
 
-Feel free to contribute to this project using [pull-requests](https://github.com/ansibleguy/ansible-webui/pulls), [issues](https://github.com/ansibleguy/ansible-webui/issues) and [discussions](https://github.com/ansibleguy/ansible-webui/discussions)!
+Feel free to contribute to this project using [pull-requests](https://github.com/ansibleguy/webui/pulls), [issues](https://github.com/ansibleguy/webui/issues) and [discussions](https://github.com/ansibleguy/webui/discussions)!
 
-Testers are also very welcome! Please [give feedback](https://github.com/ansibleguy/ansible-webui/discussions)
+Testers are also very welcome! Please [give feedback](https://github.com/ansibleguy/webui/discussions)
 
-See also: [Contributing](https://github.com/ansibleguy/ansible-webui/blob/latest/CONTRIBUTE.md)
+See also: [Contributing](https://github.com/ansibleguy/webui/blob/latest/CONTRIBUTE.md)
 
 ----
 

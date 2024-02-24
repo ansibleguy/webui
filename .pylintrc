@@ -1,5 +1,5 @@
 [MASTER]
-init-hook='import sys; sys.path.append("src/ansible-webui/")'
+init-hook='import sys; sys.path.append("src/ansibleguy-webui/")'
 
 [MAIN]
 
@@ -56,7 +56,7 @@ ignore=CVS
 # format. Because '\\' represents the directory delimiter on Windows systems,
 # it can't be used as an escape character.
 ignore-paths=venv/*,
-             src/ansible-webui/aw/migrations/*
+             src/ansibleguy-webui/aw/migrations/*
 
 # Files or directories matching the regular expression patterns are skipped.
 # The regex matches against base names, not paths. The default value ignores

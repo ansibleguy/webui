@@ -3,7 +3,7 @@
 {% load static %}
 {% block content %}
     <div align="center" style="display: block;">
-        <img src="{% static 'img/ansible.svg' %}" alt="" onerror="this.style.display='none'" class="aw-img-float"/>
+        <img src="{% get_logo %}" alt="" onerror="this.style.display='none'" class="aw-img-float"/>
     </div>
     <div class="aw-login">
         {% if form.errors %}

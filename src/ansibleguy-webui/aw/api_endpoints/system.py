@@ -29,6 +29,7 @@ class SystemConfigReadResponse(BaseResponse):
     serve_static = serializers.BooleanField()
     deployment = serializers.CharField()
     version = serializers.CharField()
+    logo_url = serializers.CharField()
 
 
 class SystemConfigWriteRequest(serializers.ModelSerializer):
@@ -89,11 +90,10 @@ class APISystemConfig(APIView):
         config_db = get_config_from_db()
         try:
             changed = False
-            for setting, value in serializer.data.items():
-                if is_set(value):
-                    if str(config[setting]) != str(value):
-                        setattr(config_db, setting, value)
-                        changed = True
+            for setting, value in serializer.validated_data.items():
+                if is_set(value) and str(config[setting]) != str(value):
+                    setattr(config_db, setting, value)
+                    changed = True
 
             if changed:
                 log(msg='System config change - updating', level=5)

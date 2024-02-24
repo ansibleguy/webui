@@ -3,7 +3,7 @@ requires = ["setuptools >= 61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "ansible-webui"
+name = "ansibleguy-webui"
 authors = [
     {name = "AnsibleGuy", email = "contact@ansibleguy.net"},
 ]
@@ -20,9 +20,9 @@ classifiers = [
 dynamic = ["dependencies", "version"]
 
 [project.urls]
-Homepage = "https://github.com/ansibleguy/ansible-webui"
-Documentation = "https://ansible-webui.readthedocs.io/"
-Repository = "https://github.com/ansibleguy/ansible-webui.git"
+Homepage = "https://github.com/ansibleguy/webui"
+Documentation = "https://webui.ansibleguy.net/"
+Repository = "https://github.com/ansibleguy/webui.git"
 Issues = "https://github.com/ansibleguy/issues"
 
 [tool.setuptools.dynamic]
@@ -36,5 +36,5 @@ where = ["src"]
 "*" = ["*.html", "*.js", "*.css", "*.svg"]
 
 # [project.scripts]
-# ansible-webui = "ansible-webui.__main__"
-# ansible-webui-db = "ansible-webui.manage"
+# ansibleguy-webui = "ansibleguy-webui.__main__"
+# ansibleguy-webui-db = "ansibleguy-webui.manage"

@@ -223,11 +223,11 @@ Normal users will not have to use these.
    .. code-block:: bash
 
         # if running non-release version
-        python3 -m ansible-webui.manage makemigrations
-        python3 -m ansible-webui.manage makemigrations aw
+        python3 -m ansibleguy-webui.manage makemigrations
+        python3 -m ansibleguy-webui.manage makemigrations aw
 
         # all
-        python3 -m ansible-webui.manage migrate
+        python3 -m ansibleguy-webui.manage migrate
 
 
 * **AW_ENV**

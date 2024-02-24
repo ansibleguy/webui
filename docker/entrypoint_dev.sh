@@ -11,4 +11,4 @@ pip install --upgrade -r /aw/requirements.txt >/dev/null
 
 . /entrypoint_requirements.sh
 
-python3 /aw/src/ansible-webui/
+python3 /aw/src/ansibleguy-webui/

@@ -2,7 +2,7 @@ ARG AW_VERSION
 ARG AW_USER=aw
 
 # references:
-#   https://github.com/ansibleguy/ansible-webui/discussions/5
+#   https://github.com/ansibleguy/webui/discussions/5
 #   https://github.com/aws/session-manager-plugin/issues/12#issuecomment-972880203
 #   https://github.com/aws/session-manager-plugin/blob/mainline/Dockerfile
 
@@ -21,7 +21,7 @@ RUN apt -y update && apt -y upgrade && apt -y install rpm tar gzip wget zip && a
     make release && \
     /go/src/github.com/session-manager-plugin/bin/linux_amd64_plugin/session-manager-plugin --version
 
-FROM ansible0guy/ansible-webui-unprivileged:${AW_VERSION}
+FROM ansible0guy/webui-unprivileged:${AW_VERSION}
 USER root
 RUN apk add py3-boto3 aws-cli
 COPY --from=ssm-builder /go/src/github.com/session-manager-plugin/bin/linux_amd64_plugin/session-manager-plugin /usr/bin/

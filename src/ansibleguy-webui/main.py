@@ -35,12 +35,12 @@ def main():
 
     _check_for_bad_config()
 
-    environ.setdefault('AW_INIT', '1')
+    environ['AW_INIT'] = '1'
     environ['MAINPID'] = str(getpid())
     install_or_migrate_db()
 
     django_setup()
-    environ.setdefault('AW_INIT', '0')
+    environ['AW_INIT'] = '0'
 
     from db import create_first_superuser, create_privileged_groups
     from webserver import init_webserver

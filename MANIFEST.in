@@ -1,2 +1,2 @@
-recursive-include src/ansible-webui/*
+recursive-include src/ansibleguy-webui/*
 include requirements.txt

@@ -75,7 +75,7 @@ def test_add():
         {'l': 'key', 'd': None},
         {'l': 'permission', 'd': {'name': 'perm1', 'jobs': 1, 'credentials': 1}},
         {'l': 'repository', 'd': {
-            'name': 'gitty1', 'rtype': 2, 'git_origin': 'https://github.com/ansibleguy/ansible-webui.git',
+            'name': 'gitty1', 'rtype': 2, 'git_origin': 'https://github.com/ansibleguy/webui.git',
             'git_branch': 'latest',
         }},
         {'l': 'repository', 'd': {'name': 'staticy1', 'rtype': 1, 'static_path': '/etc/ansible/repo'}},

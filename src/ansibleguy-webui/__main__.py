@@ -14,8 +14,6 @@ if __name__ == '__main__':
         sys_path.append(os_path.dirname(os_path.abspath(__file__)))
         from main import main
 
-    from aw.config.main import VERSION
-
     if len(sys_argv) > 1:
         if sys_argv[1] in ['--version', '-v']:
             from cli_init import init_cli
@@ -24,5 +22,6 @@ if __name__ == '__main__':
             _print_version()
             sys_exit(0)
 
-    print(f'Ansible-WebUI Version {VERSION}')
+    from aw.config.main import VERSION
+    print(f'AnsibleGuy-WebUI Version {VERSION}')
     main()

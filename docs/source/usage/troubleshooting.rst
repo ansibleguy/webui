@@ -14,7 +14,7 @@ Troubleshooting
 Topology
 ********
 
-Ansible WebUI is made of a few main components.
+AnsibleGuy WebUI is made of a few main components.
 
 It will be beneficial for the troubleshooting process if we find out in which the error occurs.
 
@@ -91,7 +91,7 @@ SSH Hostkey Verification
 
   * Maintain a `list of known-good hostkeys <https://en.wikibooks.org/wiki/OpenSSH/Client_Configuration_Files#~/.ssh/known_hosts>`_
 
-    You can specify which :code:`known_hosts` file Ansible WebUI should use, using the config setting :code:`AW_SSH_KNOWN_HOSTS`
+    You can specify which :code:`known_hosts` file AnsibleGuy WebUI should use, using the config setting :code:`AW_SSH_KNOWN_HOSTS`
 
   * Implement `CA signed-hostkeys <https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/6/html/deployment_guide/sec-creating_ssh_ca_certificate_signing-keys>`_
 

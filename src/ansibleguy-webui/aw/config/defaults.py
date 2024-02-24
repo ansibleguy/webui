@@ -46,4 +46,5 @@ CONFIG_DEFAULTS = {
     'path_ansible_config': _get_existing_ansible_config_file(),
     'path_ssh_known_hosts': _get_defaults_docker('path_ssh_known_hosts'),
     'debug': False,
+    'logo_url': 'img/logo.svg',
 }

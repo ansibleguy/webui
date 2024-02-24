@@ -1,7 +1,9 @@
 from functools import cache
 
 from django import template
+from django.conf import settings
 
+from aw.config.main import config
 from aw.config.navigation import NAVIGATION
 from aw.utils.version import get_version as get_version_util
 
@@ -11,6 +13,15 @@ register = template.Library()
 @register.simple_tag
 def get_version() -> str:
     return get_version_util()
+
+
+@register.simple_tag
+def get_logo() -> str:
+    url = config['logo_url']
+    if not url.startswith('http'):
+        return f"{settings.STATIC_URL}{url}"
+
+    return config['logo_url']
 
 
 @register.simple_tag
@@ -99,3 +110,11 @@ def whitespace_char(data: str, char: str) -> str:
 @register.filter
 def split(data: str, split_at: str) -> list:
     return data.split(split_at)
+
+
+@register.filter
+def find(data: str, search: str) -> bool:
+    if not isinstance(data, str):
+        data = str(data)
+
+    return data.find(search) != -1

@@ -3,7 +3,7 @@
 {% if title %}
     <title>{{ title }}</title>
 {% else %}
-    <title>Ansible WebUI</title>
+    <title>AW</title>
 {% endif %}
 
 <meta charset="utf-8">
@@ -11,7 +11,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <meta name="color-scheme" content="light dark" />
-<link rel="icon" type="image/svg" href="{% static 'img/ansible.svg' %}">
+<link rel="icon" {% if get_logo|find:"svg" %}type="image/svg"{% endif %} href="{% get_logo %}">
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" integrity="sha512-b2QcS5SsA8tZodcDtGRELiGv5SaKSk1vDHDaQRda0htPYWZ6046lr3kJ5bAAQdpV2mmA/4v0wQF9MyU6/pDIAg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <link href="{% static 'fontawesomefree/css/fontawesome.css' %}" rel="stylesheet" type="text/css">

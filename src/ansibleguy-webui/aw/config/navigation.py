@@ -25,7 +25,7 @@ NAVIGATION = {
     'right': {
         'GH': {
             'element': '<i class="fab fa-github-square fa-2x aw-nav-right-icon" title="GitHub"></i>',
-            'url': 'https://github.com/ansibleguy/ansible-webui',
+            'url': 'https://github.com/ansibleguy/webui',
             'login': False,
         },
         'DON': {
@@ -35,12 +35,12 @@ NAVIGATION = {
         },
         'BUG': {
             'element': '<i class="fas fa-bug fa-2x aw-nav-right-icon" title="Report bug"></i>',
-            'url': 'https://github.com/ansibleguy/ansible-webui/issues',
+            'url': 'https://github.com/ansibleguy/webui/issues',
             'login': False,
         },
         'DOC': {
             'element': '<i class="fas fa-book fa-2x aw-nav-right-icon" title="Documentation"></i>',
-            'url': 'https://ansible-webui.readthedocs.io/',
+            'url': 'https://webui.ansibleguy.net/',
             'login': False,
         },
         'LO': {

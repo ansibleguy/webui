@@ -11,12 +11,12 @@ body:
       value: |
         Please make sure to go through these steps **before opening an issue**:
 
-        - [ ] Read the documentation: [Docs](https://ansible-webui.readthedocs.io/)
+        - [ ] Read the documentation: [Docs](https://webui.ansibleguy.net/)
 
-        - [ ] Read the troubleshooting info: [Troubleshooting](https://ansible-webui.readthedocs.io/en/latest/usage/troubleshooting.html)
+        - [ ] Read the troubleshooting info: [Troubleshooting](https://webui.ansibleguy.net/en/latest/usage/troubleshooting.html)
 
-        - [ ] Check if there are existing [issues](https://github.com/ansibleguy/ansible-webui/issues)
-        or [discussions](https://github.com/ansibleguy/ansible-webui/discussions) regarding your topic
+        - [ ] Check if there are existing [issues](https://github.com/ansibleguy/webui/issues)
+        or [discussions](https://github.com/ansibleguy/webui/discussions) regarding your topic
 
   - type: textarea
     id: versions

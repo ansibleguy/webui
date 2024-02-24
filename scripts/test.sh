@@ -37,7 +37,7 @@ export AW_DB="/tmp/$(date +%s).aw.db"
 export AW_PATH_PLAY="$(pwd)/test"
 export AW_ADMIN='tester'
 export AW_ADMIN_PWD='someSecret!Pwd'
-python3 src/ansible-webui/ >/dev/null 2>/dev/null &
+python3 src/ansibleguy-webui/ >/dev/null 2>/dev/null &
 echo ''
 sleep 5
 
@@ -54,7 +54,7 @@ echo 'INTEGRATION TESTS API'
 echo ''
 
 echo 'Create API key'
-api_key="$(python3 src/ansible-webui/cli.py -f api-key -a create -p "$AW_ADMIN" | grep 'Key=' | cut -d '=' -f2)"
+api_key="$(python3 src/ansibleguy-webui/cli.py -f api-key -a create -p "$AW_ADMIN" | grep 'Key=' | cut -d '=' -f2)"
 export AW_API_KEY="$api_key"
 sleep 1
 
@@ -75,9 +75,9 @@ TMP_DIR="/tmp/aw_$(date +%s)"
 mkdir -p "$TMP_DIR"
 cp -r ./* "$TMP_DIR"
 cd "$TMP_DIR"
-rm -rf ./src/ansible-webui/aw/migrations/*
+rm -rf ./src/ansibleguy-webui/aw/migrations/*
 export AW_DB="${TMP_DIR}/aw.db"
-timeout 10 python3 src/ansible-webui
+timeout 10 python3 src/ansibleguy-webui
 ec="$?"
 if [[ "$ec" != "124" ]]
 then

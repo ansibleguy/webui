@@ -17,7 +17,7 @@ def __get_module_version() -> str:
         return env_version
 
     try:
-        return version('ansible-webui')
+        return version('ansibleguy-webui')
 
     except PackageNotFoundError:
         # NOTE: not able to use aw.utils.debug.log_warn because of circular dependency
@@ -40,6 +40,7 @@ class Config:
 
         try:
             if 'AW_INIT' in environ and environ['AW_INIT'] == '1':
+                # do not try to use ORM before django-init
                 raise AppRegistryNotReady
 
             # pylint: disable=C0415

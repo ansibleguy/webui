@@ -9,7 +9,8 @@ function log() {
 }
 
 cd "$(pwd)/.."
-TEST_DB="$(pwd)/src/ansible-webui/aw.${AW_ENV}.db"
+# git pull
+TEST_DB="$(pwd)/src/ansibleguy-webui/aw.${AW_ENV}.db"
 TEST_MIGRATE=''
 
 if [ -f "$TEST_DB" ] && [[ "$TEST_QUIET" != "1" ]]
@@ -49,8 +50,8 @@ then
   bash ./scripts/migrate_db.sh "$TEST_MIGRATE"
 
   log 'CREATING USERS'
-  python3 ./src/ansible-webui/manage.py createsuperuser --noinput || true
+  python3 ./src/ansibleguy-webui/manage.py createsuperuser --noinput || true
 fi
 
 log 'STARTING APP'
-python3 ./src/ansible-webui
+python3 ./src/ansibleguy-webui

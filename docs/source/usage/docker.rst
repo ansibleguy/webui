@@ -8,12 +8,12 @@
 Docker
 ======
 
-You can find the dockerfiles and scripts used to build the images `in the Repository <https://github.com/ansibleguy/ansible-webui/tree/latest/docker>`_
+You can find the dockerfiles and scripts used to build the images `in the Repository <https://github.com/ansibleguy/webui/tree/latest/docker>`_
 
 Ansible Requirements
 ********************
 
-Our `docker image ansible0guy/ansible-webui <https://hub.docker.com/repository/docker/ansible0guy/ansible-webui>`_ enables you to install Ansible dependencies on container startup.
+Our `docker image ansible0guy/webui <https://hub.docker.com/repository/docker/ansible0guy/webui>`_ enables you to install Ansible dependencies on container startup.
 
 Files inside the container:
 
@@ -30,9 +30,9 @@ Unprivileged
 
 There are images for running Ansible-WebUI as unprivileged user :code:`aw` with UID/GID :code:`8785` inside the container:
 
-* Latest: :code:`ansible0guy/ansible-webui-unprivileged:latest`
+* Latest: :code:`ansible0guy/webui-unprivileged:latest`
 
-* Unstable: :code:`ansible0guy/ansible-webui-unprivileged:unstable`
+* Unstable: :code:`ansible0guy/webui-unprivileged:unstable`
 
 ----
 
@@ -59,9 +59,9 @@ Basic example:
 AWS CLI Support
 ***************
 
-There is also an image that has `AWS-CLI support <https://github.com/aws/session-manager-plugin>`_ pre-enabled: :code:`ansible0guy/ansible-webui-aws:latest`
+There is also an image that has `AWS-CLI support <https://github.com/aws/session-manager-plugin>`_ pre-enabled: :code:`ansible0guy/webui-aws:latest`
 
-Its base-image is :code:`ansible0guy/ansible-webui-unprivileged:latest`
+Its base-image is :code:`ansible0guy/webui-unprivileged:latest`
 
 ----
 

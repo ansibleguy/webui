@@ -7,7 +7,7 @@ ARG AW_VERSION
 
 RUN apk add --no-cache git git-lfs ansible-core openssh-client sshpass && \
     pip install --no-cache-dir --upgrade pip 2>/dev/null && \
-    pip install --no-cache-dir "git+https://github.com/ansibleguy/ansible-webui.git@${AW_VERSION}" && \
+    pip install --no-cache-dir "git+https://github.com/ansibleguy/webui.git@${AW_VERSION}" && \
     mkdir -p /play /data/log
 
 ENV AW_VERSION=${AW_VERSION} \

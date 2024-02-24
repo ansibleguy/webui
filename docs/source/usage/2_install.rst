@@ -31,13 +31,13 @@ Install
 
 .. code-block:: bash
 
-    python3 -m pip install ansible-webui
+    python3 -m pip install ansibleguy-webui
 
 **Using docker**:
 
 .. code-block:: bash
 
-    docker image pull ansible0guy/ansible-webui:latest
+    docker image pull ansible0guy/webui:latest
 
 
 Start
@@ -48,7 +48,7 @@ Start
 .. code-block:: bash
 
     cd $PLAYBOOK_DIR
-    python3 -m ansible-webui
+    python3 -m ansibleguy-webui
 
 **Details**:
 
@@ -58,10 +58,10 @@ Start
     cd $PLAYBOOK_DIR
 
     # foreground
-    python3 -m ansible-webui
+    python3 -m ansibleguy-webui
 
     # background
-    python3 -m ansible-webui > /tmp/aw.log 2> /tmp/aw.err.log &
+    python3 -m ansibleguy-webui > /tmp/aw.log 2> /tmp/aw.err.log &
 
     # at the first startup you will see the auto-generated credentials:
 
@@ -81,7 +81,7 @@ Now you can open the Ansible-WebUI in your browser: `http://localhost:8000 <http
 .. code-block:: bash
 
     # volumes: /data = storage for logs & DB, /play = ansible playbook base-directory
-    docker run -d --name ansible-webui --publish 127.0.0.1:8000:8000 --volume $(pwd)/ansible/data:/data --volume $(pwd)/ansible/play:/play ansible-webui:<VERSION>
+    docker run -d --name ansible-webui --publish 127.0.0.1:8000:8000 --volume $(pwd)/ansible/data:/data --volume $(pwd)/ansible/play:/play ansible0guy/webui:latest
     # find initial password
     docker logs ansible-webui
 
@@ -90,7 +90,7 @@ Now you can open the Ansible-WebUI in your browser: `http://localhost:8000 <http
 Proxy
 *****
 
-You can find a nginx config example here: `Nginx config example <https://github.com/ansibleguy/ansible-webui/blob/latest/config/nginx.conf>`_
+You can find a nginx config example here: `Nginx config example <https://github.com/ansibleguy/webui/blob/latest/config/nginx.conf>`_
 
 ----
 
@@ -104,7 +104,7 @@ You might want to create a service-user:
     sudo useradd ansible-webui --shell /usr/sbin/nologin --create-home --home-dir /home/ansible-webui
 
 
-You can find a service config example here: `Systemd config example <https://github.com/ansibleguy/ansible-webui/blob/latest/config/systemd_service.conf>`_
+You can find a service config example here: `Systemd config example <https://github.com/ansibleguy/webui/blob/latest/config/systemd_service.conf>`_
 
 Enabling & starting the service:
 

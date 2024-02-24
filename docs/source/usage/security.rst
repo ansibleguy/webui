@@ -13,7 +13,7 @@ Ansible needs to handle sensible secrets like administrative passwords to functi
 
 That's why it is very important to keep security in our mind.
 
-You are very welcome to search for security vulnerabilities and `report them <https://github.com/ansibleguy/ansible-webui/issues>`_!
+You are very welcome to search for security vulnerabilities and `report them <https://github.com/ansibleguy/webui/issues>`_!
 
 
 Features

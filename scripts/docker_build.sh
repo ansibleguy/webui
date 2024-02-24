@@ -14,7 +14,7 @@ VERSION="$1"
 
 cd "$(dirname "$0")/../docker"
 
-IMAGE_REPO="ansible0guy/ansible-webui"
+IMAGE_REPO="ansible0guy/webui"
 IMAGE_REPO_UNPRIV="${IMAGE_REPO}-unprivileged"
 IMAGE_REPO_AWS="${IMAGE_REPO}-aws"
 
