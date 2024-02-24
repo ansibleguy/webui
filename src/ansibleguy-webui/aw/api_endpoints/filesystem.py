@@ -101,11 +101,15 @@ class APIFsBrowse(APIView):
         raw_items = cls._listdir(browse_root)
 
         for item in raw_items:
-            item_path = browse_root / item
-            if item_path.is_file():
-                items['files'].append(item)
-            elif item_path.is_dir():
-                items['directories'].append(item)
+            try:
+                item_path = browse_root / item
+                if item_path.is_file():
+                    items['files'].append(item)
+                elif item_path.is_dir():
+                    items['directories'].append(item)
+
+            except OSError:
+                continue
 
         return Response(items)
 
@@ -138,10 +142,14 @@ class APIFsExists(APIView):
 
         try:
             fs_item = Path(request.GET['item'])
-            return Response({
-                'exists': fs_item.exists(),
-                'fstype': 'file' if fs_item.is_file() else 'directory',
-            })
+            try:
+                return Response({
+                    'exists': fs_item.exists(),
+                    'fstype': 'file' if fs_item.is_file() else 'directory',
+                })
+
+            except OSError:
+                return Response({'exists': False, 'fstype': 'unknown'})
 
         except PermissionError:
             return Response(data={'msg': 'Access to file or directory is forbidden'}, status=403)
