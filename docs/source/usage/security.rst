@@ -48,11 +48,11 @@ Security considerations this project does take into account:
 Setup
 *****
 
-* You should use a proxy like nginx in front of Ansible-WebUI
+* You should use a proxy like nginx in front of AW
 
-    You should: (*example config will be added later on*)
+    Recommended Config: (`Example <https://github.com/ansibleguy/webui/blob/latest/examples/nginx.conf>`_)
 
-    * use HTTPS
+    * use HTTPS with a valid certificate
 
     * restrict the HTTP security headers (X-Frame-Options, X-Content-Type, Content-Security-Policy and Referrer-Policy, HSTS)
 

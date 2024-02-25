@@ -74,6 +74,8 @@ The Ansible execution itself can fail because of some common issues:
 Common Issues
 *************
 
+----
+
 SSH Hostkey Verification
 ========================
 
@@ -138,3 +140,18 @@ Connection in use
       # kill it
       pkill -f ansibleguy-webui
       kill -9 <PID>
+
+----
+
+Database is locked
+==================
+
+**Error**: The Web interface shows a plain :code:`Error 500` and the console shows :code:`django.db.utils.OperationalError: database is locked`
+
+**Problem**:
+
+* I've encountered this issue a few times. It occurs because the `SQLite database is locked by a write-operation <https://github.com/ansibleguy/webui/issues/6>`_.
+
+  Restarting the application is the easiest way of working around it.
+
+  If it occurs more often - please open an issue!

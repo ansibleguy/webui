@@ -34,7 +34,7 @@ Requests must have the API key set in the :code:`X-Api-Key` header.
     > [{"id":34,"name":"Deploy App","inventory":"inventories/dev/hosts.yml","playbook":"app.yml","schedule":"22 14 * * 4,5","limit":"dev1,dev3","verbosity":0,"comment":"Deploy my app to the first two development servers","environment_vars":"MY_APP_ENV=DEV,TZ=UTC"}]
 
     # execute job
-    curl -X 'POST' 'http://localhost:8000/api/job/34' -H 'accept: application/json' -H "X-Api-Key: lEfPOA2o.g71oIrgkwChIfEBrRdK6NvjXrYMlVIcZ"
+    curl -X 'POST' 'http://localhost:8000/api/job/34' -H 'accept: application/json' -H "X-Api-Key: <KEY>"
     > {"msg":"Job 'Deploy App' execution queued"}
 
 API Docs

@@ -50,31 +50,7 @@ Start
     cd $PLAYBOOK_DIR
     python3 -m ansibleguy-webui
 
-**Details**:
 
-.. code-block:: bash
-
-    # change into your ansible-directory
-    cd $PLAYBOOK_DIR
-
-    # foreground
-    python3 -m ansibleguy-webui
-
-    # background
-    python3 -m ansibleguy-webui > /tmp/aw.log 2> /tmp/aw.err.log &
-
-    # at the first startup you will see the auto-generated credentials:
-
-    [2024-01-22 21:43:41 +0100] [10927] [WARN] Initializing database /tmp/test.aw..
-    [2024-01-22 21:43:44 +0100] [10927] [WARN] No admin was found in the database!
-    [2024-01-22 21:43:44 +0100] [10927] [WARN] Generated user: 'ansible'
-    [2024-01-22 21:43:44 +0100] [10927] [WARN] Generated pwd: '<PASSWORD>'
-    [2024-01-22 21:43:44 +0100] [10927] [WARN] Make sure to change the password!
-    [2024-01-22 21:43:44 +0100] [10927] [WARN] Starting..
-    [2024-01-22 21:43:44 +0100] [10927] [INFO] Starting job-threads
-    [2024-01-22 21:43:44 +0100] [10927] [INFO] Listening on http://127.0.0.1:8000
-
-Now you can open the Ansible-WebUI in your browser: `http://localhost:8000 <http://localhost:8000>`_
 
 **Using docker**:
 
@@ -82,11 +58,13 @@ Now you can open the Ansible-WebUI in your browser: `http://localhost:8000 <http
 
     docker run -d --name ansible-webui --publish 127.0.0.1:8000:8000 ansible0guy/webui:latest
 
-    # or with persistent data (volumes: /data = storage for logs & DB, /play = ansible playbook base-directory)
-    docker run -d --name ansible-webui --publish 127.0.0.1:8000:8000 --volume $(pwd)/ansible/data:/data --volume $(pwd)/ansible/play:/play ansible0guy/webui:latest
 
-    # find initial password
-    docker logs ansible-webui
+**Details**:
+
+See: :ref:`Usage - Run <usage_run>`
+
+
+Now you can open the Ansible-WebUI in your browser: `http://localhost:8000 <http://localhost:8000>`_
 
 ----
 
