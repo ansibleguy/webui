@@ -66,25 +66,79 @@ def test_get_locations(locations: list):
 
 
 def test_add():
+    # NOTE: do not reference entries with ID 1! they should be deleted later on
     test_add_locations([
-        {'l': 'credentials', 'd': {'name': 'cred1', 'become_user': 'guy', 'become_pass': 'sePwd', 'vault_id': 'myID'}},
-        {'l': 'job', 'd': {
-            'name': 'job1', 'playbook_file': 'play1.yml', 'inventory_file': 'inv/hosts.yml', 'tags': 'svc1',
-            'limit': 'srv1',
-        }},
         {'l': 'key', 'd': None},
-        {'l': 'permission', 'd': {'name': 'perm1', 'jobs': 1, 'credentials': 1}},
+
+        # creds
+        {'l': 'credentials', 'd': {'name': 'cred1', 'become_user': 'guy', 'become_pass': 'sePwd', 'vault_id': 'myID'}},
+        {'l': 'credentials', 'd': {
+            'name': 'c2', 'become_user': 'otherDude', 'become_pass': 'hup', 'vault_pass': 'secUry',
+        }},
+        {'l': 'credentials', 'd': {
+            'name': 'cssh', 'connect_user': 'superGuy',
+            'ssh_key': '-----BEGIN OPENSSH PRIVATE KEY----- '
+                       'b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAMwAAAAtzc2gtZW '
+                       'QyNTUxOQAAACBqpdUHnkUoKG6khFKIvVWgy5IMXvR0/ktbcxyGKAsmeQAAAJAtbFQeLWxU '
+                       'HgAAAAtzc2gtZWQyNTUxOQAAACBqpdUHnkUoKG6khFKIvVWgy5IMXvR0/ktbcxyGKAsmeQ '
+                       'AAAEAmjuNJack1cgS1U4AL2p4EOoelebHO3CGo3x/bILwR22ql1QeeRSgobqSEUoi9VaDL '
+                       'kgxe9HT+S1tzHIYoCyZ5AAAADXN1cGVyc3Rlc0BzdXA= '
+                       '-----END OPENSSH PRIVATE KEY-----'
+        }},
+
+        # repos
         {'l': 'repository', 'd': {
             'name': 'gitty1', 'rtype': 2, 'git_origin': 'https://github.com/ansibleguy/webui.git',
             'git_branch': 'latest',
         }},
         {'l': 'repository', 'd': {'name': 'staticy1', 'rtype': 1, 'static_path': '/etc/ansible/repo'}},
+
+        # jobs
+        {'l': 'job', 'd': {
+            'name': 'job1', 'playbook_file': 'play1.yml', 'inventory_file': 'inv/hosts.yml', 'tags': 'svc1',
+            'limit': 'srv1',
+        }},
+        {'l': 'job', 'd': {
+            'name': 'My job2', 'playbook_file': 'PlayBook.yml', 'inventory_file': 'i/h.yml', 'verbosity': 2,
+            'tags_skip': 'srv1', 'comment': 'heiHo', 'cmd_args': '--superArg',
+        }},
+        {'l': 'job', 'd': {
+            'name': 'jobby3', 'playbook_file': 'PlayUsBookUs.yml', 'inventory_file': 'hosts.yml', 'enabled': False,
+            'repository': 2,
+        }},
+        {'l': 'job', 'd': {
+            'name': 'j4', 'playbook_file': 'nope.yml', 'inventory_file': 'hosts.yml', 'enabled': False,
+            'credentials_default': 3, 'mode_diff': True, 'mode_check': True,
+        }},
+        {'l': 'job', 'd': {
+            'name': 'jup5', 'playbook_file': 'nope_nr2.yml', 'inventory_file': 'hosts.yml', 'schedule': '5 4 * * *',
+            'environment_vars': 'MY=1,SUPER=2,VARS=3',
+        }},
+
+        # perms
+        {'l': 'permission', 'd': {'name': 'perm1', 'jobs': 1, 'credentials': 1}},
     ])
 
 
 def test_modify():
     test_modify_locations([
         {'l': 'config', 'd': {'run_timeout': 6060, 'path_play': '/etc/play', 'path_log': '/var/log'}},
+
+        # jobs
+        {'l': 'job/2', 'd': {
+            'name': 'My job2.5', 'playbook_file': 'PlayBook_New.yml', 'inventory_file': 'hosts.yml',
+            'schedule': '5 4 * * *', 'environment_vars': 'MY=1,SUPER=2,VARS=3', 'tags_skip': 'srv1',
+        }},
+        {'l': 'job/2', 'd': {
+            'name': 'My job2.6', 'playbook_file': 'nope.yml', 'inventory_file': 'hosts.yml', 'enabled': False,
+            'credentials_default': 3, 'mode_diff': True, 'mode_check': True,
+        }},
+        {'l': 'job/2', 'd': {
+            'name': 'My job2.7', 'playbook_file': 'PlayUsBookUs.yml', 'inventory_file': 'hosts.yml', 'enabled': False,
+            'repository': 2,
+        }},
+
+        # perms
         {'l': 'permission/1', 'd': {'name': 'perm1'}},
     ])
 
@@ -98,7 +152,7 @@ def test_list():
 
 def test_delete():
     test_delete_locations([
-        'repository/2', 'repository/1',
+        'repository/1',
         'permission/1',
         'job/1',
         'credentials/1',
@@ -110,6 +164,8 @@ def main():
     test_list()
     test_modify()
     test_delete()
+    # todo: add should-fail checks
+    # todo: add permission checks (multiple api keys)
 
 
 if __name__ == '__main__':

@@ -126,6 +126,8 @@ def get_form_field_input(bf: BoundField, existing: dict) -> str:
     value = get_form_field_value(bf, existing)
     if value is not None:
         field_value = f'value="{value}"'
+    elif bf.field.initial is not None:
+        field_value = f'value="{bf.field.initial}"'
 
     if bf.name.find('_pass') != -1 or bf.name.find('_key') != -1:
         field_attrs += ' type="password"'

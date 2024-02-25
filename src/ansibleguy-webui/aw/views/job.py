@@ -10,7 +10,7 @@ from aw.config.main import config
 from aw.utils.http import ui_endpoint_wrapper, ui_endpoint_wrapper_kwargs
 from aw.model.job import Job, JobExecution, JobExecutionResultHost
 from aw.model.permission import CHOICE_PERMISSION_WRITE
-from aw.model.job_credential import JobGlobalCredentials, JobUserCredentials
+from aw.model.job_credential import JobGlobalCredentials, JobUserCredentials, BaseJobCredentials
 from aw.model.repository import Repository
 from aw.api_endpoints.job_util import get_viewable_jobs
 from aw.api_endpoints.credentials import are_global_credentials

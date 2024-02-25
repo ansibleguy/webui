@@ -24,7 +24,8 @@ class BaseJobCredentials(BaseModel):
 
     name = models.CharField(max_length=100, null=False, blank=False)
     connect_user = models.CharField(max_length=100, **DEFAULT_NONE)
-    become_user = models.CharField(max_length=100, default='root')  # default according to ansible-playbook docs
+    default_become_user = 'root'  # default according to ansible-playbook docs
+    become_user = models.CharField(max_length=100, default=default_become_user, null=True, blank=True)
     vault_file = models.CharField(max_length=300, **DEFAULT_NONE)
     vault_id = models.CharField(max_length=50, **DEFAULT_NONE)
 

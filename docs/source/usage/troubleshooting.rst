@@ -126,6 +126,8 @@ Connection in use
 
 * Make sure no other process is binding to port 8000: :code:`netstat -tulpn | grep 8000`
 
+  If that is the case - you can set the :code:`AW_PORT` env-var to change the port to be used.
+
 * The app failed last time. There is still an old process running. If this happens repeatedly - open an issue!
 
   You can find and kill it:

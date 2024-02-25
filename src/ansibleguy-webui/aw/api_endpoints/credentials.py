@@ -389,6 +389,9 @@ class APIJobCredentialsItem(APIView):
                                 status=400,
                             )
 
+                elif field == 'user':
+                    continue
+
                 setattr(credentials, field, value)
 
             if not are_global:
