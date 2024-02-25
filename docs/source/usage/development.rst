@@ -10,7 +10,7 @@ Development
 
 Feel free to contribute to this project using `pull-requests <https://github.com/ansibleguy/webui/pulls>`_, `issues <https://github.com/ansibleguy/webui/issues>`_ and `discussions <https://github.com/ansibleguy/webui/discussions>`_!
 
-Testers are also very welcome! Please `give feedback <https://github.com/ansibleguy/webui/issues>`_
+Testers are also very welcome! Please `give feedback <https://github.com/ansibleguy/webui/discussions>`_
 
 For further details - see: `Contribute <https://github.com/ansibleguy/webui/blob/latest/CONTRIBUTE.md>`_
 

@@ -87,11 +87,11 @@ With basic setup:
 
     export AW_SECRET=aaaaaaaaaaaaaaaaaaaaabaaaaaaaaaaaaa
     export AW_PROXY=1
-    python3 -m ansible-webui
+    python3 -m ansibleguy-webui
 
     # OR
 
-    AW_SECRET=aaaaaaaaaaaaaaaaaaaaabaaaaaaaaaaaaa python3 -m ansible-webui
+    AW_SECRET=aaaaaaaaaaaaaaaaaaaaabaaaaaaaaaaaaa python3 -m ansibleguy-webui
 
 When using Docker:
 

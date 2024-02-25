@@ -1,7 +1,6 @@
 # webui
 gunicorn
 Django==5.0.*
-pycryptodome
 pytz
 pyyaml
 django-auto-logout

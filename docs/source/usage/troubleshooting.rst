@@ -40,7 +40,7 @@ Versions
 
 You can find the versions of software packages in use at the :code:`System - Environment` page.
 
-Alternatively you can check it from the cli: :code:`python3 -m ansible-webui.cli --version`
+Alternatively you can check it from the cli: :code:`python3 -m ansibleguy-webui.cli --version`
 
 ----
 

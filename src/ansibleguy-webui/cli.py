@@ -16,7 +16,7 @@ from cli_init import init_cli
 
 
 def _api_key(action: str, username: str):
-    # python3 -m ansible-webui.cli -f api-key -a create -p <username>
+    # python3 -m ansibleguy-webui.cli -f api-key -a create -p <username>
     from aw.base import USERS
     from aw.model.api import AwAPIKey
     from aw.utils.util import datetime_w_tz
@@ -32,7 +32,7 @@ def _api_key(action: str, username: str):
 
 
 def _print_version():
-    # python3 -m ansible-webui.cli --version
+    # python3 -m ansibleguy-webui.cli --version
     from aw.utils.version import get_version, get_system_versions
 
     print(f'Version: {get_version()}\n{json_dumps(get_system_versions(), indent=4)}')
