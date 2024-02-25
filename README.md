@@ -124,6 +124,8 @@ See also: [Contributing](https://github.com/ansibleguy/webui/blob/latest/CONTRIB
 
   - [x] Mobile Support
 
+  - [ ] Multi-Language Support
+
 - [ ] API
 
   - [x] Manage and execute Jobs
