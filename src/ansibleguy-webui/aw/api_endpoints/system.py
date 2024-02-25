@@ -13,6 +13,8 @@ from aw.utils.permission import has_manager_privileges
 
 
 class SystemConfigReadResponse(BaseResponse):
+    # todo: fix static fields.. duplicate logic in model
+
     # SystemConfig.form_fields
     path_run = serializers.CharField()
     path_play = serializers.CharField()
@@ -30,6 +32,8 @@ class SystemConfigReadResponse(BaseResponse):
     deployment = serializers.CharField()
     version = serializers.CharField()
     logo_url = serializers.CharField()
+    ara_server = serializers.CharField()
+    global_environment_vars = serializers.CharField()
 
 
 class SystemConfigWriteRequest(serializers.ModelSerializer):

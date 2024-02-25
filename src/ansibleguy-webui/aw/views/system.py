@@ -94,6 +94,13 @@ def _parsed_aws_versions() -> dict:
     return versions
 
 
+def _parsed_ara_version(python_modules: dict) -> (str, None):
+    if 'ara' not in python_modules:
+        return None
+
+    return python_modules['ara']['version']
+
+
 @login_required
 @ui_endpoint_wrapper
 def system_environment(request) -> HttpResponse:
@@ -109,6 +116,7 @@ def system_environment(request) -> HttpResponse:
             'env_user': getuser(),
             'env_system': env_system,
             'env_aws': _parsed_aws_versions(),
+            'env_ara': _parsed_ara_version(python_modules),
             'env_python_modules': python_modules,
             'env_ansible_config': _parsed_ansible_config(),
             # 'env_ansible_roles': get_role_list(),

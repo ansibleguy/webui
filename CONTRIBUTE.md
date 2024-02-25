@@ -24,6 +24,26 @@ Read into the [Troubleshooting Guide](https://webui.ansibleguy.net/en/latest/usa
 * Do not commit [database migrations](https://docs.djangoproject.com/en/5.0/topics/migrations/#module-django.db.migrations) - they will be created on release.
 * As we mainly use SQLite as database we should keep the DB writes to a minimum, so we do not run into locking issues (`OperationalError: database is locked`)
 * Important fixes and features should be added to the CHANGELOG.md file
+* This project is API-first - the API should be built for clean external usage.
+* Add new views and APIs to the integration tests (`test/integration/`)
+
+----
+
+### Views
+
+* Django Templates are used to provide the HTML (`templates/**.html`)
+* JS is used to populate the HTML (_aw-api-data-table_) with data (`static/js/**.js`)
+  * JS pulls the data from the backend APIs (`api_endpoints/*.py`)
+  * There are template elements that are copied by JS: (_to keep HTML logic in actual Django template_)
+    * the HTML row template (_aw-api-data-tmpl-row_)
+    * the HTML action-buttons template (_aw-api-data-tmpl-actions_)
+* Elements with classes `aw-responsive-med` or `aw-responsive-lg` are hidden on smaller screens (_tablet/mobile view_)
+
+### Forms
+
+* Forms post their data to the API using JS (`class="aw-api-click" aw-api-endpoint="permission" aw-api-item="${ID}" aw-api-method="delete"`)
+* Forms are build on the backend (`views/*.py`)
+  * Custom handling can be found in `templatetags/form_util.py`
 
 ----
 

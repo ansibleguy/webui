@@ -5,6 +5,11 @@ from os import path as os_path
 from os import remove as remove_file
 
 from ansible_runner import Runner, RunnerConfig
+try:
+    from ara.setup.callback_plugins import callback_plugins as ara_callback_plugins
+
+except (ImportError, ModuleNotFoundError):
+    ara_callback_plugins = None
 
 from aw.config.main import config
 from aw.utils.util import is_set, datetime_w_tz, write_file_0640
@@ -21,6 +26,7 @@ from aw.execute.repository import ExecuteRepository
 
 
 def _exec_log(execution: JobExecution, msg: str, level: int = 3):
+    # todo: add execution logs to UI (?)
     log(
         msg=f"Job-execution '{execution.job}' @ {execution.result.time_start}: {msg}",
         level=level,
@@ -60,6 +66,43 @@ def _commandline_arguments(job: Job, execution: JobExecution, path_run: Path) ->
     return ' '.join(cmd_arguments)
 
 
+def _environmental_variables(job: Job, execution: JobExecution) -> dict:
+    # merge global, job + execution env-vars
+    env_vars = {}
+    if is_set(config['ara_server']):
+        if ara_callback_plugins is None:
+            _exec_log(
+                execution=execution,
+                msg="Ignoring 'ara_server' setting because 'ara' module is not installed'",
+                level=3,
+            )
+
+        else:
+            env_vars['ANSIBLE_CALLBACK_PLUGINS'] = ara_callback_plugins
+            env_vars['ARA_API_CLIENT'] = 'http'
+            env_vars['ARA_API_SERVER'] = config['ara_server']
+
+    if is_set(config['global_environment_vars']):
+        env_vars = {
+            **env_vars,
+            **decode_job_env_vars(env_vars_csv=config['global_environment_vars'], src='Global')
+        }
+
+    if is_set(job.environment_vars.strip()):
+        env_vars = {
+            **env_vars,
+            **decode_job_env_vars(env_vars_csv=job.environment_vars, src='Job')
+        }
+
+    if is_set(execution.environment_vars):
+        env_vars = {
+            **env_vars,
+            **decode_job_env_vars(env_vars_csv=execution.environment_vars, src='Execution')
+        }
+
+    return env_vars
+
+
 def _execution_or_job(job: Job, execution: JobExecution, attr: str):
     exec_val = getattr(execution, attr)
     if is_set(exec_val):
@@ -73,20 +116,6 @@ def _execution_or_job(job: Job, execution: JobExecution, attr: str):
 
 
 def _runner_options(job: Job, execution: JobExecution, path_run: Path, project_dir: str) -> dict:
-    # merge job + execution env-vars
-    env_vars = {}
-    if is_set(job.environment_vars.strip()):
-        env_vars = {
-            **env_vars,
-            **decode_job_env_vars(env_vars_csv=job.environment_vars, src='Job')
-        }
-
-    if is_set(execution.environment_vars):
-        env_vars = {
-            **env_vars,
-            **decode_job_env_vars(env_vars_csv=execution.environment_vars, src='Execution')
-        }
-
     verbosity = None
     if execution.verbosity != 0:
         verbosity = execution.verbosity
@@ -103,7 +132,7 @@ def _runner_options(job: Job, execution: JobExecution, path_run: Path, project_d
         'tags': _execution_or_job(job, execution, 'tags'),
         'skip_tags': _execution_or_job(job, execution, 'tags_skip'),
         'verbosity': verbosity,
-        'envvars': env_vars,
+        'envvars': _environmental_variables(job=job, execution=execution),
         'cmdline': cmdline_args if is_set(cmdline_args) else None,
     }
 

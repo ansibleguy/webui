@@ -6,10 +6,11 @@ from aw.config.defaults import CONFIG_DEFAULTS
 from aw.config.environment import check_aw_env_var_is_set
 
 
+# NOTE: add default-values to config.defaults.CONFIG_DEFAULTS
 class SystemConfig(BaseModel):
     form_fields = [
         'path_run', 'path_play', 'path_log', 'timezone', 'run_timeout', 'session_timeout', 'path_ansible_config',
-        'path_ssh_known_hosts', 'debug', 'logo_url',
+        'path_ssh_known_hosts', 'debug', 'logo_url', 'ara_server', 'global_environment_vars',
     ]
     # NOTE: 'AW_DB' is needed to get this config from DB and 'AW_SECRET' cannot be saved because of security breach
     api_fields_write = form_fields
@@ -25,6 +26,8 @@ class SystemConfig(BaseModel):
     path_ssh_known_hosts = models.CharField(max_length=500, **DEFAULT_NONE)
     debug = models.BooleanField(default=False, choices=CHOICES_BOOL)
     logo_url = models.CharField(max_length=500, **DEFAULT_NONE)
+    ara_server = models.CharField(max_length=300, **DEFAULT_NONE)
+    global_environment_vars = models.CharField(max_length=1000, **DEFAULT_NONE)
 
     @classmethod
     def get_set_env_vars(cls) -> list:

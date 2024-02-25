@@ -65,6 +65,8 @@ FORM_LABEL = {
             'deployment': 'Deployment',
             'version': 'AnsibleGuy WebUI Version',
             'logo_url': 'URL to a Logo to use',
+            'ara_server': 'ARA Server URL',
+            'global_environment_vars': 'Global Environmental Variables',
         }
     }
 }
@@ -152,9 +154,16 @@ FORM_HELP = {
             'debug': 'Enable Debug-mode. Do not enable permanent on production systems! '
                      'It can possibly open attack vectors. '
                      'You might need to restart the application to apply this setting',
-            'logo_url': "Default: 'img/logo.svg';"
-                        "Per example: https://raw.githubusercontent.com/ansible/logos/main/vscode-ansible-logo/"
-                        'vscode-ansible.svg',
+            'logo_url': 'Default: <a href="/static/img/logo.svg">img/logo.svg</a>; '
+                        'Per example: '
+                        '<a href="https://raw.githubusercontent.com/ansible/logos/main/vscode-ansible-logo/">'
+                        'https://raw.githubusercontent.com/ansible/logos/main/vscode-ansible-logo/vscode-ansible.svg'
+                        '</a>',
+            'ara_server': 'Provide the URL to your ARA server. Can be used to gather job statistics. See: '
+                          '<a href="https://webui.ansibleguy.net/en/latest/usage/integrations.html">'
+                          'Documentation - Integrations</a>',
+            'global_environment_vars': 'Set environmental variables that will be added to every job execution. '
+                                       'Comma-separated list of key-value pairs. (VAR1=TEST1,VAR2=0)',
         }
     }
 }

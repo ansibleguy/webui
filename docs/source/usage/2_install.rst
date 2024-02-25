@@ -93,7 +93,7 @@ Now you can open the Ansible-WebUI in your browser: `http://localhost:8000 <http
 Proxy
 *****
 
-You can find a nginx config example here: `Nginx config example <https://github.com/ansibleguy/webui/blob/latest/config/nginx.conf>`_
+You can find a nginx config example here: `Nginx config example <https://github.com/ansibleguy/webui/blob/latest/examples/nginx.conf>`_
 
 ----
 
@@ -107,7 +107,7 @@ You might want to create a service-user:
     sudo useradd ansible-webui --shell /usr/sbin/nologin --create-home --home-dir /home/ansible-webui
 
 
-You can find a service config example here: `Systemd config example <https://github.com/ansibleguy/webui/blob/latest/config/systemd_service.conf>`_
+You can find a service config example here: `Systemd config example <https://github.com/ansibleguy/webui/blob/latest/examples/systemd_service.conf>`_
 
 Enabling & starting the service:
 

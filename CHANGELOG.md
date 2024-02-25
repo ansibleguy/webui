@@ -2,6 +2,13 @@
 
 ## Version 0
 
+### 0.0.13
+
+* [ARA config integration](https://webui.ansibleguy.net/en/latest/usage/integrations.html)
+* Global Environmental-Variables for Jobs
+
+----
+
 ### 0.0.12
 
 * Better [Trademark compliance](https://github.com/ansible/logos/blob/main/TRADEMARKS.md#53-unpermitted-uses-we-consider-infringing)

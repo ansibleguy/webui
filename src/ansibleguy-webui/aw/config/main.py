@@ -52,8 +52,10 @@ class Config:
         except (IntegrityError, OperationalError, ImproperlyConfigured, AppRegistryNotReady, ImportError,
                 AttributeError):
             # if database not initialized or migrations missing; or env-only var
-            if setting not in CONFIG_DEFAULTS:
-                return None
+            pass
+
+        if setting not in CONFIG_DEFAULTS:
+            return None
 
         return CONFIG_DEFAULTS[setting]
 

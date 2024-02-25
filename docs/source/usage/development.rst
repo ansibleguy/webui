@@ -22,7 +22,7 @@ Read into the :ref:`Troubleshooting Guide <usage_troubleshooting>` to get some i
 Install Unstable Version
 ************************
 
-**WARNING**: If you run non-release versions you will have to save you :code:`src/ansibleguy-webui/aw/migrations/*` else your database upgrades might fail. Can be ignored if you do not care about losing the Ansible-WebUI config.
+**WARNING**: If you run non-release versions you will have to save your :code:`src/ansibleguy-webui/aw/migrations/*` else your database upgrades might fail. Can be ignored if you do not care about losing the Ansible-WebUI config.
 
 .. code-block:: bash
 

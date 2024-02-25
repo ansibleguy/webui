@@ -55,10 +55,16 @@
                 <td>{{ env_jinja }}</td>
             </tr>
 {% endif %}
-{% if env_aws | length > 0 %}
+{% if env_aws|exists %}
             <tr>
                 <td>AWS Tools</td>
                 <td>{% for tool, version in env_aws.items %}{{ tool }}: {{ version }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+            </tr>
+{% endif %}
+{% if env_ara|exists %}
+            <tr>
+                <td>ARA Client</td>
+                <td>{{ env_ara }}</td>
             </tr>
 {% endif %}
             <tr>
