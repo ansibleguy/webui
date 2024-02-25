@@ -155,3 +155,5 @@ Database is locked
   Restarting the application is the easiest way of working around it.
 
   If it occurs more often - please open an issue!
+
+* If you are running many jobs - you could try to keep a minute between their scheduled executions.
