@@ -4,6 +4,7 @@ from functools import cache
 from aw.config.defaults import CONFIG_DEFAULTS
 
 AW_ENV_VARS = {
+    'port': ['AW_PORT'],
     'timezone': ['AW_TIMEZONE'],
     'secret': ['AW_SECRET'],
     'path_run': ['AW_PATH_RUN'],

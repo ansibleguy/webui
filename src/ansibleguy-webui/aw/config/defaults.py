@@ -35,6 +35,7 @@ def _get_defaults_docker(var: str) -> any:
 
 # need to be referenced multiple times without import dependencies
 CONFIG_DEFAULTS = {
+    'port': 8000,
     'run_timeout': 3600,
     'path_run': '/tmp/ansible-webui',
     'path_play': getcwd(),

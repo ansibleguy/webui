@@ -120,7 +120,7 @@ Python Module not installed
 Connection in use
 =================
 
-**Error**: While starting AW you see: :code:` Connection in use: ('127.0.0.1', 8000)`
+**Error**: While starting AW you see: :code:`Connection in use: ('127.0.0.1', 8000)`
 
 **Problem**
 

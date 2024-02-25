@@ -146,6 +146,11 @@ Some settings are only available as environmental variables.
    Define the path where the SQLite3 database is placed. Default: :code:`${HOME}/.config/ansible-webui/aw.db`
 
 
+* **AW_PORT**
+
+   Port to listen on. Default: :code:`8000`
+
+
 General System Settings
 -----------------------
 

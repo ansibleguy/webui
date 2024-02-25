@@ -1,4 +1,3 @@
-PORT_WEB = 8000
 THREAD_JOIN_TIMEOUT = 3
 INTERVAL_RELOAD = 10  # start/stop threads for configured jobs
 INTERVAL_CHECK = 5  # check for queued jobs

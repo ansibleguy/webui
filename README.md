@@ -128,6 +128,10 @@ See also: [Contributing](https://github.com/ansibleguy/webui/blob/latest/CONTRIB
 
   - [x] Manage and execute Jobs
 
+- [ ] Database
+
+  - [ ] Support for MySQL
+
 - [ ] Testing
 
   - [ ] Unit Tests

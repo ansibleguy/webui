@@ -13,7 +13,7 @@ except ImportError:
     from aw.config.main import config, VERSION
 
 
-from aw.config.hardcoded import LOGIN_PATH, PORT_WEB
+from aw.config.hardcoded import LOGIN_PATH
 from aw.utils.deployment import deployment_dev, deployment_prod
 from aw.config.environment import get_aw_env_var_or_default
 
@@ -126,6 +126,7 @@ def debug_mode() -> bool:
 DEBUG = debug_mode()
 
 # WEB BASICS
+PORT_WEB = get_aw_env_var_or_default('port')
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost',
     f'http://localhost:{PORT_WEB}',

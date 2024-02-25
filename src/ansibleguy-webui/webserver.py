@@ -5,9 +5,11 @@ from random import choice as random_choice
 import gunicorn
 from gunicorn.app.wsgiapp import WSGIApplication
 
-from aw.config.hardcoded import PORT_WEB
 from aw.utils.deployment import deployment_dev, deployment_docker
 from aw.utils.debug import log, warn_if_development
+from aw.config.environment import get_aw_env_var_or_default
+
+PORT_WEB = get_aw_env_var_or_default('port')
 
 # https://docs.gunicorn.org/en/stable/settings.html
 OPTIONS_DEV = {
