@@ -18,6 +18,8 @@ Keep it simple.
 
 ### Local - PIP
 
+Requires Python >=3.10
+
 ```bash
 # install
 python3 -m pip install ansibleguy-webui

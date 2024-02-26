@@ -9,7 +9,7 @@ authors = [
 ]
 description = "Basic WebUI for using Ansible"
 readme = "README.md"
-requires-python = ">=3.5"
+requires-python = ">=3.10"  # django 5.0
 keywords = ["ansible", "webui", "automation", "iac"]
 license = {file = "LICENSE.txt"}
 classifiers = [

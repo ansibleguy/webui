@@ -29,6 +29,8 @@ Login: User :code:`demo`, Password :code:`Ansible1337`
 Install
 *******
 
+Requires Python >=3.10
+
 .. code-block:: bash
 
     python3 -m pip install ansibleguy-webui
