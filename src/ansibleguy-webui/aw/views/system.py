@@ -101,6 +101,14 @@ def _parsed_ara_version(python_modules: dict) -> (str, None):
     return python_modules['ara']['version']
 
 
+def _parsed_ansible_playbook() -> str:
+    ap = process_cache('which ansible-playbook')
+    if ap['rc'] != 0:
+        return 'Not Found'
+
+    return ap['stdout']
+
+
 @login_required
 @ui_endpoint_wrapper
 def system_environment(request) -> HttpResponse:
@@ -119,6 +127,7 @@ def system_environment(request) -> HttpResponse:
             'env_ara': _parsed_ara_version(python_modules),
             'env_python_modules': python_modules,
             'env_ansible_config': _parsed_ansible_config(),
+            'env_ansible_playbook': _parsed_ansible_playbook(),
             # 'env_ansible_roles': get_role_list(),
             'env_ansible_collections': _parsed_ansible_collections(),
         },
