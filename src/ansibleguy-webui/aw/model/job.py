@@ -90,7 +90,7 @@ class Job(BaseJob):
     schedule = models.CharField(max_length=schedule_max_len, validators=[validate_cronjob], **DEFAULT_NONE)
     enabled = models.BooleanField(choices=CHOICES_BOOL, default=True)
 
-    credentials_needed = models.BooleanField(choices=CHOICES_BOOL, default=True)
+    credentials_needed = models.BooleanField(choices=CHOICES_BOOL, default=False)
     credentials_default = models.ForeignKey(
         JobGlobalCredentials, on_delete=models.SET_NULL, related_name='job_fk_creddflt', null=True, blank=True,
     )
