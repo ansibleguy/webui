@@ -1,0 +1,59 @@
+{% load util %}
+{% load form_util %}
+<div class="aw-error-msg">
+  {{ form.non_field_errors }}
+</div>
+{% for bf in form.visible_fields %}
+{%   if bf.name in primary_fields %}
+<div class="mb-3 row">
+    <label for="{{ bf.id_for_label }}" class="form-label col-sm-2 col-form-label">{{ bf.label }}</label>
+    <div class="col-sm-10">
+{%     if bf|form_field_is_dropdown %}
+        {{ bf|get_form_field_select:existing|safe }}
+{%     else %}
+        {{ bf|get_form_field_input:existing|safe }}
+{%     endif %}
+    </div>
+{%     if bf.help_text|exists %}
+    <div class="help-block">
+        <b>Info:</b> {{ bf.help_text|safe }}
+    </div>
+{%     endif %}
+{%   endif %}
+</div>
+<div class="aw-error-msg">
+    {{ bf.errors }}
+</div>
+{% endfor %}
+
+<button type="button" class="btn btn-info aw-btn-action aw-btn-expand" title="Show Settings" aw-expand="aw-spoiler-job-settings">
+    {% include "../button/icon/expand.html" %}
+</button>
+<br>
+
+<div hidden="hidden" id="aw-spoiler-job-settings">
+{% for bf in form.visible_fields %}
+{%   if bf.name not in primary_fields %}
+    <div class="mb-3 row">
+        <label for="{{ bf.id_for_label }}" class="form-label col-sm-2 col-form-label">{{ bf.label }}</label>
+        <div class="col-sm-10">
+{%     if bf|form_field_is_dropdown %}
+            {{ bf|get_form_field_select:existing|safe }}
+{%     else %}
+            {{ bf|get_form_field_input:existing|safe }}
+{%     endif %}
+        </div>
+{%     if bf.help_text|exists %}
+        <div class="help-block">
+            <b>Info:</b> {{ bf.help_text|safe }}
+        </div>
+{%     endif %}
+    </div>
+{%   endif %}
+        <div class="aw-error-msg">
+            {{ bf.errors }}
+        </div>
+{% endfor %}
+</div>
+<br>
+<button type="submit" class="btn btn-primary" title="Save">Save</button>

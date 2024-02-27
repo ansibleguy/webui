@@ -3,6 +3,7 @@ from django.db import models
 from django.core.validators import ValidationError
 from django.utils import timezone
 
+from aw.config.main import config
 from aw.model.base import BareModel, BaseModel, CHOICES_BOOL, DEFAULT_NONE, CHOICES_JOB_EXEC_STATUS
 from aw.config.hardcoded import SHORT_TIME_FORMAT
 from aw.model.job_credential import JobGlobalCredentials, JobUserCredentials
@@ -73,10 +74,11 @@ def validate_cronjob(value):
 
 class Job(BaseJob):
     CHANGE_FIELDS = [
-        'name', 'inventory_file', 'playbook_file', 'repository', 'schedule', 'enabled', 'limit', 'verbosity',
+        'name', 'playbook_file', 'inventory_file', 'repository', 'schedule', 'enabled', 'limit', 'verbosity',
         'mode_diff', 'mode_check', 'tags', 'tags_skip', 'verbosity', 'comment', 'environment_vars', 'cmd_args',
         'credentials_default', 'credentials_needed',
     ]
+    form_fields_primary = ['name', 'playbook_file', 'inventory_file', 'repository']
     form_fields = CHANGE_FIELDS
     api_fields_read = ['id']
     api_fields_read.extend(CHANGE_FIELDS)
@@ -84,8 +86,9 @@ class Job(BaseJob):
     api_fields_read.append('next_run')
 
     name = models.CharField(max_length=150, null=False, blank=False)
-    inventory_file = models.CharField(max_length=300)  # NOTE: one or multiple comma-separated inventories
     playbook_file = models.CharField(max_length=100)
+    # NOTE: one or multiple comma-separated inventories
+    inventory_file = models.CharField(max_length=300, **DEFAULT_NONE)
     schedule_max_len = 50
     schedule = models.CharField(max_length=schedule_max_len, validators=[validate_cronjob], **DEFAULT_NONE)
     enabled = models.BooleanField(choices=CHOICES_BOOL, default=True)
@@ -124,7 +127,7 @@ class JobExecutionResult(BareModel):
 
     @property
     def time_fin_str(self) -> str:
-        return datetime_from_db_str(dt=self.time_fin, fmt=SHORT_TIME_FORMAT)
+        return datetime_from_db_str(dt=self.time_fin, fmt=SHORT_TIME_FORMAT) + f" {config['timezone']}"
 
 
 class JobExecutionResultHost(BareModel):
@@ -216,7 +219,7 @@ class JobExecution(BaseJob):
         if is_null(self.created):
             return ''
 
-        return datetime_from_db_str(dt=self.created, fmt=SHORT_TIME_FORMAT)
+        return datetime_from_db_str(dt=self.created, fmt=SHORT_TIME_FORMAT) + f" {config['timezone']}"
 
     @property
     def log_stdout_url(self) -> str:

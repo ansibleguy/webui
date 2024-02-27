@@ -76,11 +76,10 @@ FORM_HELP = {
         'manage': {
             'playbook_file': f"Playbook to execute. Search path: '{config['path_play']}'",
             # todo: change search-path with repository
-            'inventory_file': 'One or multiple inventory files/directories to include for the execution. '
-                              'Comma-separated list. For details see: '
+            # 'One or multiple inventory files/directories to include for the execution. Comma-separated list.'
+            'inventory_file': 'For details see: '
                               '<a href="https://docs.ansible.com/ansible/latest/inventory_guide/'
-                              'intro_inventory.html">'
-                              'Ansible Docs - Inventory</a>',
+                              'intro_inventory.html">Ansible Docs - Inventory</a>',
             'repository': 'Used to define the static or dynamic source of your playbook directory structure. '
                           f"Default is '{config['path_play']}'",
             'limit': 'Ansible inventory hosts or groups to limit the execution to.'
@@ -102,7 +101,8 @@ FORM_HELP = {
             'credentials_needed': 'If the job requires credentials to be specified '
                                   '(either as default or at execution-time; '
                                   'fallback are the user-credentials of the executing user)',
-            'credentials_default': 'Specify job-level default credentials to use'
+            'credentials_default': 'Specify job-level default credentials to use',
+            'enabled': 'En- or disable the schedule. Can be ignored if no schedule was set',
         },
         'credentials': {
             'vault_file': 'Path to the file containing your vault-password',

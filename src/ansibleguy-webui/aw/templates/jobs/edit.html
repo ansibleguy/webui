@@ -9,7 +9,10 @@
     </button>
 </a>
 
-{% include "../forms/base.html" %}
+<form class="aw-api-form" method="{{ form_method }}" action="/api/{{ form_api }}">
+    {% csrf_token %}
+    {{ form }}
+</form>
 
 <a href="/ui/jobs/manage">
     <button class="btn btn-info aw-btn-action" title="Return">
