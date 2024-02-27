@@ -172,71 +172,6 @@ function apiActionFullError() {
     document.getElementById("aw-api-error-full").scrollIntoView();
 }
 
-function apiBrowseDirFilteredChoices(choices, userInputCurrent, allowEmpty = false) {
-    let choicesFiltered = [];
-    for (choice of choices) {
-        if (choice.startsWith(userInputCurrent)) {
-            choicesFiltered.push(choice);
-        }
-    }
-    if (!allowEmpty && choicesFiltered.length == 0) {
-        choicesFiltered = choices;
-    }
-    choicesFiltered.sort();
-    return choicesFiltered;
-}
-
-function apiBrowseDirUpdateChoices(inputElement, choicesElement, searchType, userInputCurrent, result) {
-    let choices = result[searchType];
-    inputElement.attr("pattern", '(.*\\/|^)(' + choices.join('|') + ')$');
-
-    if (choices.length == 0) {
-        inputElement.attr("title", "No available " + searchType + " found.");
-    } else if (choices[0] == '.*') {
-        // isolated repository does not exist - cannot validate files
-        return
-    }
-
-    let choicesHtml = "";
-    for (choice of apiBrowseDirFilteredChoices(choices, userInputCurrent)) {
-        choicesHtml += '<li class="aw-fs-choices-' + searchType + '">' + choice + "</li>";
-    }
-    if (searchType != 'directories') {
-        for (dir of apiBrowseDirFilteredChoices(result['directories'], userInputCurrent, true)) {
-            choicesHtml += '<li class="aw-fs-choices-directories"><i class="fa fa-folder" aria-hidden="true"></i> ' + dir + "</li>";
-        }
-    }
-    choicesElement.innerHTML = choicesHtml;
-}
-
-function apiBrowseDirRemoveChoices(inputElement, choicesElement, searchType, exception) {
-    console.log(exception);
-    inputElement.attr("pattern", '^\\b$');
-    inputElement.attr("title", "You need to choose one of the existing " + searchType);
-}
-
-function apiBrowseDir(inputElement, choicesElement, repository, searchType) {
-    if (!is_set(repository)){
-        repository = '0';
-    }
-
-    let userInput = $(inputElement).val();
-    if (typeof(userInput) == 'undefined' || userInput == null) {
-        userInput = "";
-    }
-
-    let userInputLevels = userInput.split('/');
-    let userInputCurrent = userInputLevels.pop();
-    let base = userInputLevels.join('/');
-
-    $.ajax({
-        url: "/api/fs/browse/" + repository + "?base=" + base,
-        type: "GET",
-        success: function (result) { apiBrowseDirUpdateChoices(inputElement, choicesElement, searchType, userInputCurrent, result); },
-        error: function (exception) { apiBrowseDirRemoveChoices(inputElement, choicesElement, searchType, exception); },
-    });
-}
-
 function apiFsExistsUpdateValidation(inputElement, result) {
     if (result.exists) {
         inputElement.attr("pattern", '.*');
@@ -449,23 +384,6 @@ $( document ).ready(function() {
         });
 
         return false;
-    });
-    $(".aw-main").on("input", ".aw-fs-browse", function(){
-        let searchType = $(this).attr("aw-fs-type");
-        let repository = $(this).attr("aw-fs-repository");
-        let apiChoices = document.getElementById($(this).attr("aw-fs-choices"));
-
-        $(this).attr("value", "");
-        let pattern = $(this).attr("pattern");
-        if (pattern == ".*") {
-            $(this).attr("pattern", '^\\b$');
-        }
-
-        if (this.checkValidity() == false) {
-            apiBrowseDir(jQuery(this), apiChoices, repository, searchType);
-        } else {
-            apiChoices.innerHTML = ""
-        }
     });
     $(".aw-main").on("input", ".aw-fs-exists", function(){
         apiFsExists(jQuery(this));

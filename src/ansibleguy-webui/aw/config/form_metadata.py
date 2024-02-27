@@ -3,7 +3,7 @@ from aw.config.main import config
 FORM_LABEL = {
     'jobs': {
         'manage': {
-            'repository': 'Repository/Playbook-Base',
+            'repository': 'Repository',
             'environment_vars': 'Environmental Variables',
             'mode_diff': 'Diff Mode',
             'mode_check': 'Check Mode (Try Run)',
@@ -76,8 +76,8 @@ FORM_HELP = {
         'manage': {
             'playbook_file': f"Playbook to execute. Search path: '{config['path_play']}'",
             # todo: change search-path with repository
-            # 'One or multiple inventory files/directories to include for the execution. Comma-separated list.'
-            'inventory_file': 'For details see: '
+            'inventory_file': 'One or multiple inventory files/directories to include for the execution.'
+                              'Comma-separated list. For details see: '
                               '<a href="https://docs.ansible.com/ansible/latest/inventory_guide/'
                               'intro_inventory.html">Ansible Docs - Inventory</a>',
             'repository': 'Used to define the static or dynamic source of your playbook directory structure. '

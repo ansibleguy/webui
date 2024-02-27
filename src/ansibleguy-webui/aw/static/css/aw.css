@@ -29,7 +29,6 @@ body.light {
     --tc3: #fcfdff;
     --textHead: #ff7400;
     --bg: #fcfdff;
-    --bgLight: #3A9188;
     --bgNav: #343a40;
     --bgNav2: #505050;
     --bgNav3: #343a40;
@@ -56,7 +55,6 @@ body.dark {
     --tableHead: #282828;
     --tableRow1: #404040;
     --tableRow2: #404040;
-    --bgLight: #062925;
     --bgError: #282828;
     --borderError: #404040;
     --tcError: #721c24;
@@ -379,9 +377,14 @@ input:invalid {
 
 .aw-fs-choices {
     background-color: var(--tableRow1);
+    width: 20vw;
 }
-.aw-fs-choices-files {}
-.aw-fs-choices-directories {}
+.aw-fs-choice {}
+.aw-fs-choice:hover {
+    background-color: var(--tableRow2);
+}
+.aw-fs-choice-file {}
+.aw-fs-choice-dir {}
 
 .aw-success-msg {
     color: rgb(135,169,107);
