@@ -144,17 +144,19 @@ def runner_prep(job: Job, execution: JobExecution, path_run: Path, project_dir: 
 
     opts = _runner_options(job=job, execution=execution, path_run=path_run, project_dir=project_dir)
     opts['playbook'] = job.playbook_file
-    opts['inventory'] = job.inventory_file.split(',')
+    if is_set(job.inventory_file):
+        opts['inventory'] = job.inventory_file.split(',')
 
     # https://docs.ansible.com/ansible/2.8/user_guide/playbooks_best_practices.html#directory-layout
     ppf = Path(opts['project_dir']) / opts['playbook']
     if not Path(ppf).is_file():
         config_error(f"Configured playbook not found: '{ppf}'")
 
-    for inventory in opts['inventory']:
-        pi = Path(opts['project_dir']) / inventory
-        if not Path(pi).exists():
-            config_error(f"Configured inventory not found: '{pi}'")
+    if 'inventory' in opts:
+        for inventory in opts['inventory']:
+            pi = Path(opts['project_dir']) / inventory
+            if not Path(pi).exists():
+                config_error(f"Configured inventory not found: '{pi}'")
 
     create_dirs(path=path_run, desc='run')
     create_dirs(path=config['path_log'], desc='log')
