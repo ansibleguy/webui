@@ -42,7 +42,7 @@ Read into the [Troubleshooting Guide](https://webui.ansibleguy.net/en/latest/usa
 ### Forms
 
 * Forms post their data to the API using JS (`class="aw-api-click" aw-api-endpoint="permission" aw-api-item="${ID}" aw-api-method="delete"`)
-* Forms are build on the backend (`views/*.py`)
+* Forms are build on the backend (`views/forms/*.py`)
   * Custom handling can be found in `templatetags/form_util.py`
 
 ----
