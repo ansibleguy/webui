@@ -48,4 +48,6 @@ CONFIG_DEFAULTS = {
     'path_ssh_known_hosts': _get_defaults_docker('path_ssh_known_hosts'),
     'debug': False,
     'logo_url': 'img/logo.svg',
+    'ssl_file_key': None,
+    'ssl_file_crt': None,
 }

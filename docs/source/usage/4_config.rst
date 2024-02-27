@@ -151,6 +151,20 @@ Some settings are only available as environmental variables.
    Port to listen on. Default: :code:`8000`
 
 
+* **AW_SSL_CERT**
+
+   Optionally provide the path to a ssl certificate to use. Use a (full-)chain if not self-signed.
+
+   **WARNING**: You should use a proxy in front of this application in production setups.
+
+
+* **AW_SSL_KEY**
+
+   Optionally provide the path to an unencrypted ssl key to use.
+
+   **WARNING**: You should use a proxy in front of this application in production setups.
+
+
 General System Settings
 -----------------------
 

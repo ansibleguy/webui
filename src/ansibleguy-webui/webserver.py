@@ -1,6 +1,8 @@
 from multiprocessing import cpu_count
 from string import ascii_letters
 from random import choice as random_choice
+from pathlib import Path
+from ssl import PROTOCOL_TLSv1_2
 
 import gunicorn
 from gunicorn.app.wsgiapp import WSGIApplication
@@ -53,7 +55,27 @@ def init_webserver():
         warn_if_development()
         opts = {**opts, **OPTIONS_DEV}
 
-    log(msg=f"Listening on http://{opts['bind']}", level=5)
+    scheme = 'http'
+    ssl_cert = get_aw_env_var_or_default('ssl_file_crt')
+    ssl_key = get_aw_env_var_or_default('ssl_file_key')
+    if ssl_cert is not None and ssl_key is not None:
+        if not Path(ssl_cert).is_file() or not Path(ssl_key).is_file():
+            log(
+                msg=f"Either SSL certificate or SSL key is not readable: {ssl_cert}, {ssl_key}",
+                level=1,
+            )
+
+        else:
+            opts = {
+                **opts,
+                'keyfile': ssl_key,
+                'certfile': ssl_cert,
+                'ssl_version': PROTOCOL_TLSv1_2,
+                'do_handshake_on_connect': True,
+            }
+            scheme = 'https'
+
+    log(msg=f"Listening on {scheme}://{opts['bind']}", level=5)
 
     StandaloneApplication(
         app_uri="aw.main:app",
