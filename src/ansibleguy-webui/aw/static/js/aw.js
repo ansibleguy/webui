@@ -35,7 +35,12 @@ function sleep(ms = 0) {
 function updateReloadTime() {
     var element =  document.getElementById("aw-last-update");
     if (typeof(element) != 'undefined' && element != null) {
-      element.innerHTML = "Last update: " + (new Date()).toLocaleTimeString({ hour12: false });
+      element.innerHTML = "Last update: " + (new Date()).toLocaleTimeString([], {
+        hourCycle: 'h23',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      });
     }
 }
 

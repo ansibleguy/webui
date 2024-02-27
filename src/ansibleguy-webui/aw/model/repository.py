@@ -1,5 +1,6 @@
 from django.db import models
 
+from aw.config.main import config
 from aw.config.hardcoded import SHORT_TIME_FORMAT
 from aw.model.base import BaseModel, DEFAULT_NONE, CHOICES_BOOL, CHOICES_JOB_EXEC_STATUS
 from aw.model.job_credential import JobGlobalCredentials
@@ -61,7 +62,7 @@ class Repository(BaseModel):
         if is_null(self.time_update):
             return ''
 
-        return datetime_from_db_str(dt=self.time_update, fmt=SHORT_TIME_FORMAT)
+        return datetime_from_db_str(dt=self.time_update, fmt=SHORT_TIME_FORMAT) + f" {config['timezone']}"
 
     @property
     def status_name(self) -> str:

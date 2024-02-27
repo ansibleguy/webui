@@ -3,6 +3,7 @@ from pathlib import Path
 from django.shortcuts import HttpResponse
 from rest_framework import serializers
 
+from aw.config.main import config
 from aw.config.hardcoded import JOB_EXECUTION_LIMIT
 from aw.model.job import Job, JobExecution
 from aw.utils.permission import get_viewable_jobs
@@ -85,7 +86,7 @@ def get_viewable_jobs_serialized(
 
         try:
             if job.schedule is not None:
-                job_serialized['next_run'] = get_next_cron_execution_str(job.schedule)
+                job_serialized['next_run'] = get_next_cron_execution_str(job.schedule) + f" {config['timezone']}"
 
         except ValueError:
             pass
