@@ -238,12 +238,12 @@ def parse_run_result(execution: JobExecution, result: JobExecutionResult, runner
     if runner.stats is not None:
         any_task_failed = _run_stats(runner=runner, result=result)
 
-    if result.failed or any_task_failed:
+    if runner.errored or runner.timed_out or runner.rc != 0 or any_task_failed:
         update_status(execution, status='Failed')
 
     else:
         status = 'Finished'
-        if is_execution_status(execution, 'Stopping'):
+        if is_execution_status(execution, 'Stopping') or runner.canceled:
             status = 'Stopped'
 
         update_status(execution, status=status)
