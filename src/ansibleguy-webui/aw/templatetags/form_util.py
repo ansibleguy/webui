@@ -75,28 +75,31 @@ def get_form_field_value(bf: BoundField, existing: dict) -> (str, None):
 
 @register.filter
 def get_form_field_select(bf: BoundField, existing: dict) -> str:
-    multi = False
-    selected = None
-    if bf.name in existing:
-        selected = str(existing[bf.name])
-    elif f'{bf.name}_id' in existing:
-        selected = str(existing[f'{bf.name}_id'])
-    elif bf.field.initial is not None:
-        selected = bf.field.initial
-
-    options_str = f'<select class="form-control" id="{bf.id_for_label}" name="{bf.name}"'
-    if isinstance(bf.field, MultipleChoiceField):
-        # todo: selected for multi-select
-        options_str += ' multiple'
-        selected = None  # not implemented
-        multi = True
-
-    options_str += '>'
-
     if not hasattr(bf.field, '_choices'):
         raise AttributeError(f"Field '{bf.name}' is of an invalid type: {type(bf.field)} - {bf.field.__dict__}")
 
-    if not multi:
+    options_str = f'<select class="form-control" id="{bf.id_for_label}" name="{bf.name}"'
+
+    if isinstance(bf.field, MultipleChoiceField):
+        options_str += ' multiple>'
+        # pylint: disable=W0212
+        for option in bf.field._choices:
+            is_selected = ''
+            if bf.name in existing and option[0] in existing[bf.name]:
+                is_selected = 'selected'
+
+            options_str += f'<option type="checkbox" value="{option[0]}" {is_selected}>{option[1]}</option>'
+
+    else:
+        options_str += '>'
+        selected = None
+        if bf.name in existing:
+            selected = str(existing[bf.name])
+        elif f'{bf.name}_id' in existing:
+            selected = str(existing[f'{bf.name}_id'])
+        elif bf.field.initial is not None:
+            selected = bf.field.initial
+
         if bf.field.required:
             if selected is None:
                 options_str += '<option disabled selected value>Choose an option</option>'
@@ -107,10 +110,10 @@ def get_form_field_select(bf: BoundField, existing: dict) -> str:
             else:
                 options_str += '<option value>None</option>'
 
-    # pylint: disable=W0212
-    for option in bf.field._choices:
-        is_selected = 'selected' if str(option[0]) == str(selected) else ''
-        options_str += f'<option value="{option[0]}" {is_selected}>{option[1]}</option>'
+        # pylint: disable=W0212
+        for option in bf.field._choices:
+            is_selected = 'selected' if str(option[0]) == str(selected) else ''
+            options_str += f'<option value="{option[0]}" {is_selected}>{option[1]}</option>'
 
     options_str += '</select>'
     return options_str

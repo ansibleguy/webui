@@ -119,12 +119,6 @@ class CredentialUserForm(CredentialGlobalForm):
 
 @login_required
 @ui_endpoint_wrapper_kwargs
-def job_credentials(request) -> HttpResponse:
-    return render(request, status=200, template_name='jobs/credentials.html', context={'show_update_time': True})
-
-
-@login_required
-@ui_endpoint_wrapper_kwargs
 def job_credentials_edit(request, credentials_id: int = None) -> HttpResponse:
     are_global = are_global_credentials(request)
     if are_global:

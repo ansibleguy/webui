@@ -4,7 +4,8 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 
 from aw.utils.http import ui_endpoint_wrapper_kwargs
-from aw.model.permission import JobPermission
+from aw.model.permission import JobPermission, JobPermissionMapping, JobCredentialsPermissionMapping, \
+    JobRepositoryPermissionMapping, JobPermissionMemberUser, JobPermissionMemberGroup
 from aw.config.form_metadata import FORM_LABEL, FORM_HELP
 from aw.views.base import choices_global_credentials, choices_job, choices_user, choices_group, choices_repositories
 
@@ -57,7 +58,17 @@ def setting_permission_edit(request, perm_id: int = None) -> HttpResponse:
         if perm is None:
             return redirect(f"/ui/settings/permissions?error=Permission with ID {perm_id} does not exist")
 
-        perm = perm.__dict__
+        data = perm.__dict__
+        data['users'] = [link.user.id for link in JobPermissionMemberUser.objects.filter(permission=perm)]
+        data['groups'] = [link.group.id for link in JobPermissionMemberGroup.objects.filter(permission=perm)]
+        data['jobs'] = [link.job.id for link in JobPermissionMapping.objects.filter(permission=perm)]
+        data['credentials'] = [
+            link.credentials.id for link in JobCredentialsPermissionMapping.objects.filter(permission=perm)
+        ]
+        data['repositories'] = [
+            link.repository.id for link in JobRepositoryPermissionMapping.objects.filter(permission=perm)
+        ]
+        perm = data
         form_method = 'put'
         form_api += f'/{perm_id}'
 

@@ -7,7 +7,7 @@ from aw.utils.http import ui_endpoint_wrapper, ui_endpoint_wrapper_kwargs
 from aw.model.job import JobExecution, JobExecutionResultHost
 from aw.api_endpoints.job_util import get_viewable_jobs
 from aw.utils.util import get_next_cron_execution_str
-from aw.views.forms.job import job_credentials, job_edit, job_repository_edit, job_credentials_edit
+from aw.views.forms.job import job_edit, job_repository_edit, job_credentials_edit
 
 LIMIT_JOB_RESULTS = 10
 LIMIT_JOB_LOG_RESULTS = 50
@@ -53,6 +53,12 @@ def manage(request) -> HttpResponse:
 @ui_endpoint_wrapper_kwargs
 def job_logs(request) -> HttpResponse:
     return render(request, status=200, template_name='jobs/logs.html', context={'show_update_time': True})
+
+
+@login_required
+@ui_endpoint_wrapper_kwargs
+def job_credentials(request) -> HttpResponse:
+    return render(request, status=200, template_name='jobs/credentials.html', context={'show_update_time': True})
 
 
 @login_required
