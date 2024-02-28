@@ -167,6 +167,7 @@ class JobExecution(BaseJob):
         'credential_global', 'credential_user', 'command', 'log_stdout_repo', 'log_stderr_repo',
         'log_stdout_repo_url', 'log_stderr_repo_url',
     ]
+    log_file_fields = ['log_stdout', 'log_stderr', 'log_stdout_repo', 'log_stderr_repo']
 
     # NOTE: scheduled execution will have no user
     user = models.ForeignKey(

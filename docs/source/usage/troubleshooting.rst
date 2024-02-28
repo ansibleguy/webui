@@ -159,3 +159,20 @@ Database is locked
   If it occurs more often - please open an issue!
 
 * If you are running many jobs - you could try to keep a minute between their scheduled executions.
+
+----
+
+Too Many Log Files exist
+========================
+
+**Error**: Job logs are currently not cleaned automatically. You may want to clean them manually periodically.
+
+**Resolution**:
+
+* You can easily remove all log-files older than N days with this command:
+
+.. code-block:: bash
+
+    MAX_LOG_AGE=7  # days
+    cd ~/.local/share/ansible-webui/
+    find -type f -mtime +${MAX_LOG_AGE} -delete

@@ -3,6 +3,7 @@ from shutil import rmtree
 from os import symlink
 from os import path as os_path
 from os import remove as remove_file
+from os import stat as os_stat
 
 from ansible_runner import Runner, RunnerConfig
 try:
@@ -188,7 +189,7 @@ def runner_logs(cfg: RunnerConfig, log_files: dict):
             symlink(log_files[log_type], logs_src[log_type])
 
 
-def runner_cleanup(path_run: Path, exec_repo: ExecuteRepository):
+def runner_cleanup(execution: JobExecution, path_run: Path, exec_repo: ExecuteRepository):
     overwrite_and_delete_file(f"{path_run}/env/passwords")
     overwrite_and_delete_file(f"{path_run}/env/ssh_key")
     for attr in BaseJobCredentials.SECRET_ATTRS:
@@ -199,6 +200,12 @@ def runner_cleanup(path_run: Path, exec_repo: ExecuteRepository):
 
     except AttributeError as err:
         log(msg=f'Got error of repository cleanup: {err}')
+
+    # clean empty log files
+    for log_file in JobExecution.log_file_fields:
+        log_file_path = getattr(execution, log_file)
+        if os_stat(log_file_path).st_size == 0:
+            remove_file(log_file_path)
 
     rmtree(path_run, ignore_errors=True)
 
@@ -265,4 +272,4 @@ def failure(
     result.save()
 
     execution.save()
-    runner_cleanup(path_run=path_run, exec_repo=exec_repo)
+    runner_cleanup(execution=JobExecution ,path_run=path_run, exec_repo=exec_repo)

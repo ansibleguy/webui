@@ -3,6 +3,8 @@
 // CONSTANTS
 const DATA_REFRESH_SEC = 1;
 const HTTP_PARAMS = new URLSearchParams(window.location.search);
+const TITLE_NULL = 'Does not exist';
+const LINK_NULL = 'javascript:void(0);';
 
 // UTIL FUNCTIONS
 function getCookie(name) {

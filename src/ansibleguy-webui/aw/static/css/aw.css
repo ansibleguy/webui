@@ -40,6 +40,7 @@ body.light {
     --tcError: #721c24;
     --awLogs: #404040;
     --link: #0000EE;
+    --linkDisabled: #404040;
     --awBorder: #4040404;
 }
 
@@ -61,6 +62,7 @@ body.dark {
     --tcError: #721c24;
     --awLogs: #282828;
     --link: #66B2F5;
+    --linkDisabled: #FBFAF5;
     --awBorder: #FBFAF5;
 }
 
@@ -159,6 +161,14 @@ a:hover {
 a:active {
   text-decoration: underline;
   color: #B3D8FA;
+}
+
+a[href*="javascript:void(0);"] {
+  color: var(--linkDisabled);
+}
+
+a[href*="javascript:void(0);"]:hover {
+  text-decoration: none;
 }
 
 /* STOP basic */

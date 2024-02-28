@@ -1,4 +1,5 @@
 from threading import Thread
+from pathlib import Path
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.utils import IntegrityError
@@ -65,6 +66,10 @@ def validate_repository_types(repository: dict) -> (bool, str):
 def build_repository(repository: Repository) -> dict:
     data = RepositoryReadResponse(instance=repository).data
     data['time_update'] = repository.time_update_str
+    if not Path(data['log_stderr']).is_file():
+        data['log_stderr'] = None
+        data['log_stderr_url'] = None
+
     return data
 
 

@@ -62,7 +62,7 @@ def ansible_playbook(job: Job, execution: (JobExecution, None)):
         )
         del runner
 
-        runner_cleanup(path_run=path_run, exec_repo=exec_repo)
+        runner_cleanup(execution=execution, path_run=path_run, exec_repo=exec_repo)
 
     except (OSError, AnsibleConfigError) as err:
         tb = traceback.format_exc(limit=1024)

@@ -77,14 +77,34 @@ function updateApiTableDataJobLogs(row, row2, entry) {
     let logsTemplates = document.getElementById("aw-api-data-tmpl-logs").innerHTML;
     logsTemplates = logsTemplates.replaceAll('${ID}', entry.id);
     logsTemplates = logsTemplates.replaceAll('${JOB_ID}', entry.job);
-    logsTemplates = logsTemplates.replaceAll('${LOG_STDOUT_URL}', entry.log_stdout_url);
-    logsTemplates = logsTemplates.replaceAll('${LOG_STDERR_URL}', entry.log_stderr_url);
-    logsTemplates = logsTemplates.replaceAll('${LOG_STDERR}', entry.log_stderr);
-    logsTemplates = logsTemplates.replaceAll('${LOG_STDOUT}', entry.log_stdout);
-    logsTemplates = logsTemplates.replaceAll('${LOG_STDOUT_REPO_URL}', entry.log_stdout_repo_url);
-    logsTemplates = logsTemplates.replaceAll('${LOG_STDERR_REPO_URL}', entry.log_stderr_repo_url);
-    logsTemplates = logsTemplates.replaceAll('${LOG_STDERR_REPO}', entry.log_stderr_repo);
-    logsTemplates = logsTemplates.replaceAll('${LOG_STDOUT_REPO}', entry.log_stdout_repo);
+    if (is_set(entry.log_stdout)) {
+        logsTemplates = logsTemplates.replaceAll('${LOG_STDOUT}', entry.log_stdout);
+        logsTemplates = logsTemplates.replaceAll('${LOG_STDOUT_URL}', entry.log_stdout_url);
+    } else {
+        logsTemplates = logsTemplates.replaceAll('${LOG_STDOUT}', TITLE_NULL);
+        logsTemplates = logsTemplates.replaceAll('${LOG_STDOUT_URL}', LINK_NULL);
+    }
+    if (is_set(entry.log_stderr)) {
+        logsTemplates = logsTemplates.replaceAll('${LOG_STDERR}', entry.log_stderr);
+        logsTemplates = logsTemplates.replaceAll('${LOG_STDERR_URL}', entry.log_stderr_url);
+    } else {
+        logsTemplates = logsTemplates.replaceAll('${LOG_STDERR}', TITLE_NULL);
+        logsTemplates = logsTemplates.replaceAll('${LOG_STDERR_URL}', LINK_NULL);
+    }
+    if (is_set(entry.log_stdout_repo)) {
+        logsTemplates = logsTemplates.replaceAll('${LOG_STDOUT_REPO}', entry.log_stdout_repo);
+        logsTemplates = logsTemplates.replaceAll('${LOG_STDOUT_REPO_URL}', entry.log_stdout_repo_url);
+    } else {
+        logsTemplates = logsTemplates.replaceAll('${LOG_STDOUT_REPO}', TITLE_NULL);
+        logsTemplates = logsTemplates.replaceAll('${LOG_STDOUT_REPO_URL}', LINK_NULL);
+    }
+    if (is_set(entry.log_stderr_repo)) {
+        logsTemplates = logsTemplates.replaceAll('${LOG_STDERR_REPO}', entry.log_stderr_repo);
+        logsTemplates = logsTemplates.replaceAll('${LOG_STDERR_REPO_URL}', entry.log_stderr_repo_url);
+    } else {
+        logsTemplates = logsTemplates.replaceAll('${LOG_STDERR_REPO}', TITLE_NULL);
+        logsTemplates = logsTemplates.replaceAll('${LOG_STDERR_REPO_URL}', LINK_NULL);
+    }
     row2.setAttribute("hidden", "hidden");
     row2.setAttribute("id", "aw-spoiler-" + entry.id);
     let row2Col = row2.insertCell(0);

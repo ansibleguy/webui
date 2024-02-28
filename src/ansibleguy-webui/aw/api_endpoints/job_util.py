@@ -56,6 +56,11 @@ def get_job_execution_serialized(execution: JobExecution) -> dict:
     serialized['error_s'] = None
     serialized['error_m'] = None
 
+    for logfile in JobExecution.log_file_fields:
+        if serialized[logfile] is None or not Path(serialized[logfile]).is_file():
+            serialized[logfile] = None
+            serialized[logfile + '_url'] = None
+
     if execution.result is not None:
         serialized['time_fin'] = execution.result.time_fin_str
         serialized['failed'] = execution.result.failed

@@ -53,13 +53,23 @@ function updateApiTableDataJob(row, row2, entry) {
         execs += ('<br><b>Finish time</b>: ' + exec.time_fin);
         execs += ('<br><b>Executed by</b>: ' + exec.user_name);
         execs += ('<br><b>Status</b>: <span class="aw-job-status aw-job-status-' + exec.status_name.toLowerCase() + '">' + exec.status_name + '</span>');
-        execs += ('<br><b>Logs</b>: <a href="' + exec.log_stdout_url + '" title="' + exec.log_stdout + '" download>Job Output</a>, ');
-        execs += ('<a href="' + exec.log_stderr_url + '" title="' + exec.log_stderr + '" download>Job Error</a>');
-        if (is_set(entry.repository)) {
-            execs += (', <a href="' + exec.log_stdout_repo_url + '" title="' + exec.log_stdout_repo + '" download>Repository Output</a>, ');
-            execs += ('<a href="' + exec.log_stderr_repo_url + '" title="' + exec.log_stderr_repo + '" download>Repository Error</a>');
+        if (is_set(exec.log_stdout) || is_set(exec.log_stderr) || is_set(exec.log_stdout_repo) || is_set(exec.log_stderr_repo)) {
+            let exec_logs = [];
+            if (is_set(exec.log_stdout)) {
+                exec_logs.push('<a href="' + exec.log_stdout_url + '" title="' + exec.log_stdout + '" download>Job Output</a>');
+            }
+            if (is_set(exec.log_stderr)) {
+                exec_logs.push('<a href="' + exec.log_stderr_url + '" title="' + exec.log_stderr + '" download>Job Error</a>');
+            }
+            if (is_set(exec.log_stdout_repo)) {
+                exec_logs.push('<a href="' + exec.log_stdout_repo_url + '" title="' + exec.log_stdout_repo + '" download>Repository Output</a>');
+            }
+            if (is_set(exec.log_stderr_repo)) {
+                exec_logs.push('<a href="' + exec.log_stderr_repo_url + '" title="' + exec.log_stderr_repo + '" download>Repository Error</a>');
+            }
+            execs += ('<br><b>Logs</b>: ' + exec_logs.join(', '));
         }
-        if (exec.error_s != null) {
+        if (is_set(exec.error_s)) {
             execs += ('<br><br><b>Error</b>: <code>' + exec.error_s + '</code>');
         }
     }
@@ -68,7 +78,7 @@ function updateApiTableDataJob(row, row2, entry) {
 }
 
 $( document ).ready(function() {
-    apiEndpoint = "/api/job?executions=true";
+    apiEndpoint = "/api/job?executions=true&execution_count=10";
     fetchApiTableData(apiEndpoint, updateApiTableDataJob, true);
     setInterval('fetchApiTableData(apiEndpoint, updateApiTableDataJob, true)', (DATA_REFRESH_SEC * 1000));
 });
