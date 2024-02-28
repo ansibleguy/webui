@@ -4,6 +4,12 @@
 
 ### 0.0.13
 
+* Multiple UI improvements
+  * Job Form
+  * Logs UI
+  * Added timezone to datetime
+  * Style non-existent log-files
+* HTTPS support
 * [ARA config integration](https://webui.ansibleguy.net/en/latest/usage/integrations.html)
 * Global Environmental-Variables for Jobs
 
