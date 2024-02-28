@@ -26,6 +26,11 @@
                 aw-api-item="${JOB_ID}/${ID}" aw-api-method="delete">
             {% include "../button/icon/stop.html" %}
         </button>
+        <a href="/ui/jobs/manage/job/${JOB_ID}">
+            <button class="btn btn-warning aw-btn-action" title="Edit">
+                {% include "../button/icon/edit.html" %}
+            </button>
+        </a>
         <button class="btn btn-info aw-btn-action aw-btn-expand aw-log-read" title="Show Logs"
                 aw-expand="aw-spoiler-${ID}" aw-log="aw-execution-logs-${ID}"
                 aw-job="${JOB_ID}" aw-exec="${ID}" aw-log-line="0"
