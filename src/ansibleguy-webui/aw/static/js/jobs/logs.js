@@ -57,22 +57,23 @@ function addLogLines($this) {
 }
 
 function updateApiTableDataJobLogs(row, row2, entry) {
+    row.innerHTML = document.getElementById('aw-api-data-tmpl-row').innerHTML;
     row.setAttribute("id_job", entry.job);
     row.setAttribute("id_execution", entry.id);
     row2.setAttribute("id_execution", entry.id);
 
-    row.insertCell(0).innerHTML = shortExecutionStatus(entry);
-    row.insertCell(1).innerText = entry.job_name;
+    row.cells[0].innerHTML = shortExecutionStatus(entry);
+    row.cells[1].innerText = entry.job_name;
     if (entry.job_comment == "") {
-        row.insertCell(2).innerText = "-";
+        row.cells[2].innerText = "-";
     } else {
-        row.insertCell(2).innerText = entry.job_comment;
+        row.cells[2].innerText = entry.job_comment;
     }
 
     let actionsTemplate = document.getElementById("aw-api-data-tmpl-actions").innerHTML;
     actionsTemplate = actionsTemplate.replaceAll('${ID}', entry.id);
     actionsTemplate = actionsTemplate.replaceAll('${JOB_ID}', entry.job);
-    row.insertCell(3).innerHTML = actionsTemplate;
+    row.cells[3].innerHTML = actionsTemplate;
 
     let logsTemplates = document.getElementById("aw-api-data-tmpl-logs").innerHTML;
     logsTemplates = logsTemplates.replaceAll('${ID}', entry.id);

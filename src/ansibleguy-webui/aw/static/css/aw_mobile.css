@@ -68,6 +68,11 @@
     .aw-responsive-med {
         display: none;
     }
+
+    .aw-execution-logs {
+        font-size: small;
+    }
+
 }
 
 @media only screen and (max-width: 500px) {  /* mobile devices */
@@ -107,7 +112,6 @@
     .aw-responsive-med {
         display: none;
     }
-
 }
 
 @include media-breakpoint-between(xs,sm){

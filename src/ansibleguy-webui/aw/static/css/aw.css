@@ -589,6 +589,7 @@ td div hr {
 
 .aw-execution-logs {
     white-space: pre-wrap;
+    word-break: break-word;
     padding: 1% 1.5%;
     color: var(--awSoftWhite);
     background-color: var(--awLogs);
