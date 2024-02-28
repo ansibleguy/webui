@@ -7,7 +7,7 @@ from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiParamet
 
 from aw.model.job import Job, JobExecution
 from aw.model.job_credential import BaseJobCredentials, JobUserCredentials, JobGlobalCredentials
-from aw.model.permission import CHOICE_PERMISSION_READ, CHOICE_PERMISSION_WRITE, CHOICE_PERMISSION_FULL
+from aw.model.permission import CHOICE_PERMISSION_READ, CHOICE_PERMISSION_WRITE, CHOICE_PERMISSION_DELETE
 from aw.api_endpoints.base import API_PERMISSION, get_api_user, GenericResponse, BaseResponse
 from aw.utils.permission import has_credentials_permission, has_manager_privileges
 from aw.utils.util import is_null
@@ -304,7 +304,7 @@ class APIJobCredentialsItem(APIView):
         if are_global and not has_credentials_permission(
                 user=user,
                 credentials=credentials,
-                permission_needed=CHOICE_PERMISSION_FULL,
+                permission_needed=CHOICE_PERMISSION_DELETE,
         ):
             return Response(
                 data={'msg': f"Not privileged to delete the {_log_global_user(are_global, lower=True)} "

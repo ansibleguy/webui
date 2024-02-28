@@ -8,7 +8,7 @@ from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiParamet
 from aw.config.hardcoded import JOB_EXECUTION_LIMIT
 from aw.model.job import Job, JobExecution
 from aw.model.permission import CHOICE_PERMISSION_READ, CHOICE_PERMISSION_EXECUTE, \
-    CHOICE_PERMISSION_WRITE, CHOICE_PERMISSION_FULL
+    CHOICE_PERMISSION_WRITE, CHOICE_PERMISSION_DELETE
 from aw.model.job_credential import JobGlobalCredentials
 from aw.api_endpoints.base import API_PERMISSION, get_api_user, BaseResponse, GenericResponse, \
     LogDownloadResponse
@@ -225,7 +225,7 @@ class APIJobItem(APIView):
             job = _find_job(job_id)
 
             if job is not None:
-                if not has_job_permission(user=user, job=job, permission_needed=CHOICE_PERMISSION_FULL):
+                if not has_job_permission(user=user, job=job, permission_needed=CHOICE_PERMISSION_DELETE):
                     return Response(data={'msg': f"Not privileged to delete the job '{job.name}'"}, status=403)
 
                 job.delete()

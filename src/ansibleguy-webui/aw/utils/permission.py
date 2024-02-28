@@ -1,6 +1,7 @@
 from aw.model.job import Job
 from aw.model.permission import JobPermissionMapping, JobPermissionMemberUser, JobPermissionMemberGroup, \
-    CHOICE_PERMISSION_READ, JobCredentialsPermissionMapping, JobRepositoryPermissionMapping, JobPermission
+    CHOICE_PERMISSION_READ, JobCredentialsPermissionMapping, JobRepositoryPermissionMapping, JobPermission, \
+    CHOICE_PERMISSION_WRITE, CHOICE_PERMISSION_DELETE
 from aw.model.job_credential import BaseJobCredentials, JobGlobalCredentials
 from aw.model.repository import Repository
 from aw.base import USERS
@@ -47,7 +48,8 @@ def _has_permission(
     if user.is_superuser:
         return True
 
-    if manager is not None and permission_needed <= CHOICE_PERMISSION_READ and \
+    if manager is not None and \
+            permission_needed in [CHOICE_PERMISSION_READ, CHOICE_PERMISSION_WRITE, CHOICE_PERMISSION_DELETE] and \
             has_manager_privileges(user=user, kind=manager):
         return True
 

@@ -12,7 +12,7 @@ from aw.api_endpoints.base import API_PERMISSION, GenericResponse, get_api_user,
 from aw.utils.permission import has_manager_privileges, has_repository_permission, get_viewable_repositories
 from aw.model.job import Job
 from aw.utils.util import unset_or_null, is_set
-from aw.model.permission import CHOICE_PERMISSION_READ, CHOICE_PERMISSION_WRITE, CHOICE_PERMISSION_FULL, \
+from aw.model.permission import CHOICE_PERMISSION_READ, CHOICE_PERMISSION_WRITE, CHOICE_PERMISSION_DELETE, \
     CHOICE_PERMISSION_EXECUTE
 from aw.execute.repository import api_update_repository
 from aw.api_endpoints.job_util import get_log_file_content
@@ -225,7 +225,7 @@ class APIRepositoryItem(GenericAPIView):
                 if not has_repository_permission(
                         user=user,
                         repository=repository,
-                        permission_needed=CHOICE_PERMISSION_FULL
+                        permission_needed=CHOICE_PERMISSION_DELETE
                 ):
                     return Response(
                         data={'msg': f"Not privileged to delete the repository '{repository.name}'"},
