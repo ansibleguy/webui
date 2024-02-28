@@ -66,7 +66,7 @@ def validate_repository_types(repository: dict) -> (bool, str):
 def build_repository(repository: Repository) -> dict:
     data = RepositoryReadResponse(instance=repository).data
     data['time_update'] = repository.time_update_str
-    if not Path(data['log_stderr']).is_file():
+    if data['log_stderr'] is None or not Path(data['log_stderr']).is_file():
         data['log_stderr'] = None
         data['log_stderr_url'] = None
 
