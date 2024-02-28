@@ -3,6 +3,7 @@
 <div class="aw-error-msg">
   {{ form.non_field_errors }}
 </div>
+<button type="submit" class="btn btn-primary" title="Save">Save</button>
 {% for bf in form.visible_fields %}
 {%   if bf.name in primary_fields %}
 <div class="mb-3 row">
@@ -19,14 +20,14 @@
         <b>Info:</b> {{ bf.help_text|safe }}
     </div>
 {%     endif %}
-{%   endif %}
 </div>
 <div class="aw-error-msg">
     {{ bf.errors }}
 </div>
+{%   endif %}
 {% endfor %}
 
-<button type="button" class="btn btn-info aw-btn-action aw-btn-expand" title="Show Settings" aw-expand="aw-spoiler-job-settings">
+<button type="button" class="btn btn-warning aw-btn-action aw-btn-expand" title="Show Settings" aw-expand="aw-spoiler-job-settings">
     {% include "../button/icon/expand.html" %}
 </button>
 <br>
@@ -49,10 +50,10 @@
         </div>
 {%     endif %}
     </div>
+    <div class="aw-error-msg">
+        {{ bf.errors }}
+    </div>
 {%   endif %}
-        <div class="aw-error-msg">
-            {{ bf.errors }}
-        </div>
 {% endfor %}
 </div>
 <br>

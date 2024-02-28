@@ -8,9 +8,6 @@ function apiBrowseDirFilteredChoices(choices, userInputCurrent, allowEmpty = fal
             choicesFiltered.push(choice);
         }
     }
-    if (!allowEmpty && choicesFiltered.length == 0) {
-        choicesFiltered = choices;
-    }
     choicesFiltered.sort();
     return choicesFiltered;
 }
@@ -27,7 +24,7 @@ function apiBrowseDirUpdateChoices(inputElement, choicesElement, searchType, use
     }
 
     let fileChoices = apiBrowseDirFilteredChoices(choices, userInputCurrent);
-    let dirChoices = apiBrowseDirFilteredChoices(result['directories'], userInputCurrent, true);
+    let dirChoices = apiBrowseDirFilteredChoices(result['directories'], userInputCurrent);
 
     if (fileChoices.includes(userInputCurrent) || dirChoices.includes(userInputCurrent)) {
         hideChoices();
@@ -84,7 +81,6 @@ function apiBrowseDir(inputElement, choicesElement, repository, searchType) {
     let userInputListLast = '';
     let userInputLevels = '';
 
-    console.log($(inputElement).attr("id"));
     if (MULTI_CHOICE_FIELDS.includes($(inputElement).attr("id"))) {
         userInputListLast = userInput.split(CHOICE_SEPARATOR);
         userInputLevels = userInputListLast.pop().split('/');

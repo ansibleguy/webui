@@ -76,7 +76,7 @@ FORM_HELP = {
         'manage': {
             'playbook_file': f"Playbook to execute. Search path: '{config['path_play']}'",
             # todo: change search-path with repository
-            'inventory_file': 'One or multiple inventory files/directories to include for the execution.'
+            'inventory_file': 'One or multiple inventory files/directories to include for the execution. '
                               'Comma-separated list. For details see: '
                               '<a href="https://docs.ansible.com/ansible/latest/inventory_guide/'
                               'intro_inventory.html">Ansible Docs - Inventory</a>',
