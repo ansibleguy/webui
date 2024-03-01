@@ -54,7 +54,7 @@ echo 'INTEGRATION TESTS API'
 echo ''
 
 echo 'Create API key'
-api_key="$(python3 src/ansibleguy-webui/cli.py -f api-key -a create -p "$AW_ADMIN" | grep 'Key=' | cut -d '=' -f2)"
+api_key="$(python3 src/ansibleguy-webui/cli.py -a api-key.create -p "$AW_ADMIN" | grep 'Key=' | cut -d '=' -f2)"
 export AW_API_KEY="$api_key"
 sleep 1
 

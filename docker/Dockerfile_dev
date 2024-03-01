@@ -3,7 +3,7 @@ FROM python:3.10-alpine
 # BUILD: docker build -f Dockerfile_dev -t ansible0guy/webui:dev --no-cache .
 # RUN: docker run -it --name ansible-webui-dev --publish 127.0.0.1:8000:8000 --volume /tmp/awtest:/data --volume $(pwd):/aw ansible-webui:dev
 
-RUN apk add --no-cache ansible-core openssh-client sshpass && \
+RUN apk add --no-cache openssh-client sshpass && \
     pip install --no-cache-dir --upgrade pip 2>/dev/null && \
     mkdir -p /data/log
 

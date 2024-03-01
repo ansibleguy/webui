@@ -246,6 +246,13 @@ Normal users will not have to use these.
    'staging' mode is close to production behavior.
 
 
+* **AW_DEBUG**
+
+    Enable debug output.
+
+    This debug mode **SHOULD ONLY BE ENABLED TEMPORARILY**! It could possibly open attack vectors.
+
+
 * **AW_DOCKER**
 
    Used to notify the software that it is running inside a docker container. Needed for listen port.

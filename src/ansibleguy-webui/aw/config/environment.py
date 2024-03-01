@@ -23,6 +23,7 @@ AW_ENV_VARS = {
     'path_ssh_known_hosts': ['AW_SSH_KNOWN_HOSTS'],
     'ssl_file_crt': ['AW_SSL_CERT'],
     'ssl_file_key': ['AW_SSL_KEY'],
+    'debug': ['AW_DEBUG'],
 }
 AW_ENV_VARS_SECRET = ['secret', 'init_admin', 'init_admin_pwd']
 

@@ -4,6 +4,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from aw.model.base import BaseModel, CHOICES_BOOL, DEFAULT_NONE
 from aw.config.defaults import CONFIG_DEFAULTS
 from aw.config.environment import check_aw_env_var_is_set
+from aw.config.main import VERSION
 
 
 # NOTE: add default-values to config.defaults.CONFIG_DEFAULTS
@@ -52,3 +53,23 @@ def get_config_from_db() -> SystemConfig:
         config_db.save()
 
     return config_db
+
+
+class SchemaMetadata(BaseModel):
+    schema_version = models.CharField(max_length=50)
+    schema_version_prev = models.CharField(max_length=50, **DEFAULT_NONE)
+
+
+def get_schema_metadata() -> SchemaMetadata:
+    try:
+        metadata = SchemaMetadata.objects.all().first()
+        if metadata is None:
+            raise ObjectDoesNotExist()
+
+    except ObjectDoesNotExist:
+        metadata = SchemaMetadata(
+            schema_version=VERSION,
+        )
+        metadata.save()
+
+    return metadata

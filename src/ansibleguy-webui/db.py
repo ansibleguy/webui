@@ -6,12 +6,14 @@ from secrets import choice as random_choice
 from string import digits, ascii_letters
 from os import listdir, remove
 from time import time
+from sqlite3 import connect as db_connect
+from sqlite3 import OperationalError
 
+from aw.config.main import VERSION
 from aw.settings import DB_FILE
 from aw.utils.subps import process
 from aw.utils.debug import log, log_error, log_warn
-from aw.utils.deployment import deployment_prod
-from aw.config.main import VERSION
+from aw.utils.deployment import deployment_prod, is_release_version
 from aw.config.hardcoded import FILE_TIME_FORMAT, GRP_MANAGER
 from aw.config.environment import check_aw_env_var_true, get_aw_env_var, check_aw_env_var_is_set
 
@@ -37,6 +39,51 @@ def _check_if_writable():
         sys_exit(1)
 
 
+def _schema_up_to_date() -> bool:
+    if not Path(DB_FILE).is_file():
+        return False
+
+    try:
+        with db_connect(DB_FILE) as conn:
+            return conn.execute('SELECT schema_version FROM aw_schemametadata').fetchall()[0][0] == VERSION
+
+    except (IndexError, OperationalError):
+        return False
+
+
+def _get_current_schema_version() -> (str, None):
+    try:
+        with db_connect(DB_FILE) as conn:
+            return conn.execute('SELECT schema_version FROM aw_schemametadata').fetchall()[0][0]
+
+    except (IndexError, OperationalError):
+        return None
+
+
+def _update_schema_version() -> None:
+    previous = _get_current_schema_version()
+
+    with db_connect(DB_FILE) as conn:
+        try:
+            if previous is None:
+                conn.execute(
+                    "INSERT INTO aw_schemametadata (created, updated, schema_version) VALUES "
+                    f"(DATETIME('now'), DATETIME('now'), '{VERSION}')",
+                )
+
+            else:
+                conn.execute(
+                    "UPDATE aw_schemametadata SET "
+                    f"schema_version = '{VERSION}', schema_version_prev = '{previous}', "
+                    "updated = DATETIME('now') WHERE id = 1"
+                )
+
+            conn.commit()
+
+        except (IndexError, OperationalError) as err:
+            log(msg=f"Error updating database schema version: '{err}'", level=3)
+
+
 def install_or_migrate_db():
     log(msg=f"Using DB: {DB_FILE}", level=4)
     _check_if_writable()
@@ -46,7 +93,7 @@ def install_or_migrate_db():
     return migrate()
 
 
-def _manage_db(action: str, cmd: list, backup: str = None) -> str:
+def _manage_db(action: str, cmd: list, backup: str = None) -> dict:
     cmd2 = ['python3', 'manage.py']
     cmd2.extend(cmd)
 
@@ -68,7 +115,7 @@ def _manage_db(action: str, cmd: list, backup: str = None) -> str:
         else:
             sys_exit(1)
 
-    return result['stdout']
+    return result
 
 
 def _clean_old_db_backups():
@@ -84,40 +131,39 @@ def _clean_old_db_backups():
 
 def install():
     log(msg=f"Initializing database {DB_FILE}..", level=3)
-    _make_migrations()
+    _migration_needed()
     _manage_db(action='initialization', cmd=['migrate'])
+    _update_schema_version()
 
 
 def migrate():
     _clean_old_db_backups()
-    migration_needed = _make_migrations()
 
-    if migration_needed and check_aw_env_var_true(var='db_migrate', fallback=True):
+    if _migration_needed() and check_aw_env_var_true(var='db_migrate', fallback=True):
         backup = f"{DB_FILE}.{datetime.now().strftime(FILE_TIME_FORMAT)}{DB_BACKUP_EXT}"
         log(msg=f"Creating database backup: '{backup}'", level=6)
         copy(src=DB_FILE, dst=backup)
 
         log(msg=f"Upgrading database {DB_FILE}", level=3)
-        _manage_db(action='migration', cmd=['migrate'], backup=backup)
+        if _manage_db(action='migration', cmd=['migrate'], backup=backup)['rc'] == 0:
+            _update_schema_version()
 
 
-def _make_migrations() -> bool:
-    if VERSION not in ['dev', 'staging', 'latest', '0.0.0'] and \
-            VERSION.find('dev') == -1 and VERSION.find('staging') == -1 and \
-            VERSION.find('latest') == -1:
+def _migration_needed() -> bool:
+    if is_release_version():
         # stable versions should only have released migrations
-        return False
+        return not _schema_up_to_date()
 
     changed = False
 
     for stdout in [
-        _manage_db(action='schema-creation', cmd=['makemigrations']),
-        _manage_db(action='schema-creation', cmd=['makemigrations', 'aw']),
+        _manage_db(action='schema-creation', cmd=['makemigrations'])['stdout'],
+        _manage_db(action='schema-creation', cmd=['makemigrations', 'aw'])['stdout'],
     ]:
         if stdout.find('No changes detected') == -1:
             changed = True
 
-    return changed
+    return changed or not _schema_up_to_date()
 
 
 def create_first_superuser():

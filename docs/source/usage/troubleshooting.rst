@@ -27,7 +27,7 @@ Debugging
 
 You can enable the debug mode at the :code:`System - Config` page.
 
-If that is not possible you can alternatively set the :code:`AW_ENV` environmental variable to :code:`dev`.
+If that is not possible you can alternatively set the :code:`AW_DEBUG` environmental variable.
 
 This debug mode **SHOULD ONLY BE ENABLED TEMPORARILY**! It could possibly open attack vectors.
 
@@ -176,3 +176,73 @@ Too Many Log Files exist
     MAX_LOG_AGE=7  # days
     cd ~/.local/share/ansible-webui/
     find -type f -mtime +${MAX_LOG_AGE} -delete
+
+----
+
+Database Migration Issues
+=========================
+
+*Note: This is a general guide on how to handle Django migration issues. It could also be helpful if you are running another Django app.*
+
+**Error**: After a version upgrade you see :code:`django.db.utils.OperationalError: no such column` or even :code:`django.db.utils.OperationalError: no such table`
+
+**Problem**:
+
+* It seems the database schema was not upgraded. This is normally done automatically at application startup.
+
+* You can try to execute the migrations manually:
+
+  * Stop the application
+
+  * Enter the application context & try to upgrade
+
+    .. code-block:: bash
+
+        # when running as local service-user
+        su <SERVICE-USER> --login --shell /bin/bash
+
+        # when running in docker
+        docker exec -it ansible-webui /bin/sh
+
+        # set the path to your database
+        export AW_DB=<PATH-TO-YOUR-DB>
+
+        # upgrade DB schema
+        python3 -m ansibleguy-webui.manage migrate
+
+----
+
+**Error**: While running the database schema upgrade you see :code:`django.db.utils.OperationalError: duplicate column name` or :code:`django.db.utils.OperationalError: duplicate table name`
+
+**Problem**:
+
+* This should never happen if you are running a release version (*AW_ENV=prod*) and did not already run migrations manually.
+
+* Make sure you set the :code:`AW_DB` env-var correctly before running the migrations.
+
+* You will have to find out which migrations were already applied:
+
+    .. code-block:: bash
+
+        sqlite3 <PATH-TO-YOUR-DB>
+        SELECT name,applied FROM django_migrations WHERE app = "aw";
+
+* You can also check the current schema of the table you see mentioned in the error message
+
+    .. code-block:: bash
+
+        sqlite3 <PATH-TO-YOUR-DB>
+        .table
+        .schema <TABLE>
+
+* Check which migrations are available: :code:`python3 -m ansibleguy-webui.cli -a migrations.list`
+
+* With that information you should be able to determine which migrations you can :code:`fake` and which ones to apply.
+
+    .. code-block:: bash
+
+        # migrations that are available and already are applied to the database - can be faked (only last one)
+        python3 -m ansibleguy-webui.manage migrate --fake aw 0001_v0_0_12
+
+        # you should then be able to apply the un-applied migrations
+        python3 -m ansibleguy-webui.manage migrate aw 0002_v0_0_13

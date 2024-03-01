@@ -112,6 +112,9 @@ def debug_mode() -> bool:
     if deployment_dev():
         return True
 
+    if get_aw_env_var_or_default('debug'):
+        return True
+
     try:
         if Path(DB_FILE).is_file():
             with db_connect(DB_FILE) as conn:

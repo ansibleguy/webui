@@ -10,7 +10,7 @@ FROM python:3.10-alpine
 ARG AW_UID=8785
 ARG AW_USER=aw
 
-RUN apk add --no-cache git git-lfs ansible-core openssh-client sshpass && \
+RUN apk add --no-cache git git-lfs openssh-client sshpass && \
     pip install --no-cache-dir --upgrade pip 2>/dev/null && \
     adduser --uid ${AW_UID} --home /home/ansible-webui --shell /usr/sbin/nologin --disabled-password ${AW_USER} ${AW_USER} && \
     mkdir -p /play /data/log && \
