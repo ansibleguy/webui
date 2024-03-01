@@ -2,6 +2,13 @@
 
 ## Version 0
 
+### 0.0.14
+
+* SQLite connection optimizations
+* Database version-upgrade enhancements
+
+----
+
 ### 0.0.13
 
 * Multiple UI improvements
