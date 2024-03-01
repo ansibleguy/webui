@@ -9,8 +9,6 @@ from argparse import ArgumentParser
 from json import dumps as json_dumps
 from pathlib import Path
 
-from aw.config.hardcoded import KEY_TIME_FORMAT
-
 # pylint: disable=C0415
 
 
@@ -19,6 +17,7 @@ def _api_key(username: str):
     from aw.base import USERS
     from aw.model.api import AwAPIKey
     from aw.utils.util import datetime_w_tz
+    from aw.config.hardcoded import KEY_TIME_FORMAT
 
     user = USERS.objects.get(username=username)
     token = f'{user}-{datetime_w_tz().strftime(KEY_TIME_FORMAT)}'

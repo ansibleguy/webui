@@ -67,6 +67,17 @@ sleep 1
 pkill -f 'ansibleguy-webui'
 
 echo ''
+echo 'TESTING TO CLI TOOLS'
+echo ''
+
+REPO_BASE="$(pwd)"
+cd /tmp
+export AW_DB="${REPO_BASE}/src/ansibleguy-webui/aw.dev.db"
+python3 "${REPO_BASE}/src/ansibleguy-webui/cli.py" --version
+python3 "${REPO_BASE}/src/ansibleguy-webui/manage.py"
+cd "$REPO_BASE"
+
+echo ''
 echo 'TESTING TO INITIALIZE AW-DB'
 echo ''
 
