@@ -8,6 +8,7 @@ from importlib import metadata
 
 from aw.config.main import VERSION
 from aw.utils.subps import process_cache
+from aw.utils.util import datetime_from_db_str
 from aw.config.hardcoded import LOG_TIME_FORMAT
 from aw.utils.deployment import deployment_docker
 from aw.model.system import get_schema_metadata
@@ -86,9 +87,11 @@ def get_system_versions(python_modules: dict = None, ansible_version: dict = Non
     if deployment_docker():
         linux_versions += ' (dockerized)'
 
+    db_schema = get_schema_metadata()
+
     return {
         'env_linux': linux_versions,
-        'env_db_schema': get_schema_metadata().schema_version,
+        'env_db_schema': f'{db_schema.schema_version} (updated: {datetime_from_db_str(db_schema.updated)})',
         'env_git': process_cache('git --version')['stdout'],
         'env_ansible_core': ansible_version['ansible_core'],
         'env_ansible_runner': ansible_version['ansible_runner'],
