@@ -6,6 +6,7 @@
 
 * SQLite connection optimizations
 * Database version-upgrade enhancements
+* Allow to change listen address
 
 ----
 

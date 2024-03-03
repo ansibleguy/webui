@@ -151,6 +151,11 @@ Some settings are only available as environmental variables.
    Port to listen on. Default: :code:`8000`
 
 
+* **AW_LISTEN**
+
+   IP Address to listen on. Default: :code:`127.0.0.1`
+
+
 * **AW_SSL_CERT**
 
    Optionally provide the path to a ssl certificate to use. Use a (full-)chain if not self-signed.

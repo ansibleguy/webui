@@ -130,12 +130,21 @@ DEBUG = debug_mode()
 
 # WEB BASICS
 PORT_WEB = get_aw_env_var_or_default('port')
+LISTEN_ADDRESS = get_aw_env_var_or_default('address')
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost',
     f'http://localhost:{PORT_WEB}',
     'http://127.0.0.1',
     f'http://127.0.0.1:{PORT_WEB}',
 ]
+if LISTEN_ADDRESS != '127.0.0.1':
+    CSRF_TRUSTED_ORIGINS.extend([
+        f'http://{LISTEN_ADDRESS}'
+        f'http://{LISTEN_ADDRESS}:{PORT_WEB}'
+        f'https://{LISTEN_ADDRESS}'
+        f'https://{LISTEN_ADDRESS}:{PORT_WEB}'
+    ])
+
 if 'AW_PROXY' in environ:
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     USE_X_FORWARDED_HOST = True

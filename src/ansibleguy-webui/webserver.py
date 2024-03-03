@@ -12,6 +12,7 @@ from aw.utils.debug import log, warn_if_development
 from aw.config.environment import get_aw_env_var_or_default
 
 PORT_WEB = get_aw_env_var_or_default('port')
+LISTEN_ADDRESS = get_aw_env_var_or_default('address')
 
 # https://docs.gunicorn.org/en/stable/settings.html
 OPTIONS_DEV = {
@@ -20,7 +21,7 @@ OPTIONS_DEV = {
     'workers': 2,
 }
 OPTIONS_PROD = {
-    'bind': f'127.0.0.1:{PORT_WEB}',
+    'bind': f'{LISTEN_ADDRESS}:{PORT_WEB}',
     'reload': False,
     'loglevel': 'warning',
 }

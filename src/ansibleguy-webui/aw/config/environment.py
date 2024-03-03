@@ -5,6 +5,7 @@ from aw.config.defaults import CONFIG_DEFAULTS
 
 AW_ENV_VARS = {
     'port': ['AW_PORT'],
+    'address': ['AW_LISTEN', 'AW_LISTEN_ADDRESS'],
     'timezone': ['AW_TIMEZONE'],
     'secret': ['AW_SECRET'],
     'path_run': ['AW_PATH_RUN'],
