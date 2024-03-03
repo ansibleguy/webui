@@ -65,6 +65,7 @@ jobs:
 
       - name: Building
         run: |
+          git reset --hard  # make sure only migrations from repo exist
           echo "${{ steps.version.outputs.TAG_NAME }}" > VERSION
           python3 -m build
 

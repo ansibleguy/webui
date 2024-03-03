@@ -20,7 +20,7 @@ class SystemConfig(BaseModel):
     path_run = models.CharField(max_length=500, default='/tmp/ansible-webui')
     path_play = models.CharField(max_length=500, default=None)
     path_log = models.CharField(max_length=500, default=None)
-    timezone = models.CharField(max_length=300, default=CONFIG_DEFAULTS['timezone'])
+    timezone = models.CharField(max_length=300, default='UTC')  # UTC to keep model migrations static
     run_timeout = models.PositiveIntegerField(default=CONFIG_DEFAULTS['run_timeout'])
     session_timeout = models.PositiveIntegerField(default=CONFIG_DEFAULTS['session_timeout'])
     path_ansible_config = models.CharField(max_length=500, **DEFAULT_NONE)
