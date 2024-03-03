@@ -199,12 +199,14 @@ AUTH_PASSWORD_VALIDATORS = [
 AUTO_LOGOUT = {
     'SESSION_TIME': config['session_timeout'],
 }
+SECRET_KEY = config['secret']
 
 # Internationalization
 LANGUAGE_CODE = 'en-us'
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
+TIME_ZONE = config['timezone']
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
@@ -213,9 +215,6 @@ LOGIN_REDIRECT_URL = '/ui/jobs/manage'  # todo: change to '/ui' once dashboard i
 LOGOUT_REDIRECT_URL = LOGIN_PATH
 handler403 = 'aw.utils.handlers.handler403'
 handler500 = 'aw.utils.handlers.handler500'
-
-SECRET_KEY = config['secret']
-TIMEZONE = config.timezone
 
 # api
 API_KEY_CUSTOM_HEADER = 'HTTP_X_API_KEY'
