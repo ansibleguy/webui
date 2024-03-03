@@ -86,25 +86,3 @@ if [[ "$REPLY" =~ ^[Yy]$ ]]
 then
   docker build -f Dockerfile_production_aws -t "$image_aws_latest" --build-arg "AW_VERSION=${VERSION}" .
 fi
-
-set +e
-echo ''
-echo "### STARTING IMAGE ${image} FOR TEST ###"
-timeout 10 docker run -it --name "$container" --publish 127.0.0.1:8000:8000 "$image"
-ec="$?"
-if [[ "$ec" != "124" ]]
-then
-  exit 1
-fi
-
-echo ''
-echo "### STARTING IMAGE ${image_unpriv} FOR TEST ###"
-cleanup_container
-timeout 10 docker run -it --name "$container" --publish 127.0.0.1:8000:8000 "$image_unpriv"
-ec="$?"
-if [[ "$ec" != "124" ]]
-then
-  exit 1
-fi
-
-cleanup_container

@@ -5,7 +5,6 @@ set -e
 AW_ADMIN='USER'
 AW_ADMIN_PWD='PWD'
 DIR_DATA='/var/local/ansible-webui/'
-DIR_MIG="${DIR_DATA}migrations/"
 DIR_PLAY="${DIR_DATA}play/"
 DIR_LOG="${DIR_DATA}log/"
 AW_USER='ansible-webui'
@@ -26,12 +25,11 @@ then
   BAK_DIR="/var/local/ansible-webui/$(date +%s)"
   mkdir "$BAK_DIR"
   mv /var/local/ansible-webui/aw.db "${BAK_DIR}/aw.db"
-  cp -r /var/local/ansible-webui/migrations "${BAK_DIR}/"
 fi
 
 cp "${DIR_DATA}/aw.db.bak" "${DIR_DATA}/aw.db"
 chown "$AW_USER" "$DIR_DATA" "${DIR_DATA}/aw.db"
-chown -R "$AW_USER" "$DIR_MIG" "$DIR_LOG"
+chown -R "$AW_USER" "$DIR_LOG"
 chown -R root:"$AW_USER" "$DIR_PLAY"
 
 # rm -f /var/local/ansible-webui/log/*
@@ -40,4 +38,4 @@ echo '### UPDATING ###'
 docker pull "$IMAGE"
 
 echo '### STARTING ###'
-docker run -d --restart unless-stopped --name ansible-webui --publish 8000:8000 --volume "$DIR_DATA":/data --volume "$DIR_PLAY":/play --volume "$DIR_MIG":/usr/local/lib/python3.10/site-packages/ansible-webui/aw/migrations --env AW_ADMIN_PWD="$AW_ADMIN_PWD" --env AW_ADMIN="$AW_ADMIN" --env AW_HOSTNAMES=demo.webui.ansibleguy.net --env AW_PROXY=1 "$IMAGE"
+docker run -d --restart unless-stopped --name ansible-webui --publish 8000:8000 --volume "$DIR_DATA":/data --volume "$DIR_PLAY":/play --env AW_ADMIN_PWD="$AW_ADMIN_PWD" --env AW_ADMIN="$AW_ADMIN" --env AW_HOSTNAMES=demo.webui.ansibleguy.net --env AW_PROXY=1 "$IMAGE"
