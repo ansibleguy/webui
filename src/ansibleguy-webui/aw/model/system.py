@@ -46,9 +46,11 @@ def get_config_from_db() -> SystemConfig:
             raise ObjectDoesNotExist()
 
     except ObjectDoesNotExist:
+        # create config-object and set dynamic defaults
         config_db = SystemConfig(
             path_play=CONFIG_DEFAULTS['path_play'],
             path_log=CONFIG_DEFAULTS['path_log'],
+            timezone=CONFIG_DEFAULTS['timezone'],
         )
         config_db.save()
 
