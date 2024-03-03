@@ -77,6 +77,13 @@ You can find a nginx config example here: `Nginx config example <https://github.
 
 ----
 
+Ansible Role
+************
+
+You can find an Ansible Role to install the app on Debian here: `ansibleguy.sw_ansible_webui <https://github.com/ansibleguy/sw_ansible_webui>`_
+
+----
+
 Service
 *******
 
