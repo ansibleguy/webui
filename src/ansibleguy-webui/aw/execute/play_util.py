@@ -204,8 +204,12 @@ def runner_cleanup(execution: JobExecution, path_run: Path, exec_repo: ExecuteRe
     # clean empty log files
     for log_file in JobExecution.log_file_fields:
         log_file_path = getattr(execution, log_file)
-        if os_stat(log_file_path).st_size == 0:
-            remove_file(log_file_path)
+        try:
+            if os_stat(log_file_path).st_size == 0:
+                remove_file(log_file_path)
+
+        except (FileNotFoundError, TypeError):
+            pass
 
     rmtree(path_run, ignore_errors=True)
 
