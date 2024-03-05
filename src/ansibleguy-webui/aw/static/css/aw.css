@@ -400,7 +400,7 @@ input:invalid {
     overflow-y: scroll;
 }
 .aw-fs-choice {}
-.aw-fs-choice:hover {
+.aw-fs-choice:hover, .aw-fs-choice[selected="1"] {
     background-color: var(--tableRow2);
 }
 .aw-fs-choice-file {}

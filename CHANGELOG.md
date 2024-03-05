@@ -2,11 +2,20 @@
 
 ## Version 0
 
-### 0.0.14
+### 0.0.16
+
+* Job-Form Selection
+  * Auto-Completion via Tab-Key
+  * Select using Up/Down/Enter Keys
+
+----
+
+### 0.0.14 / 0.0.15
 
 * SQLite connection optimizations
 * Database version-upgrade enhancements
 * Allow to change listen address
+* Fixed DB-migrations for PIP-based installation
 
 ----
 

@@ -137,7 +137,7 @@ def get_form_field_input(bf: BoundField, existing: dict) -> str:
 
     elif bf.name in AW_VALIDATIONS['file_system_browse']:
         field_classes += ' aw-fs-browse'
-        field_attrs += f' type="text" aw-fs-type="files" aw-fs-choices="aw-fs-choices-{bf.name}"'
+        field_attrs += f' type="text" aw-fs-choices="aw-fs-choices-{bf.name}"'
         search_choices = f'<ul class="aw-fs-choices" id="aw-fs-choices-{bf.name}" hidden="hidden"></ul>'
 
     elif bf.name in AW_VALIDATIONS['file_system_exists']:

@@ -7,11 +7,7 @@
         float: none;
     }
 
-    form .form-control {
-        width: 35vw;
-    }
-
-    .aw-fs-choices {
+    form .form-control, .aw-fs-choices {
         width: 35vw;
     }
 
@@ -53,11 +49,7 @@
         margin-top: 10px;
     }
 
-    form .form-control {
-        width: 50vw;
-    }
-
-    .aw-fs-choices {
+    form .form-control, .aw-fs-choices {
         width: 50vw;
     }
 
@@ -85,11 +77,7 @@
         padding-left: 5vw;
     }
 
-    .aw-login {
-        width: 70vw;
-    }
-
-    .aw-login-fields {
+    form .form-control, .aw-login, .aw-login-fields, .aw-fs-choices {
         width: 70vw;
     }
 
@@ -99,10 +87,6 @@
 
     .aw-btn-action {
         padding: 1px 1px !important;
-    }
-
-    form .form-control {
-        width: 70vw;
     }
 
     .aw-responsive-lg {

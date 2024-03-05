@@ -5,6 +5,12 @@ const DATA_REFRESH_SEC = 1;
 const HTTP_PARAMS = new URLSearchParams(window.location.search);
 const TITLE_NULL = 'Does not exist';
 const LINK_NULL = 'javascript:void(0);';
+const KEY_ENTER = 13;
+const KEY_LEFT = 37;
+const KEY_UP = 38;
+const KEY_RIGHT = 39;
+const KEY_DOWN = 40;
+const KEY_TAB = 9;
 
 // UTIL FUNCTIONS
 function getCookie(name) {

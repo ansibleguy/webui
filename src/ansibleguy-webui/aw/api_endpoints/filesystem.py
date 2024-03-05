@@ -90,7 +90,7 @@ class APIFsBrowse(APIView):
         else:
             base = str(request.GET['base'])
 
-        if base.find('..') != -1:
+        if base.find('..') != -1 or base.startswith('/'):
             return Response(data={'msg': 'Traversal not allowed'}, status=403)
 
         browse_root = browse_root / base
