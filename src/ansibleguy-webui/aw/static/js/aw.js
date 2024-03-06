@@ -11,6 +11,9 @@ const KEY_UP = 38;
 const KEY_RIGHT = 39;
 const KEY_DOWN = 40;
 const KEY_TAB = 9;
+const SORT_BTN_CLASS_ON = ".aw-btn-sort-on";
+const SORT_BTN_CLASS_ASC = ".aw-btn-sort-asc";
+const SORT_BTN_CLASS_DESC = ".aw-btn-sort-desc";
 
 // UTIL FUNCTIONS
 function getCookie(name) {
@@ -125,6 +128,77 @@ function jsonToClipboard(jsonElement) {
     navigator.clipboard.writeText(versionsJson);
 }
 
+function sortSwitchButtons(dataTable, sortByColumn, order) {
+    for (cell of dataTable.rows[0].cells) {
+        let sortButtonOn = cell.querySelector(SORT_BTN_CLASS_ON);
+        if (is_set(sortButtonOn)) {
+            let sortButtonAsc = cell.querySelector(SORT_BTN_CLASS_ASC);
+            let sortButtonDesc = cell.querySelector(SORT_BTN_CLASS_DESC);
+            sortButtonOn.removeAttribute("hidden");
+            sortButtonAsc.setAttribute("hidden", "hidden");
+            sortButtonDesc.setAttribute("hidden", "hidden");
+        }
+    }
+
+    let sortHeader = dataTable.rows[0].cells[sortByColumn];
+    let sortButtonOn = sortHeader.querySelector(SORT_BTN_CLASS_ON);
+    let sortButtonAsc = sortHeader.querySelector(SORT_BTN_CLASS_ASC);
+    let sortButtonDesc = sortHeader.querySelector(SORT_BTN_CLASS_DESC);
+    sortButtonOn.setAttribute("hidden", "hidden");
+    if (order == 'asc') {
+        sortButtonDesc.removeAttribute("hidden");
+        sortButtonAsc.setAttribute("hidden", "hidden");
+    } else {
+        sortButtonAsc.removeAttribute("hidden");
+        sortButtonDesc.setAttribute("hidden", "hidden");
+    }
+}
+
+// base source: https://www.w3schools.com/howto/howto_js_sort_table.asp
+function sortTable($sortButton, order = 'desc') {
+    var dataTable, rows, switching, i, x, y, shouldSwitch;
+    let sortByColumnIdx = $sortButton.closest("th").index();
+    dataTable = document.getElementById("aw-api-data-table");
+    sortSwitchButtons(dataTable, sortByColumnIdx, order);
+    switching = true;
+
+    while (switching) {
+        switching = false;
+        rows = dataTable.rows;
+        for (i = 1; i < (rows.length - 1); i++) {
+            if (!is_set(rows[i].getAttribute("aw-api-entry")) || !is_set(rows[i + 1].getAttribute("aw-api-entry"))) {
+                continue;
+            }
+            shouldSwitch = false;
+            /*Get the two elements you want to compare,
+            one from current row and one from the next:*/
+            x = rows[i].getElementsByTagName("TD")[sortByColumnIdx];
+            y = rows[i + 1].getElementsByTagName("TD")[sortByColumnIdx];
+            //check if the two rows should switch place:
+            if (!is_set(x)) {
+                continue;
+            }
+            if (!is_set(y)) {
+                shouldSwitch = true;
+                break;
+            }
+            if (order == 'desc' && x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                shouldSwitch = true;
+                break;
+            }
+            if (order == 'asc' && x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                shouldSwitch = true;
+                break;
+            }
+
+        }
+        if (shouldSwitch) {
+            rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+            switching = true;
+        }
+    }
+}
+
 // API CALLS
 const CSRF_TOKEN = getCookie('csrftoken');
 
@@ -205,7 +279,7 @@ function apiFsExists(inputElement) {
 }
 
 function fetchApiTableDataPlaceholder(dataTable, placeholderId) {
-    tmpRow = dataTable.insertRow(1);
+    let tmpRow = dataTable.insertRow(1);
     tmpRow.setAttribute("aw-api-entry", placeholderId);
     tmplRow = document.getElementById('aw-api-data-tmpl-row');
     if (is_set(tmplRow)) {
@@ -300,7 +374,7 @@ function fetchApiTableData(apiEndpoint, updateFunction, secondRow = false, place
         for (rowIdx = 0, rowCnt = dataTable.rows.length; rowIdx < rowCnt; rowIdx++) {
             let existingRow = dataTable.rows[rowIdx];
             let existingRowId = existingRow.getAttribute("aw-api-entry");
-            if (typeof(existingRowId) == 'undefined' || existingRowId == null) {
+            if (!is_set(existingRowId)) {
                 continue
             }
             if (existingRowId == placeholderId) {
@@ -345,9 +419,29 @@ $( document ).ready(function() {
         let spoiler = $(this).attr("aw-expand");
         toggleHidden(spoiler);
     });
+    $(".aw-main").on("click", ".aw-btn-expand-child", function(){
+        let spoiler = $(this).attr("aw-expand");
+
+        // move spoiler row below the parent-row in case the rows were shuffled by the sort
+        let parentRowIdx = $(this).closest("tr").index();
+        let spoilerRowIdx = $(document.getElementById(spoiler)).index();
+        let rows = document.getElementById("aw-api-data-table").rows;
+        rows[parentRowIdx].parentNode.insertBefore(rows[spoilerRowIdx], rows[parentRowIdx + 1]);
+
+        toggleHidden(spoiler);
+    });
     $(".aw-main").on("click", ".aw-btn-collapse", function(){
         let spoiler = $(this).attr("aw-collapse");
         toggleHidden(spoiler);
+    });
+    $(".aw-main").on("click", SORT_BTN_CLASS_ON, function(){
+        sortTable(jQuery(this));
+    });
+    $(".aw-main").on("click", SORT_BTN_CLASS_ASC, function(){
+        sortTable(jQuery(this), 'asc');
+    });
+    $(".aw-main").on("click", SORT_BTN_CLASS_DESC, function(){
+        sortTable(jQuery(this));
     });
 
     // API

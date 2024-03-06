@@ -530,6 +530,12 @@ input:invalid {
     transition: color 0.3s ease-in-out;
 }
 
+.aw-btn-sort {
+    margin-top: 0;
+    margin-left: 0.3rem;
+    padding: 0.1rem 0.3rem !important;
+}
+
 /* STOP buttons */
 
 .aw-job-status {

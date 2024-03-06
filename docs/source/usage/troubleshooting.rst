@@ -117,6 +117,11 @@ Python Module not installed
 
 ----
 
+Edge-Case Issues
+****************
+
+----
+
 Connection in use
 =================
 

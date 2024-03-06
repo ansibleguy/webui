@@ -4,5 +4,5 @@ venv/
 ansible_webui.egg-info/
 __pychache__.py
 **/aw*.db
-**/aw*.db.*bak
+**/aw*.db.*bak*
 VERSION
