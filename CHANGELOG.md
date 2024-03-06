@@ -7,6 +7,7 @@
 * Job-Form Selection
   * Auto-Completion via Tab-Key
   * Select using Up/Down/Enter Keys
+* Ability to clone existing jobs
 
 ----
 

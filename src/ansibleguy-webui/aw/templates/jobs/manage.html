@@ -61,16 +61,21 @@
                 aw-api-item="${ID}/${EXEC_ID_1}" aw-api-method="delete">
             {% include "../button/icon/stop.html" %}
         </button>
-        <button class="btn btn-info aw-btn-action aw-btn-expand" title="Expand" aw-expand="aw-spoiler-${ID}">
-            {% include "../button/icon/expand.html" %}
-        </button>
         <a href="/ui/jobs/manage/job/${ID}">
             <button class="btn btn-warning aw-btn-action" title="Edit">
                 {% include "../button/icon/edit.html" %}
             </button>
         </a>
+        <a href="/ui/jobs/manage/job/clone/${ID}">
+            <button class="btn btn-success aw-btn-action" title="Clone">
+                {% include "../button/icon/copy.html" %}
+            </button>
+        </a>
         <button class="btn btn-danger aw-btn-action aw-api-click" title="Delete" aw-api-endpoint="job" aw-api-item="${ID}" aw-api-method="delete">
             {% include "../button/icon/delete.html" %}
+        </button>
+        <button class="btn btn-info aw-btn-action aw-btn-expand" title="Expand" aw-expand="aw-spoiler-${ID}">
+            {% include "../button/icon/expand.html" %}
         </button>
     </div>
 </div>

@@ -90,7 +90,7 @@
         </table>
         {{ env_system|json_script:"aw-json-system" }}
         <button class="btn btn-info aw-btn-action aw-btn-refresh" title="Copy Versions" onclick="jsonToClipboard('aw-json-system')">
-            <i class="fas fa-copy fa-2x aw-btn-action-icon"></i>
+            {% include "../button/icon/copy.html" %}
         </button>
     </div>
     <hr>
@@ -112,7 +112,7 @@
         </table>
         {{ env_ansible_config|json_script:"aw-json-ansible-config" }}
         <button class="btn btn-info aw-btn-action aw-btn-refresh" title="Copy Versions" onclick="jsonToClipboard('aw-json-ansible-config')">
-            <i class="fas fa-copy fa-2x aw-btn-action-icon"></i>
+            {% include "../button/icon/copy.html" %}
         </button>
     </div>
     <hr>
@@ -134,7 +134,7 @@
         </table>
         {{ env_ansible_collections|json_script:"aw-json-ansible-collections" }}
         <button class="btn btn-info aw-btn-action aw-btn-refresh" title="Copy Versions" onclick="jsonToClipboard('aw-json-ansible-collections')">
-            <i class="fas fa-copy fa-2x aw-btn-action-icon"></i>
+            {% include "../button/icon/copy.html" %}
         </button>
     </div>
     <hr>
@@ -154,7 +154,7 @@
         </table>
         {{ env_python_modules|json_script:"aw-json-python-modules" }}
         <button class="btn btn-info aw-btn-action aw-btn-refresh" title="Copy Versions" onclick="jsonToClipboard('aw-json-python-modules')">
-            <i class="fas fa-copy fa-2x aw-btn-action-icon"></i>
+            {% include "../button/icon/copy.html" %}
         </button>
     </div>
 </div>

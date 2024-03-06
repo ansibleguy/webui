@@ -55,7 +55,7 @@ class JobForm(forms.ModelForm):
 
 @login_required
 @ui_endpoint_wrapper_kwargs
-def job_edit(request, job_id: int = None) -> HttpResponse:
+def job_edit(request, job_id: int = None, clone: bool = False) -> HttpResponse:
     job_form = JobForm()
     form_method = 'post'
     form_api = 'job'
@@ -71,13 +71,19 @@ def job_edit(request, job_id: int = None) -> HttpResponse:
         if job is None:
             return redirect(f"/ui/jobs/manage?error=Job with ID {job_id} does not exist")
 
-        if not has_job_permission(user=request.user, job=job, permission_needed=CHOICE_PERMISSION_WRITE):
-            return redirect(f"/ui/jobs/manage?error=Not privileged to modify the job '{job.name}'")
-
         job = job.__dict__
-        form_method = 'put'
-        form_api += f'/{job_id}'
+        if clone:
+            job['name'] = f"{job['name']} - Copy"
+            job.pop('id')
 
+        else:
+            if not has_job_permission(user=request.user, job=job['id'], permission_needed=CHOICE_PERMISSION_WRITE):
+                return redirect(f"/ui/jobs/manage?error=Not privileged to modify the job '{job.name}'")
+
+            form_method = 'put'
+            form_api += f'/{job_id}'
+
+    print(form_method, job)
     job_form_html = job_form.render(
         template_name='forms/job.html',
         context={'form': job_form, 'existing': job, 'primary_fields': Job.form_fields_primary},
@@ -86,6 +92,12 @@ def job_edit(request, job_id: int = None) -> HttpResponse:
         request, status=200, template_name='jobs/edit.html',
         context={'form': job_form_html, 'form_api': form_api, 'form_method': form_method}
     )
+
+
+@login_required
+@ui_endpoint_wrapper_kwargs
+def job_clone(request, job_id: int) -> HttpResponse:
+    return job_edit(request=request, job_id=job_id, clone=True)
 
 
 class CredentialGlobalForm(forms.ModelForm):
