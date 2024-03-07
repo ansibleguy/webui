@@ -15,9 +15,14 @@
         <tr>
             <td colspan="100%">
                 {% include "../button/refresh.html" %}
-                <a href="/ui/jobs/repository/0">
-                    <button class="btn btn-success aw-btn-action" title="Add">
-                        {% include "../button/icon/add.html" %}
+                <a href="/ui/jobs/repository/git/0">
+                    <button class="btn btn-success aw-btn-action" title="Add Git">
+                        {% include "../button/icon/add_git.html" %}
+                    </button>
+                </a>
+                <a href="/ui/jobs/repository/static/0">
+                    <button class="btn btn-success aw-btn-action" title="Add Static">
+                        {% include "../button/icon/add_dir.html" %}
                     </button>
                 </a>
             </td>
@@ -36,16 +41,16 @@
                 {% include "../button/icon/edit.html" %}
             </button>
         </a>
-        <button class="btn btn-success aw-btn-action aw-api-click" title="Download/Update" aw-api-endpoint="repository" aw-api-item="${ID}" aw-api-method="post">
-            {% include "../button/icon/download.html" %}
+        <button class="btn btn-danger aw-btn-action aw-api-click" title="Delete" aw-api-endpoint="repository" aw-api-item="${ID}" aw-api-method="delete">
+            {% include "../button/icon/delete.html" %}
         </button>
         <a href="/ui/jobs/log">
             <button class="btn btn-info aw-btn-action" title="Logs">
                 <i class="fa-solid fa-scroll fa-2x aw-btn-action-icon"></i>
             </button>
         </a>
-        <button class="btn btn-danger aw-btn-action aw-api-click" title="Delete" aw-api-endpoint="repository" aw-api-item="${ID}" aw-api-method="delete">
-            {% include "../button/icon/delete.html" %}
+        <button class="btn btn-success aw-btn-action aw-api-click aw-repo-update" title="Download/Update" aw-api-endpoint="repository" aw-api-item="${ID}" aw-api-method="post">
+            {% include "../button/icon/download.html" %}
         </button>
     </div>
     <div id="aw-api-data-tmpl-status" hidden="hidden">

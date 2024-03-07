@@ -264,6 +264,10 @@ td {
 .aw-nav-dd1 {
     background: var(--bgNav2) !important;
     color: var(--tc1);
+    border-color: var(--awBorder);
+    border-style: solid;
+    border-top-style: none;
+    border-width: 0px 1px 1px 1px;
 }
 
 .aw-nav-dd2 {

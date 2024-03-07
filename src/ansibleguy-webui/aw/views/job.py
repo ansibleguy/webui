@@ -7,7 +7,8 @@ from aw.utils.http import ui_endpoint_wrapper, ui_endpoint_wrapper_kwargs
 from aw.model.job import JobExecution, JobExecutionResultHost
 from aw.api_endpoints.job_util import get_viewable_jobs
 from aw.utils.util import get_next_cron_execution_str
-from aw.views.forms.job import job_edit, job_repository_edit, job_credentials_edit, job_clone
+from aw.views.forms.job import job_edit, job_clone, job_credentials_edit, job_repository_static_edit, \
+    job_repository_git_edit
 
 LIMIT_JOB_RESULTS = 10
 LIMIT_JOB_LOG_RESULTS = 50
@@ -74,7 +75,8 @@ urlpatterns_jobs = [
     path('ui/jobs/manage/job/clone/<int:job_id>', job_clone),
     path('ui/jobs/manage/job/<int:job_id>', job_edit),
     path('ui/jobs/manage/job', job_edit),
-    path('ui/jobs/repository/<int:repo_id>', job_repository_edit),
+    path('ui/jobs/repository/static/<int:repo_id>', job_repository_static_edit),
+    path('ui/jobs/repository/git/<int:repo_id>', job_repository_git_edit),
     path('ui/jobs/repository', job_repository),
     path('ui/jobs/manage', manage),
 ]

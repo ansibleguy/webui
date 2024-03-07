@@ -33,6 +33,8 @@ Jobs can be managed at the :code:`Jobs - Manage` page.
 
 |cnf_jobs|
 
+**Tip**: The file-browsing also allows you to use your keyboard. Select using Up/Down/Enter keys and auto-complete input using the Tab key!
+
 ----
 
 Permissions, Users, Groups

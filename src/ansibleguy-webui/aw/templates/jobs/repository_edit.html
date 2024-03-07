@@ -8,7 +8,13 @@
     </button>
 </a>
 
-{% include "../forms/base.html" %}
+<form class="aw-api-form" method="{{ form_method }}" action="/api/{{ form_api }}">
+    {% csrf_token %}
+    <input type="hidden" id="user" name="user" value="{{ request.user.id }}">
+    <input type="hidden" id="id_rtype" name="rtype" value="{{ repository_type }}">
+    {{ form }}
+</form>
+
 
 <a href="/ui/jobs/repository">
     <button class="btn btn-info aw-btn-action" title="Return">

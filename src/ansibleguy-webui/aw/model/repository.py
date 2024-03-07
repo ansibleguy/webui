@@ -13,6 +13,12 @@ CHOICES_REPOSITORY = [
 
 
 class Repository(BaseModel):
+    form_fields_git = [
+        'name', 'git_origin', 'git_credentials', 'git_branch', 'git_isolate', 'git_lfs', 'git_limit_depth',
+        'git_playbook_base',
+        'git_hook_pre', 'git_hook_post', 'git_override_initialize', 'git_override_update',
+    ]
+    form_fields_static = ['name', 'static_path']
     form_fields = [
         'name', 'rtype', 'static_path', 'git_origin', 'git_credentials', 'git_branch', 'git_isolate', 'git_lfs',
         'git_limit_depth', 'git_hook_pre', 'git_hook_post', 'git_override_initialize', 'git_override_update',
