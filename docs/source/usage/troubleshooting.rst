@@ -227,18 +227,22 @@ Database Migration Issues
 
 * You will have to find out which migrations were already applied:
 
-    .. code-block:: bash
+  :code:`python3 -m ansibleguy-webui.manage showmigrations`
 
-        sqlite3 <PATH-TO-YOUR-DB>
-        SELECT name,applied FROM django_migrations WHERE app = "aw";
+  * Or check your database manually:
 
-* You can also check the current schema of the table you see mentioned in the error message
+      .. code-block:: bash
 
-    .. code-block:: bash
+          sqlite3 <PATH-TO-YOUR-DB>
+          SELECT name,applied FROM django_migrations WHERE app = "aw";
 
-        sqlite3 <PATH-TO-YOUR-DB>
-        .table
-        .schema <TABLE>
+  * You can also check the current schema of the table you see mentioned in the error message
+
+      .. code-block:: bash
+
+          sqlite3 <PATH-TO-YOUR-DB>
+          .table
+          .schema <TABLE>
 
 * Check which migrations are available: :code:`python3 -m ansibleguy-webui.cli -a migrations.list`
 
