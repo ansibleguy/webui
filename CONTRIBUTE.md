@@ -38,6 +38,7 @@ Read into the [Troubleshooting Guide](https://webui.ansibleguy.net/en/latest/usa
     * the HTML row template (_aw-api-data-tmpl-row_)
     * the HTML action-buttons template (_aw-api-data-tmpl-actions_)
 * Elements with classes `aw-responsive-med` or `aw-responsive-lg` are hidden on smaller screens (_tablet/mobile view_)
+* To add sorting capabilities to table columns - simply add the buttons to its headers: `{% include "../button/icon/sort.html" %}` (*they have JS hooks*)
 
 ### Forms
 

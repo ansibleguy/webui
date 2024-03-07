@@ -3,7 +3,8 @@ function updateApiTableDataRepository(row, entry) {
     row.cells[0].innerText = entry.name;
     row.cells[1].innerText = entry.rtype_name;
     let actionsTemplate = document.getElementById("aw-api-data-tmpl-actions").innerHTML;
-    row.cells[4].innerHTML = actionsTemplate.replaceAll('${ID}', entry.id);
+    actionsTemplate = actionsTemplate.replaceAll('${ID}', entry.id);
+    row.cells[4].innerHTML = actionsTemplate.replaceAll('${RTYPE}', entry.rtype_name.toLowerCase());
 
     if (entry.rtype_name == "Git") {
         row.cells[2].innerHTML = entry.git_origin + ':' + entry.git_branch;

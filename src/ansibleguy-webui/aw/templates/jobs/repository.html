@@ -6,10 +6,10 @@
 <div class="table-responsive aw-data">
     <table class="table table-striped aw-text-responsive" id="aw-api-data-table">
         <tr>
-            <th>Name</th>
-            <th>Type</th>
-            <th class="aw-responsive-med">Path/Origin</th>
-            <th>Status</th>
+            <th>Name{% include "../button/icon/sort.html" %}</th>
+            <th>Type{% include "../button/icon/sort.html" %}</th>
+            <th class="aw-responsive-med">Path/Origin{% include "../button/icon/sort.html" %}</th>
+            <th>Status{% include "../button/icon/sort.html" %}</th>
             <th>Actions</th>
         </tr>
         <tr>
@@ -36,7 +36,7 @@
         </tr>
     </table>
     <div id="aw-api-data-tmpl-actions" hidden="hidden">
-        <a href="/ui/jobs/repository/${ID}">
+        <a href="/ui/jobs/repository/${RTYPE}/${ID}">
             <button class="btn btn-warning aw-btn-action" title="Edit">
                 {% include "../button/icon/edit.html" %}
             </button>
