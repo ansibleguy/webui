@@ -62,7 +62,7 @@ def _commandline_arguments(job: Job, execution: JobExecution, path_run: Path) ->
             )
 
         else:
-            _exec_log(execution=execution, msg='Ignoring known_host file because it does not exist', level=5)
+            _exec_log(execution=execution, msg='Ignoring known_hosts file because it does not exist', level=5)
 
     return ' '.join(cmd_arguments)
 

@@ -115,7 +115,8 @@ FORM_HELP = {
         'repository': {
             'static_path': 'Path to the local static repository/playbook-base-directory',
             'git_origin': "Full URL to the remote repository. "
-                          "Per example: 'https://github.com/ansibleguy/webui.git'",
+                          "Per example: '<a href=\"https://github.com/ansibleguy/webui.git\">"
+                          "https://github.com/ansibleguy/webui.git'</a>'",
             'git_credentials': "Credentials for connecting to the origin. "
                                "'Connect User', 'Connect Password' and 'SSH Private Key' are used",
             'git_playbook_base': 'Relative path to the Playbook base-directory relative from the repository root',
@@ -156,7 +157,8 @@ FORM_HELP = {
                      'You might need to restart the application to apply this setting',
             'logo_url': 'Default: <a href="/static/img/logo.svg">img/logo.svg</a>; '
                         'Per example: '
-                        '<a href="https://raw.githubusercontent.com/ansible/logos/main/vscode-ansible-logo/">'
+                        '<a href="https://raw.githubusercontent.com/ansible/logos/main/vscode-ansible-logo'
+                        '/vscode-ansible.svg">'
                         'https://raw.githubusercontent.com/ansible/logos/main/vscode-ansible-logo/vscode-ansible.svg'
                         '</a>',
             'ara_server': 'Provide the URL to your ARA server. Can be used to gather job statistics. See: '

@@ -1,3 +1,5 @@
+# todo: some of these settings could be moved to the system-config later on
+
 THREAD_JOIN_TIMEOUT = 3
 INTERVAL_RELOAD = 10  # start/stop threads for configured jobs
 INTERVAL_CHECK = 5  # check for queued jobs
@@ -16,3 +18,4 @@ GRP_MANAGER = {
     'credentials': 'AW Credentials Managers',
     'system': 'AW System Managers',
 }
+REPO_CLONE_TIMEOUT = 300

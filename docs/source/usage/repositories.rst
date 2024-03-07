@@ -33,3 +33,55 @@ Git
 Git repositories are also supported.
 
 They can either be updated at execution or completely re-created (*isolated*).
+
+The timeout for any single git-command is 5min.
+
+----
+
+Override commands
+=================
+
+If you have some special environment or want to tweak the way your repository is cloned - you can override the default git-commands!
+
+Default commands:
+
+**Create**
+
+.. code-block:: bash
+
+    git clone --branch ${BRANCH} (--depth ${DEPTH}) ${ORIGIN}
+    # if LFS is enabled
+    git lfs fetch
+    git lfs checkout
+
+**Update**
+
+.. code-block:: bash
+
+    git reset --hard
+    git pull
+    # if LFS is enabled
+    git lfs fetch
+    git lfs checkout
+
+----
+
+Hook commands
+=============
+
+You are able to run some hook-commands before and after updating the repository.
+
+If you want to run multiple ones - they need to be comma-separated.
+
+These hooks will not be processed if you override the actual create/update command.
+
+----
+
+Clone via SSH
+=============
+
+You can specify which :code:`known_hosts` file AW should use using the :ref:`System config <usage_config>`!
+
+You are able to append the port to the origin string like so: :code:`git@git.intern -p1337`
+
+The SSH-key configured in the linked credentials will be used.

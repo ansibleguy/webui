@@ -5,6 +5,7 @@ from re import sub as regex_replace
 from django.utils import timezone
 
 from aw.config.main import config
+from aw.config.hardcoded import REPO_CLONE_TIMEOUT
 from aw.model.job import Job, JobExecution
 from aw.utils.util import is_null, is_set, write_file_0640
 from aw.utils.subps import process
@@ -84,6 +85,8 @@ class ExecuteRepository:
             path_repo = self.get_path_repo()
 
             env = self._git_env()
+            if len(env) > 0:
+                self._log_file_write(f"USING ENVIRONMENT: {env}")
 
             self._run_repo_config_cmds(cmds=self.repository.git_hook_pre, env=env)
 
@@ -112,12 +115,30 @@ class ExecuteRepository:
         return self.path_run / '.repository'
 
     def _git_env(self) -> dict:
-        env = {}
+        env = {'GIT_SSH_COMMAND': 'ssh'}
+        if self.repository.git_origin.find(' -p') != -1:
+            try:
+                self.repository.git_origin, port = self.repository.git_origin.split(' -p')
+                env['GIT_SSH_COMMAND'] += f" -p {port}"
+
+            except IndexError:
+                pass
+
         if is_set(self.repository.git_credentials) and is_set(self.repository.git_credentials.ssh_key):
             path_run_repo = self.get_path_run_repo()
             path_run_repo.mkdir(mode=0o700, parents=True, exist_ok=True)
             write_pwd_file(credentials=self.repository.git_credentials, attr='ssh_key', path_run=path_run_repo)
-            env['GIT_SSH_COMMAND'] = f"ssh -i {get_pwd_file(path_run=path_run_repo, attr='ssh_key')}"
+            env['GIT_SSH_COMMAND'] += f" -i {get_pwd_file(path_run=path_run_repo, attr='ssh_key')}"
+
+        if is_set(config['path_ssh_known_hosts']):
+            if Path(config['path_ssh_known_hosts']).is_file():
+                env['GIT_SSH_COMMAND'] += f" -o UserKnownHostsFile={config['path_ssh_known_hosts']}"
+
+            else:
+                self._log_file_write('Ignoring known_hosts file because it does not exist')
+
+        if env['GIT_SSH_COMMAND'] == 'ssh':
+            env.pop('GIT_SSH_COMMAND')
 
         return env
 
@@ -137,10 +158,6 @@ class ExecuteRepository:
 
         if self.repository.git_isolate:
             rmtree(self.get_path_repo(), ignore_errors=True)
-
-    @staticmethod
-    def _git_cmds_to_str(cmds: list[list[str]]) -> str:
-        return '<br>'.join([' '.join(cmd) for cmd in cmds])
 
     def get_path_repo(self) -> Path:
         path_repo = get_path_repo_wo_isolate(self.repository)
@@ -162,7 +179,7 @@ class ExecuteRepository:
         if self.path_repo is None:
             self.path_repo = self.get_path_repo()
 
-        result = process(cmd=cmd, cwd=self.path_repo, env=env, shell=True)
+        result = process(cmd=cmd, cwd=self.path_repo, env=env, shell=True, timeout_sec=REPO_CLONE_TIMEOUT)
         self._log_file_write(f"COMMAND: {cmd}\n{result['stdout']}")
         if result['rc'] != 0:
             self._error(
