@@ -59,7 +59,7 @@ Default commands:
 .. code-block:: bash
 
     git reset --hard
-    git pull
+    git pull (--depth ${DEPTH})
     # if LFS is enabled
     git lfs fetch
     git lfs checkout

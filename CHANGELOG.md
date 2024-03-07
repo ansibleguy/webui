@@ -10,6 +10,7 @@
 * Ability to clone existing jobs
 * Ability to sort jobs and repositories
 * Split-up Repository Forms
+* Fix for Git-Clone Depth
 
 ----
 

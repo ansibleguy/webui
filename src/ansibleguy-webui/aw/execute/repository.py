@@ -35,7 +35,7 @@ class ExecuteRepository:
         git_clone = ['git', 'clone', '--branch', self.repository.git_branch]
 
         if is_set(self.repository.git_limit_depth):
-            git_clone.extend(['--depth', self.repository.git_limit_depth])
+            git_clone.extend(['--depth', str(self.repository.git_limit_depth)])
 
         if self.path_repo is None:
             self.path_repo = self.get_path_repo()
@@ -59,9 +59,14 @@ class ExecuteRepository:
             )
             return
 
+        git_pull = ['git', 'pull']
+
+        if is_set(self.repository.git_limit_depth):
+            git_pull.extend(['--depth', str(self.repository.git_limit_depth)])
+
         git_cmds = [
             'git reset --hard',
-            'git pull',
+            ' '.join(git_pull),
         ]
 
         if self.repository.git_lfs:

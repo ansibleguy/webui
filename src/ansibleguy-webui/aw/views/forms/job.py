@@ -84,7 +84,6 @@ def job_edit(request, job_id: int = None, clone: bool = False) -> HttpResponse:
             form_method = 'put'
             form_api += f'/{job_id}'
 
-    print(form_method, job)
     job_form_html = job_form.render(
         template_name='forms/job.html',
         context={'form': job_form, 'existing': job, 'primary_fields': Job.form_fields_primary},
