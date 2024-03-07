@@ -58,6 +58,10 @@ function addLogLines($this) {
 
 function updateApiTableDataJobLogs(row, row2, entry) {
     row.innerHTML = document.getElementById('aw-api-data-tmpl-row').innerHTML;
+    if (entryIsFiltered(entry.job)) {
+        row.setAttribute("hidden", "hidden");
+    }
+
     row.setAttribute("id_job", entry.job);
     row.setAttribute("id_execution", entry.id);
     row2.setAttribute("id_execution", entry.id);
@@ -124,24 +128,7 @@ function updateApiTableDataJobLogs(row, row2, entry) {
             logsContainer.innerHTML += ('<br><br><div class="aw-execution-errors"><h3>Error full</h3>' + entry.error_m + '</div>');
         }
     }
-}
 
-function applyFilter() {
-    if (HTTP_PARAMS.has('filter')) {
-        let filter_by = HTTP_PARAMS.get('filter');
-        let dataTable = document.getElementById("aw-api-data-table");
-        for (row of dataTable.rows) {
-            let id_job = row.getAttribute("id_job");
-            if (!is_set(id_job)) {
-                continue;
-            }
-            if (id_job == filter_by) {
-                row.removeAttribute("hidden");
-            } else {
-                row.setAttribute("hidden", "hidden");
-            }
-        }
-    }
 }
 
 $( document ).ready(function() {
@@ -157,7 +144,4 @@ $( document ).ready(function() {
     apiEndpoint = "/api/job_exec?execution_count=" + executionCount;
     fetchApiTableData(apiEndpoint, updateApiTableDataJobLogs, true, null, null, null, true);
     setInterval('fetchApiTableData(apiEndpoint, updateApiTableDataJobLogs, true, null, null, null, true)', (DATA_REFRESH_SEC * 1000));
-
-    applyFilter()
-    setInterval('applyFilter()', (DATA_REFRESH_SEC * 1000));
 });

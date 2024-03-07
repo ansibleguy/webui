@@ -199,6 +199,16 @@ function sortTable($sortButton, order = 'desc') {
     }
 }
 
+function entryIsFiltered(entryId) {
+    if (HTTP_PARAMS.has('filter')) {
+        let filter_by = HTTP_PARAMS.get('filter');
+        if (is_set(filter_by)) {
+            return Number(filter_by) != Number(entryId);
+        }
+    }
+    return false;
+}
+
 // API CALLS
 const CSRF_TOKEN = getCookie('csrftoken');
 
