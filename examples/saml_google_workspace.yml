@@ -1,0 +1,45 @@
+---
+
+# ENVIRONMENTAL VARIABLES
+#   AW_AUTH=saml
+#   AW_SAML_CONFIG=/etc/ansible-webui/saml.yml (this config file)
+
+# GOOGLE ADMIN SETTINGS (https://admin.google.com/ac/apps/saml/)
+#   Provider details:
+#     ACS URL: https://<YOUR-DOMAIN>/a/saml/acs/
+#     Entity ID: https://<YOUR-DOMAIN>/a/saml/acs/
+#     Signed response: yes
+#     Name ID format: UNSPECIFIED
+#     Name ID: Primary email
+#   Attribute mapping:
+#     Primary email => email
+#     First name => first_name
+#     Last name => last_name
+#     Groups => groups
+
+# replace with your domain
+ASSERTION_URL: 'https://<YOUR-DOMAIN>'
+ENTITY_ID: 'https://<YOUR-DOMAIN>/a/saml/acs/'
+DEFAULT_NEXT_URL: 'https://<YOUR-DOMAIN>'
+
+METADATA_LOCAL_FILE_PATH: '/etc/ansible-webui/GoogleIDPMetadata.xml'
+CERT_FILE: '/etc/ansible-webui/Google_<DATETIME>_SAML2_0.pem'
+WANT_ASSERTIONS_SIGNED: false
+TOKEN_REQUIRED: false
+
+CREATE_USER: true
+NEW_USER_PROFILE:
+    USER_GROUPS: []
+    ACTIVE_STATUS: true
+    STAFF_STATUS: true
+    SUPERUSER_STATUS: false
+
+ATTRIBUTES_MAP:
+    email: 'email'
+    username: 'email'
+    first_name: 'first_name'
+    last_name: 'last_name'
+    groups: 'groups'
+
+GROUPS_MAP:  # map IDP groups to django groups
+    'IDP GROUP': 'AW Job Managers'

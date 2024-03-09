@@ -25,9 +25,9 @@ Quote: ara provides Ansible reporting by recording ansible and ansible-playbook 
 
 ----
 
-Identity Providers using SAML
-*****************************
+Identity Providers using SAML SSO
+*********************************
 
 Easily integrate with SAML2 SSO identity providers like Okta, Azure AD and others.
 
-For configuration - see: :ref:`Usage - Config - Authentication <usage_config_auth>`
+For configuration - see: :ref:`Usage - Authentication <usage_auth>`

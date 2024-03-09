@@ -20,6 +20,7 @@ from aw.config.hardcoded import LOGIN_PATH
 from aw.config.defaults import CONFIG_DEFAULTS
 from aw.utils.deployment import deployment_dev, deployment_prod
 from aw.config.environment import get_aw_env_var_or_default, auth_mode_saml
+from aw.utils.debug import log
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 TEMPLATE_DIRS = [
@@ -208,16 +209,37 @@ SECRET_KEY = config['secret']
 
 # Authentication
 AUTH_MODE = CONFIG_DEFAULTS['auth_mode']
+SAML2_AUTH = {}
 if auth_mode_saml():
-    AUTH_MODE = 'saml'
     INSTALLED_APPS.append('django_saml2_auth')
 
     with open(get_aw_env_var_or_default('saml_config_file'), 'r', encoding='utf-8') as _config:
         try:
             SAML2_AUTH = yaml_load(_config.read())
 
-        except YAMLError:
+            # basic validation to help users find/fix their issues faster
+            _ = SAML2_AUTH['ASSERTION_URL']
+            _ = SAML2_AUTH['ENTITY_ID']
+            _ = SAML2_AUTH['ATTRIBUTES_MAP']
+            _ = SAML2_AUTH['ATTRIBUTES_MAP']['username']
+            _ = SAML2_AUTH['ATTRIBUTES_MAP']['email']
+            if 'METADATA_AUTO_CONF_URL' not in SAML2_AUTH and 'METADATA_LOCAL_FILE_PATH' not in SAML2_AUTH:
+                raise KeyError('METADATA_AUTO_CONF_URL or METADATA_LOCAL_FILE_PATH')
+
+            if ('TOKEN_REQUIRED' not in SAML2_AUTH or SAML2_AUTH['TOKEN_REQUIRED']) and \
+                    'token' not in SAML2_AUTH['ATTRIBUTES_MAP']:
+                raise KeyError('TOKEN_REQUIRED but not configured in ATTRIBUTES_MAP')
+
+        except YAMLError as err:
+            log(msg=f"Failed to load SAML config: '{err}'", level=1)
             SAML2_AUTH = {}
+
+        except KeyError as err:
+            log(msg=f"Invalid SAML config: '{err}'", level=1)
+            SAML2_AUTH = {}
+
+    if len(SAML2_AUTH) > 0:
+        AUTH_MODE = 'saml'
 
 # Internationalization
 LANGUAGE_CODE = 'en-us'
