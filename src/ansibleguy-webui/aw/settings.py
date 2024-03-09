@@ -3,6 +3,9 @@ from os import environ
 from sqlite3 import connect as db_connect
 from sqlite3 import OperationalError
 
+from yaml import safe_load as yaml_load
+from yaml import YAMLError
+
 try:
     from aw.config.main import config, VERSION
 
@@ -14,8 +17,9 @@ except ImportError:
 
 
 from aw.config.hardcoded import LOGIN_PATH
+from aw.config.defaults import CONFIG_DEFAULTS
 from aw.utils.deployment import deployment_dev, deployment_prod
-from aw.config.environment import get_aw_env_var_or_default
+from aw.config.environment import get_aw_env_var_or_default, auth_mode_saml
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 TEMPLATE_DIRS = [
@@ -56,6 +60,7 @@ INSTALLED_APPS = [
     # styles
     'fontawesomefree',
 ]
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -200,6 +205,19 @@ AUTO_LOGOUT = {
     'SESSION_TIME': config['session_timeout'],
 }
 SECRET_KEY = config['secret']
+
+# Authentication
+AUTH_MODE = CONFIG_DEFAULTS['auth_mode']
+if auth_mode_saml():
+    AUTH_MODE = 'saml'
+    INSTALLED_APPS.append('django_saml2_auth')
+
+    with open(get_aw_env_var_or_default('saml_config_file'), 'r', encoding='utf-8') as _config:
+        try:
+            SAML2_AUTH = yaml_load(_config.read())
+
+        except YAMLError:
+            SAML2_AUTH = {}
 
 # Internationalization
 LANGUAGE_CODE = 'en-us'

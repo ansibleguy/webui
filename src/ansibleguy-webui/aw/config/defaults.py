@@ -51,4 +51,6 @@ CONFIG_DEFAULTS = {
     'logo_url': 'img/logo.svg',
     'ssl_file_key': None,
     'ssl_file_crt': None,
+    'auth_mode': 'local',
+    'saml_config_file': None,
 }

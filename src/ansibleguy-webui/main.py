@@ -45,6 +45,10 @@ def main():
     from db import create_first_superuser, create_privileged_groups
     from webserver import init_webserver
     from aw.execute.scheduler import init_scheduler
+    from aw.utils.debug import log
+    from aw.settings import AUTH_MODE
+
+    log(msg=f"Using Auth-Mode: {AUTH_MODE}", level=4)
 
     create_first_superuser()
     create_privileged_groups()

@@ -2,43 +2,55 @@
 {% load util %}
 {% load static %}
 {% block content %}
-    <div align="center" style="display: block;">
-        <img src="{% get_logo %}" alt="" onerror="this.style.display='none'" class="aw-img-float"/>
-    </div>
-    <div class="aw-login">
-        {% if form.errors %}
-            {% for field in form %}
-                {% for error in field.errors %}
+    {% if ''|auth_sso and user.is_authenticated %}
+        <a href="/">
+            <button type="button" class="btn btn-primary">Home</button>
+        </a>
+    {% else %}
+        <div align="center" style="display: block;">
+            <img src="{% get_logo %}" alt="" onerror="this.style.display='none'" class="aw-img-float"/>
+        </div>
+        <div class="aw-login">
+            {% if form.errors %}
+                {% for field in form %}
+                    {% for error in field.errors %}
+                        <div class="alert alert-danger">
+                            <strong>{{ error|escape }}</strong>
+                        </div>
+                    {% endfor %}
+                {% endfor %}
+                {% for error in form.non_field_errors %}
                     <div class="alert alert-danger">
                         <strong>{{ error|escape }}</strong>
                     </div>
                 {% endfor %}
-            {% endfor %}
-            {% for error in form.non_field_errors %}
-                <div class="alert alert-danger">
-                    <strong>{{ error|escape }}</strong>
+            {% endif %}
+            {% if not user.is_authenticated %}
+                <div class="alert alert-info">
+                    Please login to see this page.
                 </div>
-            {% endfor %}
-        {% endif %}
-        {% if not user.is_authenticated %}
-            <div class="alert alert-info">
-                Please login to see this page.
-            </div>
-        {% endif %}
-        <br>
-        <form method="post" action="{% url 'login' %}">
-            {% csrf_token %}
-            <label for="id_username" class="aw-login-fields">
-                Username:
-                <input class="aw-login-fields form-control" type="text" name="username" autofocus="" autocapitalize="none" autocomplete="username" maxlength="150" required="" id="id_username">
-            </label>
+            {% endif %}
             <br>
-            <label for="id_password" class="aw-login-fields">
-                Password:
-                <input class="aw-login-fields form-control" type="password" name="password" autocomplete="current-password" required="" id="id_password">
-            </label>
-            <br>
-            <button type="submit" value="login" class="btn btn-secondary">Login</button>
-        </form>
-    </div>
+            <form method="post" action="{% url 'login' %}">
+                {% csrf_token %}
+                <label for="id_username" class="aw-login-fields">
+                    Username:
+                    <input class="aw-login-fields form-control" type="text" name="username" autofocus="" autocapitalize="none" autocomplete="username" maxlength="150" required="" id="id_username">
+                </label>
+                <br>
+                <label for="id_password" class="aw-login-fields">
+                    Password:
+                    <input class="aw-login-fields form-control" type="password" name="password" autocomplete="current-password" required="" id="id_password">
+                </label>
+                <div class="aw-login-btn">
+                    <button type="submit" value="login" class="btn btn-secondary">Login</button>
+                    {% if ''|auth_sso %}
+                        <a href="/a/sso/">
+                            <button type="button" class="btn btn-primary">SSO</button>
+                        </a>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    {% endif %}
 {% endblock %}

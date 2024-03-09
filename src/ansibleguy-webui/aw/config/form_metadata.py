@@ -67,6 +67,8 @@ FORM_LABEL = {
             'logo_url': 'URL to a Logo to use',
             'ara_server': 'ARA Server URL',
             'global_environment_vars': 'Global Environmental Variables',
+            'auth_mode': 'Authentication Mode',
+            'saml_config_file': 'SAML Config File',
         }
     }
 }

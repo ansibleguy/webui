@@ -70,42 +70,7 @@ You can find the currently set environmental variables at the :code:`System - Co
 
 Environmental variables can be set before/when starting Ansible-WebUI:
 
-Usage
-=====
-
-With basic setup:
-
-.. code-block:: bash
-
-    export AW_SECRET=aaaaaaaaaaaaaaaaaaaaabaaaaaaaaaaaaa
-    export AW_PROXY=1
-    python3 -m ansibleguy-webui
-
-    # OR
-
-    AW_SECRET=aaaaaaaaaaaaaaaaaaaaabaaaaaaaaaaaaa python3 -m ansibleguy-webui
-
-When using Docker:
-
-.. code-block:: bash
-
-    docker run -d --name ansible-webui --env AW_SECRET=aaaaaaaaaaaaaaaaaaaaabaaaaaaaaaaaaa --env AW_PROXY=1 ...
-
-When running as Systemd service:
-
-.. code-block:: bash
-
-    # add inside the '[Service]' area of the service-config-file
-    EnvironmentFile=/etc/ansible-webui/env.txt
-
-    # add variables to the file
-    echo 'AW_SECRET=aaaaaaaaaaaaaaaaaaaaabaaaaaaaaaaaaa' >> /etc/ansible-webui/env.txt
-    echo 'AW_PROXY=1' >> /etc/ansible-webui/env.txt
-
-    # make sure the access is limited so your secret(s) are safe
-    chown root /etc/ansible-webui/env.txt
-    chmod 600 /etc/ansible-webui/env.txt
-
+----
 
 Settings
 ========
@@ -170,6 +135,18 @@ Some settings are only available as environmental variables.
    Optionally provide the path to an unencrypted ssl key to use.
 
    **WARNING**: You should use a proxy in front of this application in production setups.
+
+
+* **AW_AUTH**
+
+    Choose the authentication mode you want to use.
+
+    One of :code:`saml`, :code:`ldap` or :code:`local`. Default: :code:`local`
+
+
+* **AW_SAML_CONFIG**
+
+    Provide the absolute path to your SAML configuration file.
 
 
 General System Settings
@@ -264,3 +241,118 @@ Normal users will not have to use these.
 
    Used to notify the software that it is running inside a docker container. Needed for listen port.
 
+----
+
+Usage
+=====
+
+With basic setup:
+
+.. code-block:: bash
+
+    export AW_SECRET=aaaaaaaaaaaaaaaaaaaaabaaaaaaaaaaaaa
+    export AW_PROXY=1
+    python3 -m ansibleguy-webui
+
+    # OR
+
+    AW_SECRET=aaaaaaaaaaaaaaaaaaaaabaaaaaaaaaaaaa python3 -m ansibleguy-webui
+
+When using Docker:
+
+.. code-block:: bash
+
+    docker run -d --name ansible-webui --env AW_SECRET=aaaaaaaaaaaaaaaaaaaaabaaaaaaaaaaaaa --env AW_PROXY=1 ...
+
+When running as Systemd service:
+
+.. code-block:: bash
+
+    # add inside the '[Service]' area of the service-config-file
+    EnvironmentFile=/etc/ansible-webui/env.txt
+
+    # add variables to the file
+    echo 'AW_SECRET=aaaaaaaaaaaaaaaaaaaaabaaaaaaaaaaaaa' >> /etc/ansible-webui/env.txt
+    echo 'AW_PROXY=1' >> /etc/ansible-webui/env.txt
+
+    # make sure the access is limited so your secret(s) are safe
+    chown root /etc/ansible-webui/env.txt
+    chmod 600 /etc/ansible-webui/env.txt
+
+----
+
+.. _usage_config_auth:
+
+Authentication Modes
+********************
+
+SAML
+====
+
+This app is integrating the `grafana/django-saml2-auth module <https://github.com/grafana/django-saml2-auth>`_ (indirect `pysaml2 <https://github.com/IdentityPython/pysaml2>`_).
+
+To enable it:
+
+1. Set the **AW_AUTH** env-var to :code:`saml`
+
+2. Create a `YAML config file <https://www.redhat.com/en/topics/automation/what-is-yaml>`_ to configure the SAML settings you need.
+
+  For options see: `Module settings <https://github.com/grafana/django-saml2-auth?tab=readme-ov-file#module-settings>`_
+
+  Example:
+
+  .. code-block:: yaml
+
+      ---
+
+      # config file at '/etc/ansible-webui/saml.yml'
+
+      METADATA_AUTO_CONF_URL: 'https://<YOUR-IDP>/metadata'
+      # METADATA_LOCAL_FILE_PATH: '/etc/ansible-webui/saml-metadata.txt'
+
+      # replace with your scheme, domain and port!
+      ASSERTION_URL: 'http://localhost:8000'
+      ENTITY_ID: 'http://localhost:8000/a/sso/'
+
+      CREATE_USER: true
+      NEW_USER_PROFILE:
+        USER_GROUPS: []  # The default group name when a new user logs in
+        ACTIVE_STATUS: true
+        STAFF_STATUS: true  # allow user to view 'System - Admin' page
+        SUPERUSER_STATUS: false  # full system admin privileges
+
+      ATTRIBUTES_MAP:  # email or username and token are required!
+          # mapping: django => IDP
+          email: 'email'
+          username: 'lastName'
+          token: 'id'
+          # optional:
+          first_name: 'user.first_name'
+          last_name: 'user.last_name'
+          groups: 'Groups'  # Optional
+
+      DEBUG: false  # DO NOT PERMANENTLY ENABLE!
+
+      GROUPS_MAP:  # map IDP groups to django groups
+          'IDP GROUP': 'AW Job Managers'
+
+      # NAME_ID_FORMAT: 'user.email'
+      # KEY_FILE: '/etc/ansible-webui/saml.key'
+      # CERT_FILE: '/etc/ansible-webui/saml.crt'
+
+3. Set the **AW_SAML_CONFIG** env-var containing the absolute path to your config-file (*readable by the user executing AW*)
+
+4. SSO identity provider settings:
+
+  **ACS URL**: :code:`http://localhost:8000/a/saml/acs/`
+
+  **Audience URL**: :code:`http://localhost:8000/a/sso/`
+
+  Note: Replace *http://localhost:8000* with your scheme, domain and port
+
+
+5. Install the :code:`xmlsec` package that is used internally (see: `details <https://github.com/IdentityPython/pysaml2?tab=readme-ov-file#external-dependencies>`_)
+
+You should now be able to see :code:`[INFO] [main] Using Auth-Mode: saml` logged on startup.
+
+If you have troubles with getting SAML to work - check out :ref:`Usage - Troubleshooting - SAML <usage_troubleshooting_saml>`

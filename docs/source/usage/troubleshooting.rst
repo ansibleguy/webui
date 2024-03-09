@@ -117,6 +117,55 @@ Python Module not installed
 
 ----
 
+.. _usage_troubleshooting_saml:
+
+SAML Issues
+===========
+
+To get more information - you can enable its logging by adding this block to the config file:
+
+.. code-block:: yaml
+
+    ...
+
+    LOGGING:
+        version: 1
+        formatters:
+            simple:
+              format: '[%(asctime)s] [%(levelname)s] [%(name)s.%(funcName)s] %(message)s'
+        handlers:
+            stdout:
+                class: 'logging.StreamHandler'
+                stream: 'ext://sys.stdout'
+                level: 'DEBUG'
+                formatter: 'simple'
+        loggers:
+            saml2:
+                level: 'DEBUG'
+        root:
+            level: 'DEBUG'
+            handlers: ['stdout']
+
+
+Note: The SAML config-file is only reloaded on restart.
+
+**Common errors you might encounter**:
+
+* :code:`CSRF validation failed` - the ACS url may not be configured correctly
+
+* If you see a page with an error-code - you can look-up `their references here <https://github.com/grafana/django-saml2-auth/blob/main/django_saml2_auth/errors.py>`_
+
+  Per example:
+
+    * :code:`1107` means you supplied an invalid SAML configuration or the :code:`xmlsec` package is not installed
+
+    * :code:`1110` means you might need to check your IDPs metadata and modify the :code:`NAME_ID_FORMAT` setting
+
+    * :code:`1113` and :code:`1114` mean you have not or mis-configured your attribute mappings
+
+Note: SAML testing has been done using the `mocksaml.com <https://mocksaml.com/>`_ service
+
+
 Edge-Case Issues
 ****************
 

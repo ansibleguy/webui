@@ -121,6 +121,10 @@ iframe {
     width: 25vw;
 }
 
+.aw-login-btn {
+    margin-top: 1vh;
+}
+
 .aw-login-fields {
     width: 100%;
     box-sizing: border-box;

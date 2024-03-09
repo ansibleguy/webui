@@ -6,6 +6,9 @@ pyyaml
 django-auto-logout
 pycryptodome
 
+## auth
+grafana-django-saml2-auth
+
 ## api
 djangorestframework==3.*
 djangorestframework-api-key==2.*

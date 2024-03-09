@@ -5,7 +5,7 @@ ARG AW_VERSION
 # BUILD CMD: docker build -f Dockerfile_production -t ansible-webui:<VERSION> --build-arg "AW_VERSION=<VERSION>" --no-cache .
 # RUN: docker run -d --name ansible-webui --publish 127.0.0.1:8000:8000 --volume $(pwd)/ansible/data:/data --volume $(pwd)/ansible/play:/play ansible-webui:<VERSION>
 
-RUN apk add --no-cache git git-lfs openssh-client sshpass && \
+RUN apk add --no-cache git git-lfs openssh-client sshpass xmlsec && \
     pip install --no-cache-dir --upgrade pip 2>/dev/null && \
     pip install --no-cache-dir "git+https://github.com/ansibleguy/webui.git@${AW_VERSION}" && \
     mkdir -p /play /data/log

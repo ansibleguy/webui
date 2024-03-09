@@ -82,7 +82,7 @@ See also: [Contributing](https://github.com/ansibleguy/webui/blob/latest/CONTRIB
 
   - [ ] [LDAP integration](https://github.com/django-auth-ldap/django-auth-ldap)
 
-  - [ ] [SAML SSO integration](https://github.com/grafana/django-saml2-auth)
+  - [x] [SAML SSO integration](https://github.com/grafana/django-saml2-auth)
 
 - [ ] Jobs
 

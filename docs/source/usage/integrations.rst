@@ -22,3 +22,12 @@ To enable AW to send data to an ARA server - you need to:
 Quote: ara provides Ansible reporting by recording ansible and ansible-playbook commands regardless of how and where they run.
 
 `Documentation <https://ara.readthedocs.io/>`_ | `Repository <https://github.com/ansible-community/ara>`_
+
+----
+
+Identity Providers using SAML
+*****************************
+
+Easily integrate with SAML2 SSO identity providers like Okta, Azure AD and others.
+
+For configuration - see: :ref:`Usage - Config - Authentication <usage_config_auth>`

@@ -2,6 +2,12 @@
 
 ## Version 0
 
+### 0.0.17
+
+* SAML integration
+
+----
+
 ### 0.0.16
 
 * Job-Form Selection

@@ -1,5 +1,6 @@
 from os import environ
 from functools import cache
+from pathlib import Path
 
 from aw.config.defaults import CONFIG_DEFAULTS
 
@@ -25,6 +26,8 @@ AW_ENV_VARS = {
     'ssl_file_crt': ['AW_SSL_CERT'],
     'ssl_file_key': ['AW_SSL_KEY'],
     'debug': ['AW_DEBUG'],
+    'auth_mode': ['AW_AUTH'],
+    'saml_config_file': ['AW_SAML_CONFIG'],
 }
 AW_ENV_VARS_SECRET = ['secret', 'init_admin', 'init_admin_pwd']
 
@@ -63,3 +66,9 @@ def check_aw_env_var_true(var: str, fallback: bool = False) -> bool:
         return fallback
 
     return str(val).lower() in ['1', 'true', 'y', 'yes']
+
+
+def auth_mode_saml() -> bool:
+    saml_config_file = get_aw_env_var_or_default('saml_config_file')
+    return get_aw_env_var_or_default('auth_mode').lower() == 'saml' and \
+        saml_config_file is not None and Path(saml_config_file).is_file()

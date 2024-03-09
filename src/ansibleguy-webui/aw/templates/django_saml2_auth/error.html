@@ -1,0 +1,11 @@
+{% extends "../body.html" %}
+{% load util %}
+{% block content %}
+    <h2>Sorry, you are not allowed to access this app</h2>
+    <p>To report a problem with your access please contact your system administrator</p>
+    {% if error_code %}<p>Error code: {{ error_code }}{{ error_code|saml_error_by_code }}</p>{% endif %}
+    {% if reason %}<p>Reason: {{ reason }}</p>{% endif %}
+    <a href="/a/login/">
+        <button type="button" class="btn btn-secondary">Local Login</button>
+    </a>
+{% endblock %}
