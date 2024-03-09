@@ -233,7 +233,8 @@ if auth_mode_saml():
             if 'JWT_ALGORITHM' not in SAML2_AUTH:
                 # use when no signing or verification operations are required; we only transfer the user-id..
                 SAML2_AUTH['JWT_ALGORITHM'] = 'none'
-                SAML2_AUTH['JWT_SECRET'] = ''
+                SAML2_AUTH['JWT_SECRET'] = None
+                SAML2_AUTH['JWT_EXP'] = 60
 
         except YAMLError as err:
             log(msg=f"Failed to load SAML config: '{err}'", level=1)
