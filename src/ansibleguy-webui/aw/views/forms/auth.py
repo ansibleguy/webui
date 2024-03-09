@@ -21,7 +21,7 @@ def __create_jwt_token(user_id: str) -> str:
         'exp': (datetime.now(tz=timezone.utc) +
                 timedelta(seconds=SAML2_AUTH['JWT_EXP'])).timestamp()
     }
-    return jwt_encode(payload, secret=None, algorithm='none')
+    return jwt_encode(payload=payload, key='', algorithm='none')
 
 
 @ui_endpoint_wrapper_auth
