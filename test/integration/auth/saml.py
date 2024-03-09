@@ -29,9 +29,9 @@ def _response_ok(url: str) -> bool:
     return _response_code(url) in [200, 302]
 
 
-def login(user: str, pwd: str):
-    print('TESTING LOGIN')
-    login_url = f'{BASE_URL}/a/login/'
+def login_fallback(user: str, pwd: str):
+    print('TESTING FALLBACK-LOGIN')
+    login_url = f'{BASE_URL}/a/login/fallback/'
     DRIVER.get(login_url)
     DRIVER.find_element(By.ID, 'id_username').send_keys(user)
     DRIVER.find_element(By.ID, 'id_password').send_keys(pwd)
@@ -52,29 +52,24 @@ def test_get_locations(locations: list):
         assert _response_ok(url)
 
 
-def test_main_pages():
+def test_auth_pages():
     test_get_locations([
-        'ui/jobs/manage', 'ui/jobs/log', 'ui/jobs/credentials', 'ui/jobs/repository',
-        'ui/settings/api_keys', 'ui/settings/permissions',
-        'ui/system/admin/', 'ui/system/api_docs', 'ui/system/environment', 'ui/system/config',
-        'a/password_change/',
+        'a/login/', 'a/login/fallback/',
     ])
 
 
-def test_actions_views():
+def test_fallback_main_pages():
+    # not all.. but some to make sure the fallback-auth is working
     test_get_locations([
-        'ui/jobs/manage/job',
-        'ui/jobs/credentials/0?global=false', 'ui/jobs/credentials/0?global=true',
-        'ui/settings/permissions/0', 'ui/jobs/repository/git/0', 'ui/jobs/repository/static/0'
+        'ui/jobs/manage', 'ui/jobs/log', 'ui/system/config', 'a/password_change/',
     ])
 
 
 def main():
     try:
-        login(user=environ['AW_ADMIN'], pwd=environ['AW_ADMIN_PWD'])
-        test_main_pages()
-        test_actions_views()
-        # todo: add action post variants
+        test_auth_pages()
+        login_fallback(user=environ['AW_ADMIN'], pwd=environ['AW_ADMIN_PWD'])
+        test_fallback_main_pages()
 
     finally:
         DRIVER.quit()

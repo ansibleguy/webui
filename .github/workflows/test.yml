@@ -126,3 +126,22 @@ jobs:
           sleep 1
 
           pkill -f 'ansibleguy-webui'
+
+      - name: Running Integration Tests - AUTH SAML
+        run: |
+          sleep 5
+          export AW_ENV='dev'
+          export AW_DB="/tmp/$(date +%s).aw.db"
+          export AW_ADMIN='tester'
+          export AW_ADMIN_PWD='someSecret!Pwd'
+          export AW_AUTH='saml'
+          export AW_SAML_CONFIG="$(pwd)/test/integration/auth/saml.yml"
+          rm -rf src/ansibleguy-webui/aw/migrations/*
+          python3 src/ansibleguy-webui/ >/dev/null 2>/dev/null &
+          sleep 5
+
+          echo 'WEB-UI AUTH-SAML INTEGRATION TESTS'
+          python3 test/integration/auth/saml.py
+          sleep 1
+
+          pkill -f 'ansibleguy-webui'

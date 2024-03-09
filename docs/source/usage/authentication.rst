@@ -17,7 +17,12 @@ SAML SSO
 
 This app is integrating the `grafana/django-saml2-auth module <https://github.com/grafana/django-saml2-auth>`_ (indirect `pysaml2 <https://github.com/IdentityPython/pysaml2>`_).
 
-To enable it:
+If you have troubles with getting SAML to work - check out :ref:`Usage - Troubleshooting - SAML <usage_troubleshooting_saml>`
+
+----
+
+Setup
+=====
 
 1. Set the **AW_AUTH** env-var to :code:`saml`
 
@@ -80,6 +85,17 @@ To enable it:
 
 5. For non-Docker setups: Install the :code:`xmlsec` package that is used internally (see: `details <https://github.com/IdentityPython/pysaml2?tab=readme-ov-file#external-dependencies>`_)
 
+
 You should now be able to see :code:`[INFO] [main] Using Auth-Mode: saml` logged on startup.
 
-If you have troubles with getting SAML to work - check out :ref:`Usage - Troubleshooting - SAML <usage_troubleshooting_saml>`
+----
+
+Docker
+======
+
+Example:
+
+.. code-block::
+
+    # save all needed SAML files to /etc/ansible-webui/ on your host system
+    sudo docker run -d --name ansible-webui --publish 127.0.0.1:8000:8000 --env AW_HOSTNAMES=<YOUR-DOMAINS> --env AW_AUTH=saml --env AW_SAML_CONFIG=/etc/aw/saml.yml --volume /etc/ansible-webui/:/etc/aw/ ansible0guy/webui:latest

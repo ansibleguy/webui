@@ -67,6 +67,31 @@ sleep 1
 pkill -f 'ansibleguy-webui'
 
 echo ''
+echo 'INTEGRATION TESTS SAML'
+echo ''
+
+sleep 5
+
+echo 'Starting AnsibleGuy-WebUI with SAML enabled..'
+# shellcheck disable=SC2155
+export AW_DB="/tmp/$(date +%s).aw.db"
+export AW_AUTH='saml'
+# shellcheck disable=SC2155
+export AW_SAML_CONFIG="$(pwd)/test/integration/auth/saml.yml"
+python3 src/ansibleguy-webui/ >/dev/null 2>/dev/null &
+echo ''
+sleep 50
+
+set +e
+if ! python3 test/integration/auth/saml.py
+then
+  failure
+fi
+
+sleep 1
+pkill -f 'ansibleguy-webui'
+
+echo ''
 echo 'TESTING TO CLI TOOLS'
 echo ''
 

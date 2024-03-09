@@ -117,6 +117,17 @@ Python Module not installed
 
 ----
 
+CSRF Failed
+===========
+
+**Error**: After submitting a form you see: :code:`Forbidden (403) CSRF verification failed. Request aborted.`
+
+**Problem**:
+
+* The hostname you are using to access AW is probably not configured as/listed in :code:`AW_HOSTNAMES`
+
+----
+
 .. _usage_troubleshooting_saml:
 
 SAML Issues
