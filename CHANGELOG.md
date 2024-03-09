@@ -4,7 +4,7 @@
 
 ### 0.0.17
 
-* SAML integration
+* [Integration for SAML-SSO Identity Providers](https://webui.ansibleguy.net/en/latest/usage/authentication.html)
 
 ----
 
