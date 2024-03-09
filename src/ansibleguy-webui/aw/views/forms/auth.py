@@ -10,17 +10,11 @@ from aw.settings import LOGIN_REDIRECT_URL, SAML2_AUTH, LOGIN_PATH
 # SP-initiated SAML SSO; see: https://github.com/grafana/django-saml2-auth/issues/105
 @ui_endpoint_wrapper
 def saml_sp_initiated_login(request) -> HttpResponse:
-    if request.user.is_authenticated:
-        return redirect(LOGIN_REDIRECT_URL)
-
     return render(request, status=200, template_name='registration/saml.html')
 
 
 @ui_endpoint_wrapper
 def saml_sp_initiated_login_init(request) -> HttpResponse:
-    if request.user.is_authenticated:
-        return redirect(LOGIN_REDIRECT_URL)
-
     if request.method != 'POST' or 'username' not in request.POST:
         return redirect(f"{LOGIN_PATH}?error=Required 'username' was not provided!")
 

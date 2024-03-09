@@ -7,7 +7,7 @@ then
 fi
 
 echo 'INSTALLING/UPGRADING REQUIREMENTS..'
-pip install --upgrade -r /aw/requirements.txt >/dev/null
+pip install --upgrade -r /aw/requirements.txt --root-user-action=ignore --no-warn-script-location >/dev/null
 
 . /entrypoint_requirements.sh
 
