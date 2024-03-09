@@ -231,9 +231,9 @@ if auth_mode_saml():
                 raise KeyError('TOKEN_REQUIRED but not configured in ATTRIBUTES_MAP')
 
             if 'JWT_ALGORITHM' not in SAML2_AUTH:
-                # use when no signing or verification operations are required; we only transfer the user-id..
-                SAML2_AUTH['JWT_ALGORITHM'] = 'none'
-                SAML2_AUTH['JWT_SECRET'] = None
+                # for SSO-login page; internal communications
+                SAML2_AUTH['JWT_ALGORITHM'] = CONFIG_DEFAULTS['jwt_algo']
+                SAML2_AUTH['JWT_SECRET'] = CONFIG_DEFAULTS['jwt_secret']
                 SAML2_AUTH['JWT_EXP'] = 60
 
         except YAMLError as err:
