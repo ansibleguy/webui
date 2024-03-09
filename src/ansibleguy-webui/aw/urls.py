@@ -2,8 +2,7 @@
 from django.urls import path, re_path
 from django.conf.urls import include
 from django.contrib import admin
-from django.contrib.auth import views as auth_views
-from django.contrib.auth.views import LoginView
+from django.contrib.auth.views import LoginView, PasswordChangeView
 
 from web_serve_static import urlpatterns_static
 from aw.api import urlpatterns_api
@@ -21,21 +20,21 @@ if deployment_dev() or check_aw_env_var_true(var='serve_static', fallback=True):
 urlpatterns += urlpatterns_api
 
 if auth_mode_saml():
-    from django_saml2_auth import views as saml_auth_views
     urlpatterns += [
-        re_path(r'^a/saml/', include('django_saml2_auth.urls')),
-        re_path(r'^a/saml/login/$', saml_auth_views.sp_initiated_login),
-        re_path(r'^a/saml/init/$', saml_sp_initiated_login_init),
+        re_path('a/saml/init/', saml_sp_initiated_login_init),
+        re_path('a/saml/', include('django_saml2_auth.urls')),
         # user views
-        re_path(r'^a/login/$', saml_sp_initiated_login),
-        re_path(r'^a/login/fallback/$', LoginView.as_view),
+        path('a/login/', saml_sp_initiated_login),
+        path('a/login/fallback/', LoginView.as_view()),
     ]
+
+else:
+    path('a/login/', LoginView.as_view()),
 
 urlpatterns += [
     # auth
-    path('a/', include('django.contrib.auth.urls')),  # login page
-    path('a/password_change/', auth_views.PasswordChangeView.as_view()),
-    path('_admin/', admin.site.urls),  # admin page
+    path('a/password_change/', PasswordChangeView.as_view()),
+    path('_admin/', admin.site.urls),
     path('o/', logout),
 ]
 

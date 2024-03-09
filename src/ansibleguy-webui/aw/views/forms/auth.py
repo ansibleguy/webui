@@ -4,7 +4,7 @@ from django.shortcuts import redirect, render, HttpResponse
 from django_saml2_auth.user import create_jwt_token
 
 from aw.utils.http import ui_endpoint_wrapper
-from aw.settings import LOGIN_REDIRECT_URL, SAML2_AUTH, LOGIN_PATH
+from aw.settings import SAML2_AUTH, LOGIN_PATH  # LOGIN_REDIRECT_URL
 
 
 # SP-initiated SAML SSO; see: https://github.com/grafana/django-saml2-auth/issues/105
@@ -20,5 +20,5 @@ def saml_sp_initiated_login_init(request) -> HttpResponse:
 
     token = create_jwt_token(request.POST['username'])
     assertion_url = SAML2_AUTH['ASSERTION_URL']
-    sso_init_url = urljoin(assertion_url, f'a/saml/init/?token={token}')
+    sso_init_url = urljoin(assertion_url, f'a/saml/sp/?token={token}')
     return redirect(sso_init_url)
