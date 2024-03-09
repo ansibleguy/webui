@@ -21,15 +21,15 @@ urlpatterns += urlpatterns_api
 
 if auth_mode_saml():
     urlpatterns += [
-        re_path('a/saml/init/', saml_sp_initiated_login_init),
-        re_path('a/saml/', include('django_saml2_auth.urls')),
+        path('a/saml/init/', saml_sp_initiated_login_init),
+        path('a/saml/', include('django_saml2_auth.urls')),
         # user views
         path('a/login/', saml_sp_initiated_login),
-        path('a/login/fallback/', LoginView.as_view()),
+        path('a/login/fallback/', LoginView.as_view(), name='login'),
     ]
 
 else:
-    path('a/login/', LoginView.as_view()),
+    path('a/login/', LoginView.as_view(), name='login'),
 
 urlpatterns += [
     # auth
