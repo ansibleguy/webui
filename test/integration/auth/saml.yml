@@ -29,7 +29,7 @@ LOGGING:
     version: 1
     formatters:
         simple:
-          format: '[%(asctime)s] [%(levelname)s] [%(name)s.%(funcName)s] %(message)s'
+            format: '[%(asctime)s] [%(levelname)s] [%(name)s.%(funcName)s] %(message)s'
     handlers:
         stdout:
             class: 'logging.StreamHandler'

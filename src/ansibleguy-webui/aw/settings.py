@@ -230,6 +230,11 @@ if auth_mode_saml():
                     'token' not in SAML2_AUTH['ATTRIBUTES_MAP']:
                 raise KeyError('TOKEN_REQUIRED but not configured in ATTRIBUTES_MAP')
 
+            if 'JWT_ALGORITHM' not in SAML2_AUTH:
+                # use when no signing or verification operations are required; we only transfer the user-id..
+                SAML2_AUTH['JWT_ALGORITHM'] = 'none'
+                SAML2_AUTH['JWT_SECRET'] = ''
+
         except YAMLError as err:
             log(msg=f"Failed to load SAML config: '{err}'", level=1)
             SAML2_AUTH = {}
