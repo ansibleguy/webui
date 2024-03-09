@@ -8,6 +8,8 @@
 Authentication
 ==============
 
+In case your primary authentication method is not working for some reason - you can enter the application with a local user at: :code:`/a/login/fallback`
+
 SAML SSO
 ********
 
@@ -49,11 +51,11 @@ To enable it:
       ATTRIBUTES_MAP:  # email or username and token are required!
           # mapping: django => IDP
           email: 'email'
-          username: 'lastName'
+          username: 'email'
           token: 'id'
           # optional:
-          first_name: 'user.first_name'
-          last_name: 'user.last_name'
+          first_name: 'firstName'
+          last_name: 'lastName'
           groups: 'Groups'  # Optional
 
       DEBUG: false  # DO NOT PERMANENTLY ENABLE!

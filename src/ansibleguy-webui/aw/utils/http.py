@@ -12,6 +12,20 @@ def deny_request(request) -> (bool, HttpResponse):
     return False, None
 
 
+def ui_endpoint_wrapper_auth(func) -> Callable:
+    def wrapper(request, *args, **kwargs):
+        del args
+        del kwargs
+
+        bad, deny = deny_request(request)
+        if bad:
+            return deny
+
+        return func(request)
+
+    return wrapper
+
+
 def ui_endpoint_wrapper(func) -> Callable:
     def wrapper(request, *args, **kwargs):
         del args

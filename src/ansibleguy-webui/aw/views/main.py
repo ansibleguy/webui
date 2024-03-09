@@ -43,7 +43,7 @@ def catchall(request) -> HttpResponse:
     if request.user.is_authenticated:
         return redirect(LOGIN_REDIRECT_URL)
 
-    return redirect(LOGIN_PATH)
+    return redirect(LOGIN_PATH)  # will be done by endpoint_wrapper
 
 
 @login_required
