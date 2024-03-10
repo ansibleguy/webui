@@ -6,6 +6,7 @@ if __name__ == '__main__':
     from sys import exit as sys_exit
     from sys import path as sys_path
     from os import path as os_path
+    from os import environ
 
     try:
         from main import main
@@ -21,6 +22,10 @@ if __name__ == '__main__':
             init_cli()
             _print_version()
             sys_exit(0)
+
+        elif sys_argv[1] in ['--config', '-c']:
+            from aw.config.hardcoded import ENV_KEY_CONFIG
+            environ[ENV_KEY_CONFIG] = sys_argv[2]
 
     from aw.config.main import VERSION
     print(f'AnsibleGuy-WebUI Version {VERSION}')

@@ -19,3 +19,5 @@ GRP_MANAGER = {
     'system': 'AW System Managers',
 }
 REPO_CLONE_TIMEOUT = 300
+ENV_KEY_CONFIG = 'AW_CONFIG'
+ENV_KEY_SAML = 'AW_SAML'

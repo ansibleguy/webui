@@ -24,9 +24,7 @@ If you have troubles with getting SAML to work - check out :ref:`Usage - Trouble
 Setup
 =====
 
-1. Set the **AW_AUTH** env-var to :code:`saml`
-
-2. Create a `YAML config file <https://www.redhat.com/en/topics/automation/what-is-yaml>`_ to configure the SAML settings you need.
+1. Add the :code:`SAML` config-block to your config-file. See: :ref:`Usage - Config - File <usage_config_file>`
 
   For options see: `Module settings <https://github.com/grafana/django-saml2-auth?tab=readme-ov-file#module-settings>`_
 
@@ -34,47 +32,46 @@ Setup
 
   .. code-block:: yaml
 
-      ---
+      HOSTNAMES: '<YOUR-DOMAIN>'
+      AUTH: 'saml'
+      SAML:
+          METADATA_AUTO_CONF_URL: 'https://<YOUR-IDP>/metadata'
+          # METADATA_LOCAL_FILE_PATH: '/etc/ansible-webui/saml-metadata.txt'
 
-      # config file at '/etc/ansible-webui/saml.yml'
+          # replace with your scheme, domain and port!
+          ASSERTION_URL: 'http://localhost:8000'
+          ENTITY_ID: 'http://localhost:8000/a/saml/acs/'
+          DEFAULT_NEXT_URL: 'http://localhost:8000/'
 
-      METADATA_AUTO_CONF_URL: 'https://<YOUR-IDP>/metadata'
-      # METADATA_LOCAL_FILE_PATH: '/etc/ansible-webui/saml-metadata.txt'
+          CREATE_USER: true
+          NEW_USER_PROFILE:
+              USER_GROUPS: []  # The default group name when a new user logs in
+              ACTIVE_STATUS: true
+              STAFF_STATUS: true  # allow user to view 'System - Admin' page
+              SUPERUSER_STATUS: false  # full system admin privileges
 
-      # replace with your scheme, domain and port!
-      ASSERTION_URL: 'http://localhost:8000'
-      ENTITY_ID: 'http://localhost:8000/a/saml/acs/'
-      DEFAULT_NEXT_URL: 'http://localhost:8000/'
+          ATTRIBUTES_MAP:  # email or username and token are required!
+              # mapping: django => IDP
+              email: 'email'
+              username: 'email'
+              token: 'id'
+              # optional:
+              first_name: 'firstName'
+              last_name: 'lastName'
+              groups: 'Groups'  # Optional
 
-      CREATE_USER: true
-      NEW_USER_PROFILE:
-          USER_GROUPS: []  # The default group name when a new user logs in
-          ACTIVE_STATUS: true
-          STAFF_STATUS: true  # allow user to view 'System - Admin' page
-          SUPERUSER_STATUS: false  # full system admin privileges
+          DEBUG: false  # DO NOT PERMANENTLY ENABLE!
 
-      ATTRIBUTES_MAP:  # email or username and token are required!
-          # mapping: django => IDP
-          email: 'email'
-          username: 'email'
-          token: 'id'
-          # optional:
-          first_name: 'firstName'
-          last_name: 'lastName'
-          groups: 'Groups'  # Optional
+          GROUPS_MAP:  # map IDP groups to django groups
+              'IDP GROUP': 'AW Job Managers'
 
-      DEBUG: false  # DO NOT PERMANENTLY ENABLE!
+          # NAME_ID_FORMAT: 'user.email'
+          # KEY_FILE: '/etc/ansible-webui/saml.key'
+          # CERT_FILE: '/etc/ansible-webui/saml.crt'
 
-      GROUPS_MAP:  # map IDP groups to django groups
-          'IDP GROUP': 'AW Job Managers'
+2. Set the **AW_SAML_CONFIG** env-var containing the absolute path to your config-file (*readable by the user executing AW*)
 
-      # NAME_ID_FORMAT: 'user.email'
-      # KEY_FILE: '/etc/ansible-webui/saml.key'
-      # CERT_FILE: '/etc/ansible-webui/saml.crt'
-
-3. Set the **AW_SAML_CONFIG** env-var containing the absolute path to your config-file (*readable by the user executing AW*)
-
-4. SSO identity provider settings:
+3. SSO identity provider settings:
 
   **ACS URL**: :code:`http://localhost:8000/a/saml/acs/`
 
@@ -83,7 +80,7 @@ Setup
   Note: Replace *http://localhost:8000* with your scheme, domain and port
 
 
-5. For non-Docker setups: Install the :code:`xmlsec` package that is used internally (see: `details <https://github.com/IdentityPython/pysaml2?tab=readme-ov-file#external-dependencies>`_)
+4. For non-Docker setups: Install the :code:`xmlsec` package that is used internally (see: `details <https://github.com/IdentityPython/pysaml2?tab=readme-ov-file#external-dependencies>`_)
 
 
 You should now be able to see :code:`[INFO] [main] Using Auth-Mode: saml` logged on startup.
@@ -95,7 +92,7 @@ Docker
 
 Example:
 
-.. code-block::
+.. code-block:: bash
 
     # save all needed SAML files to /etc/ansible-webui/ on your host system
-    sudo docker run -d --name ansible-webui --publish 127.0.0.1:8000:8000 --env AW_HOSTNAMES=<YOUR-DOMAINS> --env AW_AUTH=saml --env AW_SAML_CONFIG=/etc/aw/saml.yml --volume /etc/ansible-webui/:/etc/aw/ ansible0guy/webui:latest
+    sudo docker run -d --name ansible-webui --publish 127.0.0.1:8000:8000 --env AW_CONFIG=/etc/aw/config.yml --volume /etc/ansible-webui/:/etc/aw/ ansible0guy/webui:latest

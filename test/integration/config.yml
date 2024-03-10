@@ -1,0 +1,9 @@
+---
+
+admin: 'test'
+admin_pwd: 'myPwd'
+secret: 'adslfksldjflsmelnfslefnlsneflksneflksneflksneklf'
+
+run_timeout: 600
+path_run: '/tmp/test1'
+db: '/tmp/test1.aw.db'

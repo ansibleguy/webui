@@ -2,6 +2,13 @@
 
 ## Version 0
 
+### 0.0.18
+
+* Support for Config-File
+  * Moved SAML config to general Config-File
+
+----
+
 ### 0.0.17
 
 * [Integration for SAML-SSO Identity Providers](https://webui.ansibleguy.net/en/latest/usage/authentication.html)

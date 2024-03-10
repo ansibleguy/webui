@@ -68,7 +68,11 @@ FORM_LABEL = {
             'ara_server': 'ARA Server URL',
             'global_environment_vars': 'Global Environmental Variables',
             'auth_mode': 'Authentication Mode',
-            'saml_config_file': 'SAML Config File',
+            'saml_config': 'SAML Config File',
+            'address': 'Listen Address',
+            'port': 'Listen Port',
+            'ssl_file_crt': 'SSL Certificate',
+            'ssl_file_key': 'SSL Private-Key',
         }
     }
 }

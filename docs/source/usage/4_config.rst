@@ -4,15 +4,6 @@
 
 .. include:: ../_include/warn_develop.rst
 
-.. |cnf_admin| image:: ../_static/img/config_admin.png
-   :class: wiki-img
-
-.. |cnf_jobs| image:: ../_static/img/config_jobs.png
-   :class: wiki-img
-
-.. |cnf_sys| image:: ../_static/img/config_system.png
-   :class: wiki-img
-
 ==========
 4 - Config
 ==========
@@ -20,9 +11,7 @@
 WebUI
 *****
 
-Most system configuration can be managed using the WebUI :code:`System - Config` page.
-
-|cnf_sys|
+Runtime system configuration can be managed using the WebUI :code:`System - Config` page.
 
 ----
 
@@ -30,8 +19,6 @@ Jobs
 ====
 
 Jobs can be managed at the :code:`Jobs - Manage` page.
-
-|cnf_jobs|
 
 **Tip**: The file-browsing also allows you to use your keyboard. Select using Up/Down/Enter keys and auto-complete input using the Tab key!
 
@@ -51,24 +38,47 @@ See: :ref:`Usage - Repositories <usage_repositories>`
 
 ----
 
-Administration
-==============
-
-As this project is still in its early stages, there are no fancy forms to manage some 'good-to-have' settings yet.
-
-You can use the :code:`System - Admin` page to administer those using the Django administration tool:
-
-|cnf_admin|
-
-
-----
-
 Environmental variables
 ***********************
 
 You can find the currently set environmental variables at the :code:`System - Config` page.
 
-Environmental variables can be set before/when starting Ansible-WebUI:
+----
+
+.. _usage_config_file:
+
+Config File
+===========
+
+You are able to provide the following settings by using a `YAML <https://www.redhat.com/en/topics/automation/what-is-yaml>`_ config-file.
+
+* Provide it by flag: :code:`python3 -m ansibleguy-webui -c /etc/ansible-webui/config.yml`
+
+* Provide it by env-var: :code:`AW_CONFIG=/etc/ansible-webui/config.yml`
+
+Example config:
+
+.. code-block:: yaml
+
+    # env-vars without the 'AW_' prefix
+    DB: '/etc/ansible-webui/aw.db'
+    PORT: 8000
+    SECRET: 'sflsjklfdsjlfsDlNDIDEÜNfsnfa-ehöajklsfnn,sf,sdfs,i3uo'
+    HOSTNAMES: ['webui.ansibleguy.net', 'cname.webui.ansibleguy.net']
+    RUN_TIMEOUT: 600
+    SSH_KNOWN_HOSTS: '/etc/ansible-webui/known_hosts'
+
+    AUTH: 'saml'
+    SAML:
+        METADATA_AUTO_CONF_URL: 'https://<YOUR-IDP>/metadata'
+        ...
+
+Docker usage:
+
+.. code-block:: bash
+
+    # safe config to /etc/ansible-webui/config.yml on your host system
+    sudo docker run -d ... --env AW_CONFIG=/etc/aw/config.yml --volume /etc/ansible-webui/:/etc/aw/ ansible0guy/webui:latest
 
 ----
 
@@ -143,10 +153,7 @@ Some settings are only available as environmental variables.
 
     One of :code:`saml`, :code:`ldap` or :code:`local`. Default: :code:`local`
 
-
-* **AW_SAML_CONFIG**
-
-    Provide the absolute path to your SAML configuration file.
+    If the mode is set to :code:`saml` or :code:`ldap` - you need to define its config inside the config file.
 
 
 General System Settings
@@ -245,6 +252,8 @@ Normal users will not have to use these.
 
 Usage
 =====
+
+Environmental variables can be set before/when starting Ansible-WebUI.
 
 With basic setup:
 

@@ -5,40 +5,42 @@
 # RUN:
 #   AW_AUTH=saml AW_SAML_CONFIG=test/integration/auth/saml.yml bash scripts/run_dev.sh q
 
-METADATA_AUTO_CONF_URL: 'https://mocksaml.com/api/saml/metadata'
-ASSERTION_URL: 'http://localhost:8000'
-ENTITY_ID: 'http://localhost:8000/a/saml/acs/'
-DEFAULT_NEXT_URL: 'http://localhost:8000/'
+AUTH: 'saml'
+SAML:
+    METADATA_AUTO_CONF_URL: 'https://mocksaml.com/api/saml/metadata'
+    ASSERTION_URL: 'http://localhost:8000'
+    ENTITY_ID: 'http://localhost:8000/a/saml/acs/'
+    DEFAULT_NEXT_URL: 'http://localhost:8000/'
 
-CREATE_USER: true
-NEW_USER_PROFILE:
-    USER_GROUPS: []
-    ACTIVE_STATUS: true
-    STAFF_STATUS: true
-    SUPERUSER_STATUS: false
+    CREATE_USER: true
+    NEW_USER_PROFILE:
+        USER_GROUPS: []
+        ACTIVE_STATUS: true
+        STAFF_STATUS: true
+        SUPERUSER_STATUS: false
 
-ATTRIBUTES_MAP:
-    email: 'email'
-    username: 'email'
-    token: 'id'
-    first_name: 'firstName'
-    last_name: 'lastName'
+    ATTRIBUTES_MAP:
+        email: 'email'
+        username: 'email'
+        token: 'id'
+        first_name: 'firstName'
+        last_name: 'lastName'
 
-DEBUG: true
-LOGGING:
-    version: 1
-    formatters:
-        simple:
-            format: '[%(asctime)s] [%(levelname)s] [%(name)s.%(funcName)s] %(message)s'
-    handlers:
-        stdout:
-            class: 'logging.StreamHandler'
-            stream: 'ext://sys.stdout'
+    DEBUG: true
+    LOGGING:
+        version: 1
+        formatters:
+            simple:
+                format: '[%(asctime)s] [%(levelname)s] [%(name)s.%(funcName)s] %(message)s'
+        handlers:
+            stdout:
+                class: 'logging.StreamHandler'
+                stream: 'ext://sys.stdout'
+                level: 'DEBUG'
+                formatter: 'simple'
+        loggers:
+            saml2:
+                level: 'DEBUG'
+        root:
             level: 'DEBUG'
-            formatter: 'simple'
-    loggers:
-        saml2:
-            level: 'DEBUG'
-    root:
-        level: 'DEBUG'
-        handlers: ['stdout']
+            handlers: ['stdout']

@@ -16,7 +16,7 @@ except ImportError:
     from aw.config.main import config, VERSION
 
 
-from aw.config.hardcoded import LOGIN_PATH
+from aw.config.hardcoded import LOGIN_PATH, ENV_KEY_CONFIG, ENV_KEY_SAML
 from aw.config.defaults import CONFIG_DEFAULTS
 from aw.utils.deployment import deployment_dev, deployment_prod
 from aw.config.environment import get_aw_env_var_or_default, auth_mode_saml
@@ -213,10 +213,11 @@ SAML2_AUTH = {}
 if auth_mode_saml():
     INSTALLED_APPS.append('django_saml2_auth')
 
-    with open(get_aw_env_var_or_default('saml_config_file'), 'r', encoding='utf-8') as _config:
-        try:
-            SAML2_AUTH = yaml_load(_config.read())
+    try:
+        with open(environ[ENV_KEY_CONFIG], 'r', encoding='utf-8') as _config:
+            SAML2_AUTH = yaml_load(_config.read())[environ[ENV_KEY_SAML]]
 
+        try:
             # basic validation to help users find/fix their issues faster
             _ = SAML2_AUTH['ASSERTION_URL']
             _ = SAML2_AUTH['ENTITY_ID']
@@ -236,13 +237,13 @@ if auth_mode_saml():
                 SAML2_AUTH['JWT_SECRET'] = CONFIG_DEFAULTS['jwt_secret']
                 SAML2_AUTH['JWT_EXP'] = 60
 
-        except YAMLError as err:
-            log(msg=f"Failed to load SAML config: '{err}'", level=1)
-            SAML2_AUTH = {}
-
         except KeyError as err:
             log(msg=f"Invalid SAML config: '{err}'", level=1)
             SAML2_AUTH = {}
+
+    except (YAMLError, KeyError) as err:
+        log(msg=f"Failed to load SAML config: '{err}'", level=1)
+        SAML2_AUTH = {}
 
     if len(SAML2_AUTH) > 0:
         AUTH_MODE = 'saml'

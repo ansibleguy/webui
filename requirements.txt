@@ -23,3 +23,6 @@ crontab
 # ansible
 ansible-core
 ansible-runner
+
+# config
+PyYAML

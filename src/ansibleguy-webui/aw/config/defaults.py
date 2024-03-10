@@ -52,7 +52,7 @@ CONFIG_DEFAULTS = {
     'ssl_file_key': None,
     'ssl_file_crt': None,
     'auth_mode': 'local',
-    'saml_config_file': None,
+    'saml_config': None,
     'jwt_algo': 'HS256',
     'jwt_secret': ''.join(random_choice(ascii_letters + digits + punctuation) for _ in range(30)),
 }

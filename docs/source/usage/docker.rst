@@ -50,7 +50,7 @@ Basic example:
 
 .. code-block:: bash
 
-    # add matching service-user on the root system
+    # add matching service-user on the host system
     sudo useradd ansible-webui --shell /usr/sbin/nologin --uid 8785 --user-group
     chown ansible-webui:ansible-webui ${YOUR_DATA_DIR}
 

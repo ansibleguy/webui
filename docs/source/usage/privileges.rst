@@ -17,7 +17,7 @@
 Privileges
 ==========
 
-You can set job-permissions to limit user actions.
+You can set permissions to limit user actions.
 
 Users & Groups
 **************
@@ -39,13 +39,13 @@ To allow a users to perform management actions - add them to the corresponding s
 
 Available ones are:
 
-* :code:`AW Job Managers` - create new jobs and view all existing ones
+* :code:`AW Job Managers` - create new jobs, view and update all existing ones
 
 * :code:`AW Permission Managers` - create, update and delete permissions
 
-* :code:`AW Repository Managers` - create new repositories and view all existing ones
+* :code:`AW Repository Managers` - create new repositories, view and update all existing ones
 
-* :code:`AW Credentials Managers` - create new global credentials and view all existing ones
+* :code:`AW Credentials Managers` - create new global credentials, view and update all existing ones
 
 * :code:`AW System Managers` - configure system settings
 
