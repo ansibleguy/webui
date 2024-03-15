@@ -187,7 +187,7 @@ class JobExecution(BaseJob):
     log_stderr = models.CharField(max_length=300, **DEFAULT_NONE)
     log_stdout_repo = models.CharField(max_length=300, **DEFAULT_NONE)
     log_stderr_repo = models.CharField(max_length=300, **DEFAULT_NONE)
-    command = models.CharField(max_length=1000, **DEFAULT_NONE)
+    command = models.CharField(max_length=2000, **DEFAULT_NONE)
 
     credential_global = models.ForeignKey(
         JobGlobalCredentials, on_delete=models.SET_NULL, related_name='jobexec_fk_credglob', null=True,
