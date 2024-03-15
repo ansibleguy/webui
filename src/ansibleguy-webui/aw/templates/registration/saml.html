@@ -2,6 +2,7 @@
 {% load util %}
 {% load static %}
 {% block content %}
+    <script src="{% static 'js/login.js' %}"></script>
     {% if user.is_authenticated %}
         <a href="/">
             <button type="button" class="btn btn-primary">Home</button>
@@ -31,12 +32,13 @@
                 </div>
             {% endif %}
             <br>
-            <form method="post" action="/a/saml/init/">
+            <form class="aw-login-form" method="post" action="/a/saml/init/">
                 {% csrf_token %}
                 <label for="id_username" class="aw-login-fields">
                     Username:
                     <input class="aw-login-fields form-control" type="text" name="username" autofocus="" autocapitalize="none" autocomplete="username" maxlength="150" required="" id="id_username">
                 </label>
+                {% include "./remember_user.html" %}
                 <div class="aw-login-btn">
                     <button type="submit" value="login" class="btn btn-primary">Login</button>
                     <a href="/a/login/fallback/">

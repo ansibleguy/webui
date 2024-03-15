@@ -6,6 +6,10 @@
 
 * Support for Config-File
   * Moved SAML config to general Config-File
+* Added Execution-Duration to UI
+* Allow to save Username at Login-Form
+* Multiple fixes for UI
+* Increased maximum execution-command length
 
 ----
 
