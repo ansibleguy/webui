@@ -200,6 +200,7 @@ These settings are also configurable using the WebUI.
 
    Override the timezone used.
    Default is the system timezone.
+   Fallback value is :code:`UTC` if all others are invalid.
 
 
 Advanced Settings

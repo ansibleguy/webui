@@ -66,13 +66,17 @@ class Config:
         return self._from_env_or_db(setting)
 
     @property
-    def timezone(self) -> BaseTzInfo:
+    def timezone_str(self) -> str:
         tz_str = self.get('timezone')
 
         if tz_str not in all_timezones:
-            return timezone('GMT')
+            return 'UTC'
 
-        return timezone(tz_str)
+        return tz_str
+
+    @property
+    def timezone(self) -> BaseTzInfo:
+        return timezone(self.timezone_str)
 
     def is_true(self, setting: str, fallback: bool = False) -> bool:
         val = self.get(setting)
