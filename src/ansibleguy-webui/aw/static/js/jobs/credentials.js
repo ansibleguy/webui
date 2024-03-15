@@ -1,5 +1,5 @@
 function updateApiTableDataCreds(row, entry) {
-    row.innerHTML = document.getElementById('aw-api-data-tmpl-row').innerHTML;
+    row.innerHTML = document.getElementById(ELEM_ID_TMPL_ROW).innerHTML;
     row.cells[0].innerText = entry.name;
 
     let users = [];

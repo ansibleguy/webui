@@ -46,9 +46,8 @@ function addLogLines($this) {
     }
     if (!hidden) {
         $.get("/api/job/" + job_id + "/" + exec_id + "/log/" + logLineStart, function(data) {
-          let element = document.getElementById(logElement);
-          element.innerHTML += replaceLineColors(data.lines).join('');
           if (data.lines.length > 0) {
+            document.getElementById(logElement).innerHTML += replaceLineColors(data.lines).join('');
             $this.attr("aw-log-line", parseInt(logLineStart) + data.lines.length);
             logElementEnd.scrollIntoView({ behavior: "smooth", block: "end", inline: "end" });
           }
@@ -57,7 +56,7 @@ function addLogLines($this) {
 }
 
 function updateApiTableDataJobLogs(row, row2, entry) {
-    row.innerHTML = document.getElementById('aw-api-data-tmpl-row').innerHTML;
+    row.innerHTML = document.getElementById(ELEM_ID_TMPL_ROW).innerHTML;
     if (entryIsFiltered(entry.job)) {
         row.setAttribute("hidden", "hidden");
     }
@@ -68,16 +67,21 @@ function updateApiTableDataJobLogs(row, row2, entry) {
 
     row.cells[0].innerHTML = shortExecutionStatus(entry);
     row.cells[1].innerText = entry.job_name;
-    if (entry.job_comment == "") {
+    if (!is_set(entry.time_duration)) {
         row.cells[2].innerText = "-";
     } else {
-        row.cells[2].innerText = entry.job_comment;
+        row.cells[2].innerText = entry.time_duration;
+    }
+    if (!is_set(entry.job_comment)) {
+        row.cells[3].innerText = "-";
+    } else {
+        row.cells[3].innerText = entry.job_comment;
     }
 
-    let actionsTemplate = document.getElementById("aw-api-data-tmpl-actions").innerHTML;
+    let actionsTemplate = document.getElementById(ELEM_ID_TMPL_ACTIONS).innerHTML;
     actionsTemplate = actionsTemplate.replaceAll('${ID}', entry.id);
     actionsTemplate = actionsTemplate.replaceAll('${JOB_ID}', entry.job);
-    row.cells[3].innerHTML = actionsTemplate;
+    row.cells[4].innerHTML = actionsTemplate;
 
     let logsTemplates = document.getElementById("aw-api-data-tmpl-logs").innerHTML;
     logsTemplates = logsTemplates.replaceAll('${ID}', entry.id);
@@ -115,20 +119,27 @@ function updateApiTableDataJobLogs(row, row2, entry) {
     let row2Col = row2.insertCell(0);
     row2Col.setAttribute("colspan", "100%");
     row2Col.innerHTML = logsTemplates;
-    var logsContainer = document.getElementById("aw-execution-logs-" + entry.id);
+    let logsContainerBegin = document.getElementById("aw-execution-logs-beg-" + entry.id);
+    logsContainerBegin.innerHTML = "<b>Start time:</b> " + entry.time_start + '<br>';
     if (entry.command != null) {
-        logsContainer.innerHTML = "<b>Running command:</b><br><small>" + entry.command + "</small><br>" + logsContainer.innerHTML;
+        logsContainerBegin.innerHTML += "<b>Running command:</b><br><small>" + entry.command + "</small><br>";
     }
     if (entry.command_repository != null) {
-        logsContainer.innerHTML = "<b>Creating/Updating repository:</b><br><small>" + entry.command_repository + "</small><br>" + logsContainer.innerHTML;
+        logsContainerBegin.innerHTML += "<b>Creating/Updating repository:</b><br><small>" + entry.command_repository + "</small><br>";
     }
+
+    let logsContainerMain = document.getElementById("aw-execution-logs-" + entry.id);
     if (entry.error_s != null) {
-        logsContainer.innerHTML += ('<div class="aw-execution-errors"><h3>Error</h3>' + entry.error_s + '</div>');
+        logsContainerMain.innerHTML += ('<div class="aw-execution-errors"><h3>Error</h3>' + entry.error_s + '</div>');
         if (entry.error_m != null) {
-            logsContainer.innerHTML += ('<br><br><div class="aw-execution-errors"><h3>Error full</h3>' + entry.error_m + '</div>');
+            logsContainerMain.innerHTML += ('<br><br><div class="aw-execution-errors"><h3>Error full</h3>' + entry.error_m + '</div>');
         }
     }
 
+    if (is_set(entry.time_fin)) {
+        let logsContainerEnd = document.getElementById("aw-execution-logs-end-" + entry.id);
+        logsContainerEnd.innerHTML = "<br><b>Finish time:</b> " + entry.time_fin + "<br><b>Duration:</b> " + entry.time_duration;
+    }
 }
 
 $( document ).ready(function() {

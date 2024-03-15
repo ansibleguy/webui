@@ -12,12 +12,14 @@
 <div class="table-responsive aw-data">
     <table class="table table-striped aw-text-responsive" id="aw-api-data-table">
         <tr>
-            <th>Run</th>
+            <th>Execution</th>
             <th>Job</th>
+            <th>Duration</th>
             <th class="aw-responsive-med">Comment</th>
             <th>Actions</th>
         </tr>
         <tr id="aw-api-data-tmpl-row" hidden="hidden">
+            <td></td>
             <td></td>
             <td></td>
             <td class="aw-responsive-med"></td>
@@ -33,7 +35,7 @@
             {% include "../button/icon/stop.html" %}
         </button>
         <a href="/ui/jobs/manage/job/${JOB_ID}">
-            <button class="btn btn-warning aw-btn-action" title="Edit">
+            <button class="btn btn-warning aw-btn-action" title="Edit Job">
                 {% include "../button/icon/edit.html" %}
             </button>
         </a>
@@ -52,7 +54,11 @@
             <a href="${LOG_STDOUT_REPO_URL}" title="${LOG_STDOUT_REPO}" download>Repository Output</a>,
             <a href="${LOG_STDERR_REPO_URL}" title="${LOG_STDERR_REPO}" download>Repository Error</a>
         </div>
-        <div id="aw-execution-logs-${ID}" class="aw-execution-logs"></div>
+        <div class="aw-execution-logs">
+            <div id="aw-execution-logs-beg-${ID}"></div>
+            <div id="aw-execution-logs-${ID}"></div>
+            <div id="aw-execution-logs-end-${ID}"></div>
+        </div>
         <div>
             <button type="submit" title="Collapse" class="btn btn-info aw-btn-action aw-btn-collapse" aw-collapse="aw-spoiler-${ID}"
             id="aw-log-end-${ID}">

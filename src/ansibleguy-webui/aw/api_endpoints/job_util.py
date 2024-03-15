@@ -7,7 +7,7 @@ from aw.config.main import config
 from aw.config.hardcoded import JOB_EXECUTION_LIMIT
 from aw.model.job import Job, JobExecution
 from aw.utils.permission import get_viewable_jobs
-from aw.utils.util import get_next_cron_execution_str
+from aw.utils.util import get_next_cron_execution_str, is_set
 from aw.base import USERS
 
 
@@ -61,8 +61,9 @@ def get_job_execution_serialized(execution: JobExecution) -> dict:
             serialized[logfile] = None
             serialized[logfile + '_url'] = None
 
-    if execution.result is not None:
+    if execution.result is not None and is_set(execution.result.time_fin):
         serialized['time_fin'] = execution.result.time_fin_str
+        serialized['time_duration'] = execution.result.time_duration_str
         serialized['failed'] = execution.result.failed
         if execution.result.error is not None:
             serialized['error_s'] = execution.result.error.short

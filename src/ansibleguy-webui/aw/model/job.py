@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from crontab import CronTab
 from django.db import models
 from django.core.validators import ValidationError
@@ -9,7 +11,8 @@ from aw.config.hardcoded import SHORT_TIME_FORMAT
 from aw.model.job_credential import JobGlobalCredentials, JobUserCredentials
 from aw.base import USERS
 from aw.model.repository import Repository
-from aw.utils.util import get_choice_key_by_value, get_choice_value_by_key, datetime_from_db_str, is_null
+from aw.utils.util import get_choice_key_by_value, get_choice_value_by_key, datetime_from_db_str, is_null, \
+    datetime_from_db, pretty_timedelta_str
 
 
 class JobError(BareModel):
@@ -127,7 +130,24 @@ class JobExecutionResult(BareModel):
 
     @property
     def time_fin_str(self) -> str:
+        if is_null(self.time_fin):
+            return ''
+
         return datetime_from_db_str(dt=self.time_fin, fmt=SHORT_TIME_FORMAT) + f" {config['timezone']}"
+
+    @property
+    def time_duration(self) -> timedelta:
+        if is_null(self.time_fin):
+            return timedelta(0)
+
+        return datetime_from_db(self.time_fin) - datetime_from_db(self.time_start)
+
+    @property
+    def time_duration_str(self) -> str:
+        if is_null(self.time_fin):
+            return ''
+
+        return pretty_timedelta_str(self.time_duration.total_seconds())
 
 
 class JobExecutionResultHost(BareModel):

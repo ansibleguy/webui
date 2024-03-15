@@ -602,13 +602,18 @@ td div hr {
 }
 
 .aw-execution-logs {
-    white-space: pre-wrap;
     word-break: break-word;
-    padding: 1% 1.5%;
+    padding: 1vh 1.5vw;
     color: var(--awSoftWhite);
     background-color: var(--awLogs);
     letter-spacing: normal;
     font-size: medium;
+}
+
+.aw-execution-logs > div {
+    white-space: pre-wrap;
+    margin-top: 2vh;
+    margin-bottom: 2vh;
 }
 
 .aw-execution-errors {

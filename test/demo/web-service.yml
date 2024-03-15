@@ -1,0 +1,41 @@
+---
+
+- hosts: localhost
+  become: false
+  gather_facts: false
+  tasks:
+    - name: Listing files in directory
+      ansible.builtin.command: 'ls -l /play'
+      register: job1
+
+    - name: Show response
+      ansible.builtin.debug:
+        var: job1.stdout_lines
+
+    - name: Add config file
+      ansible.builtin.copy:
+        content: |
+          # ansible_managed
+          # this is some config..
+          key={{ job_value | default('no') }}
+        dest: '/tmp/awtest.txt'
+        mode: 0640
+
+    - name: Wait some time
+      ansible.builtin.pause:
+        seconds: 5
+
+    - name: Remove file
+      ansible.builtin.file:
+        path: '/tmp/awtest.txt'
+        state: absent
+
+    - name: "Showing randomness ({{ item }}/10)"
+      ansible.builtin.pause:
+        prompt: "{{ lookup('password', '/dev/null chars=ascii_letters,digit length=20') }}"
+        seconds: 1
+      loop: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+    - name: Output some information
+      ansible.builtin.debug:
+        msg: 'Ansible-WebUI DEMO'

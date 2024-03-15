@@ -4,11 +4,11 @@ from time import time
 from os import open as open_file
 from pathlib import Path
 from functools import lru_cache, wraps
-from pkg_resources import get_distribution
+from math import ceil
 
+from pkg_resources import get_distribution
 from crontab import CronTab
 from pytz import utc
-
 
 from aw.config.main import config
 from aw.config.hardcoded import SHORT_TIME_FORMAT
@@ -129,3 +129,20 @@ def get_choice_key_by_value(choices: list[tuple], find: any):
 
 def unset_or_null(data: dict, key: str) -> bool:
     return key not in data or is_null(data[key])
+
+
+def pretty_timedelta_str(sec: (int, float)) -> str:
+    sec = ceil(sec)
+    days, sec = divmod(sec, 86400)
+    hours, sec = divmod(sec, 3600)
+    minutes, sec = divmod(sec, 60)
+    if days > 0:
+        return f'{days}d {hours}h {minutes}m {sec}s'
+
+    if hours > 0:
+        return f'{hours}h {minutes}m {sec}s'
+
+    if minutes > 0:
+        return f'{minutes}m {sec}s'
+
+    return f'{sec}s'

@@ -1,6 +1,6 @@
 function updateApiTableDataKey(row, entry) {
     row.insertCell(0).innerText = entry.token;
-    actionsTemplate = document.getElementById("aw-api-data-tmpl-actions").innerHTML;
+    actionsTemplate = document.getElementById(ELEM_ID_TMPL_ACTIONS).innerHTML;
     row.insertCell(1).innerHTML = actionsTemplate.replaceAll('${TOKEN}', entry.token);
 }
 

@@ -1,8 +1,8 @@
 function updateApiTableDataRepository(row, entry) {
-    row.innerHTML = document.getElementById('aw-api-data-tmpl-row').innerHTML;
+    row.innerHTML = document.getElementById(ELEM_ID_TMPL_ROW).innerHTML;
     row.cells[0].innerText = entry.name;
     row.cells[1].innerText = entry.rtype_name;
-    let actionsTemplate = document.getElementById("aw-api-data-tmpl-actions").innerHTML;
+    let actionsTemplate = document.getElementById(ELEM_ID_TMPL_ACTIONS).innerHTML;
     actionsTemplate = actionsTemplate.replaceAll('${ID}', entry.id);
     row.cells[4].innerHTML = actionsTemplate.replaceAll('${RTYPE}', entry.rtype_name.toLowerCase());
 

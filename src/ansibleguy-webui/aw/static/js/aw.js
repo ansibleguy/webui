@@ -14,6 +14,9 @@ const KEY_TAB = 9;
 const SORT_BTN_CLASS_ON = ".aw-btn-sort-on";
 const SORT_BTN_CLASS_ASC = ".aw-btn-sort-asc";
 const SORT_BTN_CLASS_DESC = ".aw-btn-sort-desc";
+const ELEM_ID_TMPL_ROW = 'aw-api-data-tmpl-row';
+const ELEM_ID_TMPL_ACTIONS = 'aw-api-data-tmpl-actions';
+const ELEM_ID_TABLE = 'aw-api-data-table';
 
 // UTIL FUNCTIONS
 function getCookie(name) {
@@ -103,9 +106,13 @@ function toggleHidden(elementID) {
 }
 
 function shortExecutionStatus(execution) {
-    return execution.time_start + '<br>' + execution.user_name +
-           '<br><div class="aw-job-status aw-job-status-' + execution.status_name.toLowerCase() + '">' +
-           execution.status_name + '</div>';
+    let status = execution.time_start + '<br>' + execution.user_name + '<br><span class="aw-job-status aw-job-status-' + execution.status_name.toLowerCase() + '">' + execution.status_name + '</span>';
+
+    if (is_set(execution.time_duration)) {
+        status += (' after ' + execution.time_duration);
+    }
+
+    return status;
 }
 
 // source: https://stackoverflow.com/questions/7616461/generate-a-hash-from-string-in-javascript
@@ -158,7 +165,7 @@ function sortSwitchButtons(dataTable, sortByColumn, order) {
 function sortTable($sortButton, order = 'desc') {
     var dataTable, rows, switching, i, x, y, shouldSwitch;
     let sortByColumnIdx = $sortButton.closest("th").index();
-    dataTable = document.getElementById("aw-api-data-table");
+    dataTable = document.getElementById(ELEM_ID_TABLE);
     sortSwitchButtons(dataTable, sortByColumnIdx, order);
     switching = true;
 
@@ -291,7 +298,7 @@ function apiFsExists(inputElement) {
 function fetchApiTableDataPlaceholder(dataTable, placeholderId) {
     let tmpRow = dataTable.insertRow(1);
     tmpRow.setAttribute("aw-api-entry", placeholderId);
-    tmplRow = document.getElementById('aw-api-data-tmpl-row');
+    tmplRow = document.getElementById(ELEM_ID_TMPL_ROW);
     if (is_set(tmplRow)) {
         tmpRow.innerHTML = tmplRow.innerHTML;
     }
@@ -311,7 +318,7 @@ function fetchApiTableDataPlaceholder(dataTable, placeholderId) {
 function fetchApiTableData(apiEndpoint, updateFunction, secondRow = false, placeholderFunction = null, targetTable = null, dataSubKey = null, reverseData = false) {
     // NOTE: data needs to be list of dict and include an 'id' attribute
     if (targetTable == null) {
-        targetTable = "aw-api-data-table";
+        targetTable = ELEM_ID_TABLE;
     }
     let dataTable = document.getElementById(targetTable);
     let secondRowAppendix = '_2';
@@ -385,6 +392,7 @@ function fetchApiTableData(apiEndpoint, updateFunction, secondRow = false, place
             let existingRow = dataTable.rows[rowIdx];
             let existingRowId = existingRow.getAttribute("aw-api-entry");
             if (!is_set(existingRowId)) {
+                // ignore non-data rows (head & templates)
                 continue
             }
             if (existingRowId == placeholderId) {
@@ -396,7 +404,7 @@ function fetchApiTableData(apiEndpoint, updateFunction, secondRow = false, place
                 rowsToDelete.push(rowIdx);
             }
         }
-        for (rowIdx of rowsToDelete) {
+        for (rowIdx of rowsToDelete.reverse()) {
             console.log("Removing entry row", rowIdx);
             dataTable.deleteRow(rowIdx);
         }
@@ -435,7 +443,7 @@ $( document ).ready(function() {
         // move spoiler row below the parent-row in case the rows were shuffled by the sort
         let parentRowIdx = $(this).closest("tr").index();
         let spoilerRowIdx = $(document.getElementById(spoiler)).index();
-        let rows = document.getElementById("aw-api-data-table").rows;
+        let rows = document.getElementById(ELEM_ID_TABLE).rows;
         rows[parentRowIdx].parentNode.insertBefore(rows[spoilerRowIdx], rows[parentRowIdx + 1]);
 
         toggleHidden(spoiler);

@@ -1,5 +1,5 @@
 function updateApiTableDataPermission(row, entry) {
-    row.innerHTML = document.getElementById('aw-api-data-tmpl-row').innerHTML;
+    row.innerHTML = document.getElementById(ELEM_ID_TMPL_ROW).innerHTML;
     row.cells[0].innerText = entry.name;
     row.cells[1].innerText = entry.permission_name;
     if (entry.jobs_all) {
@@ -34,7 +34,7 @@ function updateApiTableDataPermission(row, entry) {
         row.cells[6].innerText = entry.groups_name.join(', ');
     }
 
-    actionsTemplate = document.getElementById("aw-api-data-tmpl-actions").innerHTML;
+    actionsTemplate = document.getElementById(ELEM_ID_TMPL_ACTIONS).innerHTML;
     row.cells[7].innerHTML = actionsTemplate.replaceAll('${ID}', entry.id);
 }
 

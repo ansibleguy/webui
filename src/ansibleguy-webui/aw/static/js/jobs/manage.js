@@ -1,6 +1,6 @@
 function updateApiTableDataJob(row, row2, entry) {
     // job
-    row.innerHTML = document.getElementById('aw-api-data-tmpl-row').innerHTML;
+    row.innerHTML = document.getElementById(ELEM_ID_TMPL_ROW).innerHTML;
     row.cells[0].innerText = entry.name;
     row.cells[1].innerText = entry.inventory_file;
     row.cells[2].innerText = entry.playbook_file;
@@ -35,7 +35,7 @@ function updateApiTableDataJob(row, row2, entry) {
         }
     }
 
-    let actionsTemplate = document.getElementById("aw-api-data-tmpl-actions").innerHTML;
+    let actionsTemplate = document.getElementById(ELEM_ID_TMPL_ACTIONS).innerHTML;
     actionsTemplate = actionsTemplate.replaceAll('${ID}', entry.id);
     if (lastExecution != null) {
         actionsTemplate = actionsTemplate.replaceAll('${EXEC_ID_1}', lastExecution.id);
@@ -43,7 +43,7 @@ function updateApiTableDataJob(row, row2, entry) {
     row.cells[7].innerHTML = actionsTemplate;
 
     // execution stati
-    row2.innerHTML = document.getElementById('aw-api-data-tmpl-row2').innerHTML;
+    row2.innerHTML = document.getElementById(ELEM_ID_TMPL_ROW).innerHTML;
     row2.setAttribute("id", "aw-spoiler-" + entry.id);
     row2.setAttribute("hidden", "hidden");
     row2.innerHTML = row2.innerHTML.replaceAll('${ID}', entry.id);
@@ -51,6 +51,7 @@ function updateApiTableDataJob(row, row2, entry) {
     for (exec of entry.executions) {
         execs += ('<hr><b>Start time</b>: ' + exec.time_start);
         execs += ('<br><b>Finish time</b>: ' + exec.time_fin);
+        execs += ('<br><b>Duration</b>: ' + exec.time_duration);
         execs += ('<br><b>Executed by</b>: ' + exec.user_name);
         execs += ('<br><b>Status</b>: <span class="aw-job-status aw-job-status-' + exec.status_name.toLowerCase() + '">' + exec.status_name + '</span>');
         if (is_set(exec.log_stdout) || is_set(exec.log_stderr) || is_set(exec.log_stdout_repo) || is_set(exec.log_stderr_repo)) {
