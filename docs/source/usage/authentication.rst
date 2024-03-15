@@ -69,9 +69,7 @@ Setup
           # KEY_FILE: '/etc/ansible-webui/saml.key'
           # CERT_FILE: '/etc/ansible-webui/saml.crt'
 
-2. Set the **AW_SAML_CONFIG** env-var containing the absolute path to your config-file (*readable by the user executing AW*)
-
-3. SSO identity provider settings:
+2. SSO identity provider settings:
 
   **ACS URL**: :code:`http://localhost:8000/a/saml/acs/`
 
@@ -80,7 +78,7 @@ Setup
   Note: Replace *http://localhost:8000* with your scheme, domain and port
 
 
-4. For non-Docker setups: Install the :code:`xmlsec` package that is used internally (see: `details <https://github.com/IdentityPython/pysaml2?tab=readme-ov-file#external-dependencies>`_)
+3. For non-Docker setups: Install the :code:`xmlsec` package that is used internally (see: `details <https://github.com/IdentityPython/pysaml2?tab=readme-ov-file#external-dependencies>`_)
 
 
 You should now be able to see :code:`[INFO] [main] Using Auth-Mode: saml` logged on startup.

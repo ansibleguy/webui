@@ -139,23 +139,24 @@ To get more information - you can enable its logging by adding this block to the
 
     ...
 
-    LOGGING:
-        version: 1
-        formatters:
-            simple:
-              format: '[%(asctime)s] [%(levelname)s] [%(name)s.%(funcName)s] %(message)s'
-        handlers:
-            stdout:
-                class: 'logging.StreamHandler'
-                stream: 'ext://sys.stdout'
+    SAML:
+        LOGGING:
+            version: 1
+            formatters:
+                simple:
+                  format: '[%(asctime)s] [%(levelname)s] [%(name)s.%(funcName)s] %(message)s'
+            handlers:
+                stdout:
+                    class: 'logging.StreamHandler'
+                    stream: 'ext://sys.stdout'
+                    level: 'DEBUG'
+                    formatter: 'simple'
+            loggers:
+                saml2:
+                    level: 'DEBUG'
+            root:
                 level: 'DEBUG'
-                formatter: 'simple'
-        loggers:
-            saml2:
-                level: 'DEBUG'
-        root:
-            level: 'DEBUG'
-            handlers: ['stdout']
+                handlers: ['stdout']
 
 
 Note: The SAML config-file is only reloaded on restart.
