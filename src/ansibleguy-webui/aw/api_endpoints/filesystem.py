@@ -65,7 +65,7 @@ class APIFsBrowse(APIView):
                     raise ObjectDoesNotExist
 
                 if repository.rtype_name == 'Static':
-                    browse_root = repository.static_path
+                    browse_root = Path(repository.static_path)
 
                 else:
                     if repository.git_isolate:
