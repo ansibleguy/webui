@@ -1,5 +1,5 @@
 from pathlib import Path
-from shutil import copy
+from shutil import copy, move
 from datetime import datetime
 from sys import exit as sys_exit
 from secrets import choice as random_choice
@@ -7,7 +7,7 @@ from string import digits, ascii_letters
 from os import listdir, remove
 from time import time
 from sqlite3 import connect as db_connect
-from sqlite3 import OperationalError
+from sqlite3 import OperationalError, DatabaseError
 
 from aw.config.main import VERSION
 from aw.settings import DB_FILE
@@ -39,16 +39,36 @@ def _check_if_writable():
         sys_exit(1)
 
 
-def _schema_up_to_date() -> bool:
-    if not Path(DB_FILE).is_file():
-        return False
-
+def _schema_up_to_date_base() -> bool:
     try:
         with db_connect(DB_FILE) as conn:
             return conn.execute('SELECT schema_version FROM aw_schemametadata').fetchall()[0][0] == VERSION
 
     except (IndexError, OperationalError):
         return False
+
+
+def _schema_up_to_date() -> bool:
+    if not Path(DB_FILE).is_file():
+        return False
+
+    try:
+        return _schema_up_to_date_base()
+
+    except DatabaseError as err:
+        # this may happen if WAL or SHM got corrupted (p.e. connection was not closed gracefully)
+        log_warn(msg=f"Trying to fix database error: '{err}'", _stderr=True)
+        backup_ext = f".{datetime.now().strftime(FILE_TIME_FORMAT)}{DB_BACKUP_EXT}"
+        db_shm = f'{DB_FILE}-shm'
+        db_wal = f'{DB_FILE}-wal'
+
+        if Path(db_shm).is_file():
+            move(db_shm, f'{db_shm}{backup_ext}')
+
+        if Path(db_wal).is_file():
+            move(db_wal, f'{db_wal}{backup_ext}')
+
+        return _schema_up_to_date_base()
 
 
 def _get_current_schema_version() -> (str, None):

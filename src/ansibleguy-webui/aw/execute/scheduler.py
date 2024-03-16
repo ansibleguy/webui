@@ -1,11 +1,7 @@
-import signal
-from os import environ
-from os import kill as os_kill
-from sys import exit as sys_exit
 from threading import Thread, ThreadError
 from time import sleep, time
+from typing import Callable
 
-from gunicorn.arbiter import Arbiter
 from django.core.validators import ValidationError
 from django.db.utils import OperationalError, IntegrityError
 
@@ -28,28 +24,11 @@ class Scheduler:
 
     def stop(self, signum=None, error: bool = False):
         if not self.stopping:
-            log('Stopping..', level=3)
-            self._signum_log(signum=signum)
+            log('Stopping scheduler..', level=3)
             self.stopping = True
-
-            log('Stopping job-threads', level=6)
+            log('Stopping job-threads..', level=6)
             self.thread_manager.stop()
-
             sleep(self.WAIT_TIME)
-            log('Finished!')
-
-            # else gunicorn will not know it should die
-            os_kill(int(environ['MAINPID']), signal.SIGTERM)
-
-            # just in case
-            if error or signum is not None:
-                sys_exit(1)
-
-            sys_exit(0)
-
-    @staticmethod
-    def _signum_log(signum):
-        log(f'Scheduler got signal {signum}')
 
     def _add_thread(self, job: Job, execution: JobExecution = None, once: bool = False):
         self.thread_manager.add_thread(job=job, execution=execution, once=once)
@@ -57,7 +36,7 @@ class Scheduler:
 
     def start(self):
         log('Starting..', level=3)
-        log('Starting job-threads', level=4)
+        log('Starting job-threads..', level=4)
         try:
             self.reload()
             self._run()
@@ -122,7 +101,6 @@ class Scheduler:
 
             if signum is not None:
                 log('Reloading..', level=3)
-                self._signum_log(signum=signum)
 
             self._reload_action(**self._reload_check())
             self.thread_manager.clean_stopped_threads()
@@ -198,28 +176,7 @@ class Scheduler:
         return result
 
 
-def init_scheduler():
+def init_scheduler(handle_signals: Callable):
     scheduler = Scheduler()
-    scheduler_thread = Thread(target=scheduler.start)
-
-    # override gunicorn signal handling to allow for graceful shutdown
-    Arbiter.SIGNALS.remove(signal.SIGHUP)
-    Arbiter.SIGNALS.remove(signal.SIGINT)
-    Arbiter.SIGNALS.remove(signal.SIGTERM)
-
-    def signal_exit(signum=None, stack=None):
-        del stack
-        scheduler.stop(signum)
-        os_kill(int(environ['MAINPID']), signal.SIGQUIT)  # trigger 'Arbiter.stop'
-        sleep(3)
-        sys_exit(1)
-
-    def signal_reload(signum=None, stack=None):
-        del stack
-        scheduler.reload(signum)
-
-    signal.signal(signal.SIGHUP, signal_reload)
-    signal.signal(signal.SIGINT, signal_exit)
-    signal.signal(signal.SIGTERM, signal_exit)
-
-    scheduler_thread.start()
+    handle_signals(scheduler)
+    Thread(target=scheduler.start).start()

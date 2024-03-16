@@ -94,6 +94,7 @@ def main():
     environ['AW_INIT'] = '0'
 
     from db import create_first_superuser, create_privileged_groups
+    from handle_signals import handle_signals
     from webserver import init_webserver
     from aw.execute.scheduler import init_scheduler
     from aw.settings import AUTH_MODE
@@ -102,5 +103,5 @@ def main():
 
     create_first_superuser()
     create_privileged_groups()
-    init_scheduler()
+    init_scheduler(handle_signals)
     init_webserver()

@@ -2,6 +2,12 @@
 
 ## Version 0
 
+### 0.0.19
+
+* Enhanced graceful stop
+
+----
+
 ### 0.0.18
 
 * Support for Config-File
