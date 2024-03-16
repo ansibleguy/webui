@@ -18,8 +18,8 @@ def handle_signals(scheduler):
     Arbiter.SIGNALS.remove(signal.SIGTERM)
 
     def signal_exit(signum=None, stack=None):
-        del stack
-        scheduler.stop(signum)
+        del signum, stack
+        scheduler.stop()
 
         log('Stopping webserver..')
         os_kill(int(environ['MAINPID']), signal.SIGQUIT)  # trigger 'Arbiter.stop'

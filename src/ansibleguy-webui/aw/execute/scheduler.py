@@ -22,7 +22,7 @@ class Scheduler:
         self.stopping = False
         self.reloading = False
 
-    def stop(self, signum=None, error: bool = False):
+    def stop(self):
         if not self.stopping:
             log('Stopping scheduler..', level=3)
             self.stopping = True
@@ -77,7 +77,7 @@ class Scheduler:
 
         except Exception as err:
             log(msg=f'Got unexpected error: {err}', level=1)
-            self.stop(error=True)
+            self.stop()
             return
 
     def status(self):
