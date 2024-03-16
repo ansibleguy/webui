@@ -29,8 +29,8 @@ NAVIGATION = {
             'login': False,
         },
         'DON': {
-            'element': '<i class="fas fa-coins fa-2x aw-nav-right-icon" title="Sponsor"></i>',
-            'url': 'https://github.com/sponsors/ansibleguy',
+            'element': '<i class="fas fa-coins fa-2x aw-nav-right-icon" title="Tip Me"></i>',
+            'url': 'https://ko-fi.com/ansible0guy',
             'login': False,
         },
         'BUG': {
