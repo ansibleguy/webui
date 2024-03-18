@@ -1,5 +1,7 @@
 # Basic WebUI for using Ansible
 
+<a href='https://ko-fi.com/ansible0guy' target='_blank'><img height='35' style='border:0px;height:46px;' src='https://az743702.vo.msecnd.net/cdn/kofi3.png?v=0' border='0' alt='Buy me a coffee' />
+
 [![Documentation](https://readthedocs.org/projects/ansible-webui/badge/?version=latest)](https://webui.ansibleguy.net/en/latest/?badge=latest)
 [![Lint](https://github.com/ansibleguy/webui/actions/workflows/lint.yml/badge.svg?branch=latest)](https://github.com/ansibleguy/webui/actions/workflows/lint.yml)
 [![Test](https://github.com/ansibleguy/webui/actions/workflows/test.yml/badge.svg?branch=latest)](https://github.com/ansibleguy/webui/actions/workflows/test.yml)
