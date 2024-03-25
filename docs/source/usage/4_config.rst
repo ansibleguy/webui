@@ -52,6 +52,9 @@ Config File
 
 You are able to provide the following settings by using a `YAML <https://www.redhat.com/en/topics/automation/what-is-yaml>`_ config-file.
 
+ **WARNING**: If possible - set your secrets as environmental variables. Users that are allowed to execute/modify jobs :ref:`are be able to read the content of the config-file <usage_security_issues>`
+
+
 * Provide it by flag: :code:`python3 -m ansibleguy-webui -c /etc/ansible-webui/config.yml`
 
 * Provide it by env-var: :code:`AW_CONFIG=/etc/ansible-webui/config.yml`
@@ -96,6 +99,8 @@ Some settings are only available as environmental variables.
    By default it will be re-generated at service restart.
    It **has to be set** for job-secrets like passwords to be loadable after restart.
    It has to be **at least 30 characters** long!
+
+   **WARNING**: If possible - set this secret as environmental variable. Users that are allowed to execute/modify jobs :ref:`are be able to read the content of the config-file <usage_security_issues>`
 
 
 * **AW_ADMIN**

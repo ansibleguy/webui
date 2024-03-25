@@ -15,6 +15,30 @@ That's why it is very important to keep security in our mind.
 
 You are very welcome to search for security vulnerabilities and `report them <https://github.com/ansibleguy/webui/issues>`_!
 
+----
+
+.. _usage_security_issues:
+
+Known Issues
+************
+
+* **Remote-Code-Execution on Controller**
+
+  As mentioned in `this issue <https://github.com/ansibleguy/webui/issues/33>`_ the Ansible-Execution is done in the same context as the Web-Service.
+
+  So you should be aware that every user that can supply the Web-Service with playbooks, or execute ad-hoc commands, is able to execute code in the context of the service-user.
+
+  This **includes reading the config-file**!
+
+  So if possible - you should set your **AW_SECRET** (*and other secrets*) as environmental variable!
+
+  **Possible future fixes**:
+
+  * Run Ansible-Runner with `process-isolation (execution in container) <https://ansible.readthedocs.io/projects/runner/en/stable/standalone/#running-with-process-isolation>`_ enabled (*not yet implemented in AW*)
+
+  * Run Ansible-Runner as `dedicated user <https://github.com/ansible/ansible-runner/issues/1350>`_ (*not yet implemented in Ansible-Runner and AW*)
+
+----
 
 Features
 ********
