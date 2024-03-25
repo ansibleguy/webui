@@ -10,6 +10,7 @@ from aw.model.job_credential import BaseJobCredentials, JobUserCredentials, JobG
 from aw.model.permission import CHOICE_PERMISSION_READ, CHOICE_PERMISSION_WRITE, CHOICE_PERMISSION_DELETE
 from aw.api_endpoints.base import API_PERMISSION, get_api_user, GenericResponse, BaseResponse
 from aw.utils.permission import has_credentials_permission, has_manager_privileges
+from aw.config.hardcoded import SECRET_HIDDEN
 from aw.utils.util import is_null
 from aw.base import USERS
 
@@ -186,7 +187,7 @@ class APIJobCredentials(APIView):
         for field in BaseJobCredentials.SECRET_ATTRS:
             value = serializer.validated_data[field]
             if field in BaseJobCredentials.SECRET_ATTRS:
-                if is_null(value) or value == BaseJobCredentials.SECRET_HIDDEN:
+                if is_null(value) or value == SECRET_HIDDEN:
                     serializer.validated_data[field] = None
 
                 elif field == 'ssh_key':
@@ -376,9 +377,9 @@ class APIJobCredentialsItem(APIView):
 
         try:
             # not working with password properties: 'Job.objects.filter(id=job_id).update(**serializer.data)'
-            for field, value in serializer.data.items():
+            for field, value in serializer.validated_data.items():
                 if field in BaseJobCredentials.SECRET_ATTRS:
-                    if is_null(value) or value == BaseJobCredentials.SECRET_HIDDEN:
+                    if is_null(value) or value == SECRET_HIDDEN:
                         value = getattr(credentials, field)
 
                     elif field == 'ssh_key':

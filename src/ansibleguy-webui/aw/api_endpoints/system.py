@@ -7,9 +7,10 @@ from django.db.utils import IntegrityError
 from aw.config.main import config
 from aw.model.system import SystemConfig, get_config_from_db
 from aw.api_endpoints.base import API_PERMISSION, get_api_user, GenericResponse, BaseResponse
-from aw.utils.util_no_config import is_set
+from aw.utils.util_no_config import is_set, is_null
 from aw.utils.debug import log
 from aw.utils.permission import has_manager_privileges
+from aw.config.hardcoded import SECRET_HIDDEN
 
 
 class SystemConfigReadResponse(BaseResponse):
@@ -34,12 +35,17 @@ class SystemConfigReadResponse(BaseResponse):
     logo_url = serializers.CharField()
     ara_server = serializers.CharField()
     global_environment_vars = serializers.CharField()
+    mail_server = serializers.CharField()
+    mail_transport = serializers.IntegerField()
+    mail_user = serializers.CharField()
 
 
 class SystemConfigWriteRequest(serializers.ModelSerializer):
     class Meta:
         model = SystemConfig
         fields = SystemConfig.api_fields_write
+
+    mail_pass = serializers.CharField(max_length=100, required=False, default=None, allow_blank=True)
 
 
 class APISystemConfig(APIView):
@@ -95,12 +101,16 @@ class APISystemConfig(APIView):
         try:
             changed = False
             for setting, value in serializer.validated_data.items():
+                if setting in SystemConfig.SECRET_ATTRS:
+                    if is_null(value) or value == SECRET_HIDDEN:
+                        value = getattr(config_db, setting)
+
                 if is_set(value) and str(config[setting]) != str(value):
                     setattr(config_db, setting, value)
                     changed = True
 
             if changed:
-                log(msg='System config change - updating', level=5)
+                log(msg='System config changed - updating', level=5)
                 config_db.save()
 
             return Response(data={'msg': "System config updated"}, status=200)

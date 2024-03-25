@@ -272,7 +272,7 @@ class APIPermission(GenericAPIView):
                 status=400,
             )
 
-        return Response({'msg': f"Permission '{serializer.data['name']}' created successfully"})
+        return Response({'msg': f"Permission '{serializer.validated_data['name']}' created successfully"})
 
 
 class APIPermissionItem(GenericAPIView):

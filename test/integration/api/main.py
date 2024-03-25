@@ -138,7 +138,7 @@ def test_modify():
             'repository': 2,
         }},
 
-        # perms
+        # perms; todo: fix
         {'l': 'permission/1', 'd': {'name': 'perm1'}},
     ])
 

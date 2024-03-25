@@ -85,6 +85,10 @@ FORM_LABEL = {
             'port': 'Listen Port',
             'ssl_file_crt': 'SSL Certificate',
             'ssl_file_key': 'SSL Private-Key',
+            'mail_server': 'Mail Server',
+            'mail_transport': 'Mail Transport',
+            'mail_user': 'Mail Login Username',
+            'mail_pass': 'Mail Login Password',
         }
     }
 }
@@ -197,6 +201,7 @@ FORM_HELP = {
                           'Documentation - Integrations</a>',
             'global_environment_vars': 'Set environmental variables that will be added to every job execution. '
                                        'Comma-separated list of key-value pairs. (VAR1=TEST1,VAR2=0)',
+            'mail_server': 'Mail Server to use for Alert Mails',
         }
     }
 }

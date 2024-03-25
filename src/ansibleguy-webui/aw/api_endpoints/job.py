@@ -270,7 +270,7 @@ class APIJobItem(APIView):
                     )
 
                 try:
-                    Job.objects.filter(id=job.id).update(**serializer.data)
+                    Job.objects.filter(id=job.id).update(**serializer.validated_data)
 
                 except IntegrityError as err:
                     return Response(

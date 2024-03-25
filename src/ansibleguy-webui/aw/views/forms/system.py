@@ -37,6 +37,9 @@ class SystemConfigForm(forms.ModelForm):
         label=FORM_LABEL['system']['config']['timezone'],
     )
     debug = forms.BooleanField(initial=CONFIG_DEFAULTS['debug'] or deployment_dev())
+    mail_pass = forms.CharField(
+        max_length=100, required=False, label=Meta.labels['mail_pass'],
+    )
 
 
 @login_required

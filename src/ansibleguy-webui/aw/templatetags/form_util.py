@@ -5,10 +5,15 @@ from django.forms.widgets import Select
 from django.core.validators import RegexValidator
 
 from aw.model.job_credential import BaseJobCredentials
+from aw.model.system import SystemConfig
 from aw.utils.util import is_set
 from aw.views.validation import AW_VALIDATIONS
+from aw.config.hardcoded import SECRET_HIDDEN
 
 register = template.Library()
+
+FORM_SECRET_FIELDS = BaseJobCredentials.SECRET_ATTRS.copy()
+FORM_SECRET_FIELDS.extend(SystemConfig.SECRET_ATTRS)
 
 
 @register.filter
@@ -47,10 +52,10 @@ def get_form_required(bf: BoundField) -> str:
 
 def get_form_field_value(bf: BoundField, existing: dict) -> (str, None):
     # SECRET_ATTRS are not exposed here
-    if bf.name not in existing and bf.name not in BaseJobCredentials.SECRET_ATTRS:
+    if bf.name not in existing and bf.name not in FORM_SECRET_FIELDS:
         return None
 
-    if bf.name in BaseJobCredentials.SECRET_ATTRS:
+    if bf.name in FORM_SECRET_FIELDS:
         enc_field = '_enc_' + bf.name
         if enc_field in existing and not is_set(existing[enc_field]):
             return None
@@ -59,7 +64,7 @@ def get_form_field_value(bf: BoundField, existing: dict) -> (str, None):
             value = None
 
         else:
-            value = BaseJobCredentials.SECRET_HIDDEN
+            value = SECRET_HIDDEN
 
     else:
         if existing[bf.name] is None:

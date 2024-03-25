@@ -124,7 +124,7 @@ class APIRepository(GenericAPIView):
         except IntegrityError as err:
             return Response(data={'msg': f"Provided repository data is not valid: '{err}'"}, status=400)
 
-        return Response({'msg': f"Repository '{serializer.data['name']}' created successfully"})
+        return Response({'msg': f"Repository '{serializer.validated_data['name']}' created successfully"})
 
 
 class APIRepositoryItem(GenericAPIView):
@@ -204,7 +204,7 @@ class APIRepositoryItem(GenericAPIView):
             )
 
         try:
-            Repository.objects.filter(id=repo_id).update(**serializer.data)
+            Repository.objects.filter(id=repo_id).update(**serializer.validated_data)
             return Response(data={'msg': f"Repository '{repository.name}' updated"}, status=200)
 
         except IntegrityError as err:
