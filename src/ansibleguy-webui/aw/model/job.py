@@ -13,6 +13,7 @@ from aw.base import USERS
 from aw.model.repository import Repository
 from aw.utils.util import get_choice_key_by_value, get_choice_value_by_key, datetime_from_db_str, is_null, \
     datetime_from_db, pretty_timedelta_str
+from aw.model.job_form import JobExecutionForm
 
 
 class JobError(BareModel):
@@ -79,7 +80,7 @@ class Job(BaseJob):
     CHANGE_FIELDS = [
         'name', 'playbook_file', 'inventory_file', 'repository', 'schedule', 'enabled', 'limit', 'verbosity',
         'mode_diff', 'mode_check', 'tags', 'tags_skip', 'verbosity', 'comment', 'environment_vars', 'cmd_args',
-        'credentials_default', 'credentials_needed',
+        'credentials_default', 'credentials_needed', 'form',
     ]
     form_fields_primary = ['name', 'playbook_file', 'inventory_file', 'repository']
     form_fields = CHANGE_FIELDS
@@ -101,6 +102,7 @@ class Job(BaseJob):
         JobGlobalCredentials, on_delete=models.SET_NULL, related_name='job_fk_creddflt', null=True, blank=True,
     )
     repository = models.ForeignKey(Repository, on_delete=models.SET_NULL, related_name='job_fk_repo', **DEFAULT_NONE)
+    form = models.ForeignKey(JobExecutionForm, on_delete=models.SET_NULL, related_name='job_fk_form', **DEFAULT_NONE)
 
     def __str__(self) -> str:
         limit = '' if self.limit is None else f' [{self.limit}]'
@@ -200,9 +202,6 @@ class JobExecution(BaseJob):
         **DEFAULT_NONE,  # execution is created before result is available
     )
     status = models.PositiveSmallIntegerField(default=0, choices=CHOICES_JOB_EXEC_STATUS)
-    user_credentials = models.ForeignKey(
-        Job, on_delete=models.SET_NULL, related_name='jobexec_fk_usercreds', **DEFAULT_NONE,
-    )
     log_stdout = models.CharField(max_length=300, **DEFAULT_NONE)
     log_stderr = models.CharField(max_length=300, **DEFAULT_NONE)
     log_stdout_repo = models.CharField(max_length=300, **DEFAULT_NONE)

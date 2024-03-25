@@ -8,11 +8,11 @@ FORM_LABEL = {
             'mode_diff': 'Diff Mode',
             'mode_check': 'Check Mode (Try Run)',
             'cmd_args': 'Commandline Arguments',
-            'user_credentials': 'User Credentials',
             'enabled': 'Schedule Enabled',
             'tags_skip': 'Skip Tags',
             'credentials_needed': 'Needs Credentials',
             'credentials_default': 'Default Job Credentials',
+            'form': 'Execution Form',
         },
         'credentials': {
             'connect_user': 'Connect User',
@@ -38,6 +38,18 @@ FORM_LABEL = {
             'git_hook_post': 'Git Post-Hook',
             'git_override_initialize': 'Git Override Initialize-Command',
             'git_override_update': 'Git Override Update-Command',
+        },
+        'execution_form_field': {
+            'help': 'Help Text',
+            'var': 'Variable',
+            'var_type': 'Variable Type',
+            'field_type': 'Field Type',
+            'multiple': 'Multiple Choices',
+            'separator': 'Multiple-Choice Separator',
+            'validate_error': 'Validation Error-Message',
+            'validate_regex': 'Validation Regex',
+            'validate_max': 'Maximum Value',
+            'validate_min': 'Minimum Value',
         },
     },
     'settings': {
@@ -109,6 +121,7 @@ FORM_HELP = {
                                   'fallback are the user-credentials of the executing user)',
             'credentials_default': 'Specify job-level default credentials to use',
             'enabled': 'En- or disable the schedule. Can be ignored if no schedule was set',
+            'form': 'Select a Job-Execution form to display on ad-hoc executions',
         },
         'credentials': {
             'vault_file': 'Path to the file containing your vault-password',
@@ -138,6 +151,18 @@ FORM_HELP = {
                                        '(clone) the repository',
             'git_override_update': 'Advanced usage! Completely override the command used to update '
                                    '(pull) the repository',
+        },
+        'execution_form_field': {
+            'var_type': '<b>WARNING</b>: Choose env-var for secret values! Commandline arguments are viewable and '
+                        'will be logged',
+            'multiple': 'If multiple the form should support multiple user-choices',
+            'separator': 'If multiple choices are used - they will be joined on serialization before they get passed '
+                         'to the Ansible Execution. This separator will be used on that join operation',
+            'validate_error': 'Error-Message to display on validation error',
+            'validate_regex': 'Regex to validate the value. Test it here: '
+                              '<a href="https://regex101.com/">regex101.com</a>. (flavor needs to be JavaScript)',
+            'validate_max': 'Field-type integer: maximum integer; Field-type string: maximum length',
+            'validate_min': 'Field-type integer: minimum integer; Field-type string: minimum length',
         },
     },
     'settings': {

@@ -316,3 +316,16 @@ Database Migration Issues
 
         # you should then be able to apply the un-applied migrations
         python3 -m ansibleguy-webui.manage migrate aw 0002_v0_0_13
+
+----
+
+Database Startup Issue
+======================
+
+**Error**: While starting AW - you see the error :code:`sqlite3.DatabaseError: database disk image is malformed`
+
+**Problem**:
+
+* The service may have been force-terminated without being able to close the database connection gracefully.
+
+  You can try to re-/move the :code:`aw.db-shm` and :code:`aw.db-wal` files that can be found in the same directory as your database-file.

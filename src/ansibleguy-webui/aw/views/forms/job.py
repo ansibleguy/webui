@@ -15,7 +15,7 @@ from aw.api_endpoints.credentials import are_global_credentials
 from aw.utils.permission import has_job_permission, has_credentials_permission
 from aw.utils.util import get_choice_key_by_value
 from aw.config.form_metadata import FORM_LABEL, FORM_HELP
-from aw.views.base import choices_global_credentials, choices_repositories
+from aw.views.base import choices_global_credentials, choices_repositories, choices_forms
 
 
 class JobForm(forms.ModelForm):
@@ -30,14 +30,24 @@ class JobForm(forms.ModelForm):
         required=False,
         widget=forms.Select,
         choices=choices_global_credentials,
-        label=FORM_LABEL['jobs']['manage']['credentials_default'],
+        label=Meta.labels['credentials_default'],
+        help_text=Meta.help_texts['credentials_default'],
     )
 
     repository = forms.ChoiceField(
         required=False,
         widget=forms.Select,
         choices=choices_repositories,
-        label=FORM_LABEL['jobs']['manage']['repository'],
+        label=Meta.labels['repository'],
+        help_text=Meta.help_texts['repository'],
+    )
+
+    form = forms.ChoiceField(
+        required=False,
+        widget=forms.Select,
+        choices=choices_forms,
+        label=Meta.labels['form'],
+        help_text=Meta.help_texts['form'],
     )
 
     # form not picking up regex-validator
@@ -109,16 +119,16 @@ class CredentialGlobalForm(forms.ModelForm):
         help_texts = FORM_HELP['jobs']['credentials']
 
     vault_pass = forms.CharField(
-        max_length=100, required=False, label=FORM_LABEL['jobs']['credentials']['vault_pass'],
+        max_length=100, required=False, label=Meta.labels['vault_pass'],
     )
     become_pass = forms.CharField(
-        max_length=100, required=False, label=FORM_LABEL['jobs']['credentials']['become_pass'],
+        max_length=100, required=False, label=Meta.labels['become_pass'],
     )
     connect_pass = forms.CharField(
-        max_length=100, required=False, label=FORM_LABEL['jobs']['credentials']['connect_pass'],
+        max_length=100, required=False, label=Meta.labels['connect_pass'],
     )
     ssh_key = forms.CharField(
-        max_length=2000, required=False, label=FORM_LABEL['jobs']['credentials']['ssh_key'],
+        max_length=2000, required=False, label=Meta.labels['ssh_key'],
     )
 
 
@@ -192,7 +202,7 @@ class RepositoryGitForm(forms.ModelForm):
         required=False,
         widget=forms.Select,
         choices=choices_global_credentials,
-        label=FORM_LABEL['jobs']['repository']['git_credentials'],
+        label=Meta.labels['git_credentials'],
     )
 
 

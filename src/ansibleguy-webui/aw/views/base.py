@@ -2,6 +2,7 @@ from aw.model.job import Job
 from aw.model.job_credential import JobGlobalCredentials
 from aw.base import USERS, GROUPS
 from aw.model.repository import Repository
+from aw.model.job_form import JobExecutionForm
 
 
 def choices_job() -> list[tuple]:
@@ -17,6 +18,10 @@ def choices_global_credentials() -> list[tuple]:
 def choices_repositories() -> list[tuple]:
     # todo: only show credentials the user is privileged to view => get_viewable_credentials(user)
     return [(repo.id, repo.name) for repo in Repository.objects.all()]
+
+
+def choices_forms() -> list[tuple]:
+    return [(form.id, form.name) for form in JobExecutionForm.objects.all()]
 
 
 def choices_user() -> list[tuple]:
