@@ -94,7 +94,11 @@ See also: [Contributing](https://github.com/ansibleguy/webui/blob/latest/CONTRIB
 
     - [x] Manual/immediate execution
 
+    - [ ] Custom Execution-Forms
+
     - [ ] Support for [ad-hoc commands](https://docs.ansible.com/ansible/latest/command_guide/intro_adhoc.html)
+
+    - [ ] Support for [Process-Isolation](https://ansible.readthedocs.io/projects/runner/en/stable/standalone/#running-with-process-isolation)
 
   - [x] Job Logging
 
@@ -107,6 +111,10 @@ See also: [Contributing](https://github.com/ansibleguy/webui/blob/latest/CONTRIB
     - [x] User-specific job credentials
 
   - [ ] Alerting on Failure
+
+    - [ ] E-Mail
+
+    - [ ] Support for external Plugins (*simple Interface for Scripts*)
 
 - [ ] WebUI
 
