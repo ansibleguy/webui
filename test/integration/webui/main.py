@@ -57,7 +57,7 @@ def test_main_pages():
         'ui/jobs/manage', 'ui/jobs/log', 'ui/jobs/credentials', 'ui/jobs/repository',
         'ui/settings/api_keys', 'ui/settings/permissions',
         'ui/system/admin/', 'ui/system/api_docs', 'ui/system/environment', 'ui/system/config',
-        'a/password_change/',
+        'a/password_change/', 'ui/settings/alerts',
     ])
 
 
@@ -65,7 +65,9 @@ def test_actions_views():
     test_get_locations([
         'ui/jobs/manage/job',
         'ui/jobs/credentials/0?global=false', 'ui/jobs/credentials/0?global=true',
-        'ui/settings/permissions/0', 'ui/jobs/repository/git/0', 'ui/jobs/repository/static/0'
+        'ui/settings/permissions/0', 'ui/jobs/repository/git/0', 'ui/jobs/repository/static/0',
+        'ui/settings/alerts/global/0', 'ui/settings/alerts/group/0', 'ui/settings/alerts/user/0',
+        'ui/settings/alerts/plugin/0',
     ])
 
 

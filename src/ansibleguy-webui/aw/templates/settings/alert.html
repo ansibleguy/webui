@@ -1,0 +1,144 @@
+{% extends "../body.html" %}
+{% load util %}
+{% load static %}
+{% block content %}
+<script src="{% static 'js/settings/alert.js' %}"></script>
+<div class="table-responsive aw-data">
+    <h2>User Alerts</h2>
+    <p>Your personal Alerting Rules</p>
+    <table class="table table-striped aw-text-responsive" id="aw-api-data1-table">
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Condition</th>
+            <th>Actions</th>
+        </tr>
+        <tr>
+            <td colspan="100%">
+                <a href="/ui/settings/alerts/user/0">
+                    <button class="btn btn-success aw-btn-action" title="Add User-Alert">
+                        {% include "../button/icon/add.html" %}
+                    </button>
+                </a>
+            </td>
+        </tr>
+        <tr id="aw-api-data-tmpl-row" hidden="hidden">
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+    </table>
+    <div id="aw-api-data1-tmpl-actions" hidden="hidden">
+        <a href="/ui/settings/alerts/user/${ID}">
+            <button class="btn btn-warning aw-btn-action" title="Edit">
+                {% include "../button/icon/edit.html" %}
+            </button>
+        </a>
+        <button class="btn btn-danger aw-btn-action aw-api-click" title="Delete" aw-api-endpoint="alert/user" aw-api-item="${ID}" aw-api-method="delete">
+            {% include "../button/icon/delete.html" %}
+        </button>
+    </div>
+    <br>
+
+    <h2>Group Alerts</h2>
+    <p>Alert all members of a specific group</p>
+    <table class="table table-striped aw-text-responsive" id="aw-api-data2-table">
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Condition</th>
+            <th>Actions</th>
+        </tr>
+        <tr>
+            <td colspan="100%">
+                {% include "../button/refresh.html" %}
+                <a href="/ui/settings/alerts/group/0">
+                    <button class="btn btn-success aw-btn-action" title="Add Group Alert">
+                        {% include "../button/icon/add.html" %}
+                    </button>
+                </a>
+            </td>
+        </tr>
+    </table>
+    <div id="aw-api-data2-tmpl-actions" hidden="hidden">
+        <a href="/ui/settings/alerts/group/${ID}">
+            <button class="btn btn-warning aw-btn-action" title="Edit">
+                {% include "../button/icon/edit.html" %}
+            </button>
+        </a>
+        <button class="btn btn-danger aw-btn-action aw-api-click" title="Delete" aw-api-endpoint="alert/group" aw-api-item="${ID}" aw-api-method="delete">
+            {% include "../button/icon/delete.html" %}
+        </button>
+    </div>
+    <br>
+
+
+    <h2>Global Alerts</h2>
+    <p>Alert all existing users</p>
+    <table class="table table-striped aw-text-responsive" id="aw-api-data3-table">
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Condition</th>
+            <th>Actions</th>
+        </tr>
+        <tr>
+            <td colspan="100%">
+                {% include "../button/refresh.html" %}
+                <a href="/ui/settings/alerts/global/0">
+                    <button class="btn btn-success aw-btn-action" title="Add Global Alert">
+                        {% include "../button/icon/add.html" %}
+                    </button>
+                </a>
+            </td>
+        </tr>
+    </table>
+    <div id="aw-api-data3-tmpl-actions" hidden="hidden">
+        <a href="/ui/settings/alerts/global/${ID}">
+            <button class="btn btn-warning aw-btn-action" title="Edit">
+                {% include "../button/icon/edit.html" %}
+            </button>
+        </a>
+        <button class="btn btn-danger aw-btn-action aw-api-click" title="Delete" aw-api-endpoint="alert/global" aw-api-item="${ID}" aw-api-method="delete">
+            {% include "../button/icon/delete.html" %}
+        </button>
+    </div>
+    <br>
+
+
+    <h2>Alert Plugins</h2>
+    <table class="table table-striped aw-text-responsive" id="aw-api-data4-table">
+        <tr>
+            <th>Name</th>
+            <th>Executable</th>
+            <th>Actions</th>
+        </tr>
+        <tr>
+            <td colspan="100%">
+                {% include "../button/refresh.html" %}
+                <a href="/ui/settings/alerts/plugin/0">
+                    <button class="btn btn-success aw-btn-action" title="Add Alert-Plugin">
+                        {% include "../button/icon/add.html" %}
+                    </button>
+                </a>
+            </td>
+        </tr>
+        <tr id="aw-api-data-tmpl-row2" hidden="hidden">
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+    </table>
+    <div id="aw-api-data4-tmpl-actions" hidden="hidden">
+        <a href="/ui/settings/alerts/plugin/${ID}">
+            <button class="btn btn-warning aw-btn-action" title="Edit">
+                {% include "../button/icon/edit.html" %}
+            </button>
+        </a>
+        <button class="btn btn-danger aw-btn-action aw-api-click" title="Delete" aw-api-endpoint="alert/plugin" aw-api-item="${ID}" aw-api-method="delete">
+            {% include "../button/icon/delete.html" %}
+        </button>
+    </div>
+</div>
+{% endblock %}

@@ -12,7 +12,7 @@ NAVIGATION = {
         'Settings': {
             'API Keys': '/ui/settings/api_keys',
             'Permissions': '/ui/settings/permissions',
-            # 'Ansible': '/ui/settings/ansible',
+            'Alerts': '/ui/settings/alerts',
         },
         'System': {
             'Admin': '/ui/system/admin/',

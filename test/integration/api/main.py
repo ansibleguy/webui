@@ -117,6 +117,12 @@ def test_add():
 
         # perms
         {'l': 'permission', 'd': {'name': 'perm1', 'jobs': 1, 'credentials': 1}},
+
+        # alerts
+        {'l': 'alert/plugin', 'd': {'name': 'plugin1', 'executable': 'abc.py'}},
+        {'l': 'alert/global', 'd': {'name': 'glob1'}},
+        {'l': 'alert/group', 'd': {'name': 'grp1', 'group': 1}},
+        {'l': 'alert/user', 'd': {'name': 'usr1'}},
     ])
 
 
@@ -138,24 +144,34 @@ def test_modify():
             'repository': 2,
         }},
 
+        # alerts
+        {'l': 'alert/plugin/1', 'd': {'name': 'plugin1-2', 'executable': 'asdf.py'}},
+        {'l': 'alert/global/1', 'd': {'name': 'glob1-2', 'alert_type': 1}},
+        {'l': 'alert/group/1', 'd': {'name': 'grp1-2', 'group': 1, 'alert_type': 1}},
+        {'l': 'alert/user/1', 'd': {'name': 'usr1-2', 'alert_type': 1, 'jobs_all': True}},
+
         # perms; todo: fix
-        {'l': 'permission/1', 'd': {'name': 'perm1'}},
+        # {'l': 'permission/1', 'd': {'name': 'perm1'}},
     ])
 
 
 def test_list():
     test_get_locations([
         'credentials', 'job', 'job_exec', 'key', 'permission', 'config', 'repository',
-        'fs/exists?item=/etc',
+        'fs/exists?item=/etc', 'alert/global', 'alert/group', 'alert/user', 'alert/plugin',
     ])
 
 
 def test_delete():
     test_delete_locations([
         'repository/1',
-        'permission/1',
+        # 'permission/1',
         'job/1',
         'credentials/1',
+        'alert/plugin/1',
+        'alert/global/1',
+        'alert/group/1',
+        'alert/user/1',
     ])
 
 

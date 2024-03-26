@@ -9,7 +9,8 @@ from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiParameter
 
 from aw.model.repository import Repository
-from aw.api_endpoints.base import API_PERMISSION, GenericResponse, get_api_user, LogDownloadResponse
+from aw.api_endpoints.base import API_PERMISSION, GenericResponse, get_api_user, LogDownloadResponse, api_docs_put, \
+    api_docs_delete, api_docs_post
 from aw.utils.permission import has_manager_privileges, has_repository_permission, get_viewable_repositories
 from aw.model.job import Job
 from aw.utils.util import unset_or_null, is_set
@@ -96,11 +97,7 @@ class APIRepository(GenericAPIView):
 
     @extend_schema(
         request=RepositoryWriteRequest,
-        responses={
-            200: OpenApiResponse(response=GenericResponse, description='Repository created'),
-            400: OpenApiResponse(response=GenericResponse, description='Invalid repository data provided'),
-            403: OpenApiResponse(response=GenericResponse, description='Not privileged to create a repository'),
-        },
+        responses=api_docs_post('Repository'),
         summary='Create a new Repository.',
         operation_id='repository_create',
     )
@@ -164,12 +161,7 @@ class APIRepositoryItem(GenericAPIView):
 
     @extend_schema(
         request=RepositoryWriteRequest,
-        responses={
-            200: OpenApiResponse(response=GenericResponse, description='Repository updated'),
-            400: OpenApiResponse(response=GenericResponse, description='Invalid repository data provided'),
-            403: OpenApiResponse(response=GenericResponse, description='Not privileged to edit the repository'),
-            404: OpenApiResponse(response=GenericResponse, description='Repository does not exist'),
-        },
+        responses=api_docs_put('Repository'),
         summary='Modify a repository.',
         operation_id='repository_edit',
     )
@@ -212,12 +204,7 @@ class APIRepositoryItem(GenericAPIView):
 
     @extend_schema(
         request=None,
-        responses={
-            200: OpenApiResponse(response=GenericResponse, description='Repository deleted'),
-            400: OpenApiResponse(response=GenericResponse, description='Invalid repository data provided'),
-            403: OpenApiResponse(response=GenericResponse, description='Not privileged to delete the repository'),
-            404: OpenApiResponse(response=GenericResponse, description='Repository does not exist'),
-        },
+        responses=api_docs_delete('Repository'),
         summary='Delete a repository.',
         operation_id='repository_delete'
     )

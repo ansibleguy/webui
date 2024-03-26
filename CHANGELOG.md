@@ -5,6 +5,7 @@
 ### 0.0.19
 
 * Enhanced graceful stop
+* Alerting
 
 ----
 

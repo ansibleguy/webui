@@ -1,5 +1,5 @@
 <form class="aw-api-form" method="{{ form_method }}" action="/api/{{ form_api }}">
     {% csrf_token %}
-    <input type="hidden" id="user" name="user" value="{{ request.user.id }}">
+    <input type="hidden" name="user" value="{{ request.user.id }}">
     {{ form }}
 </form>

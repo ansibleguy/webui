@@ -8,7 +8,8 @@ from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiParamet
 from aw.model.job import Job, JobExecution
 from aw.model.job_credential import BaseJobCredentials, JobUserCredentials, JobGlobalCredentials
 from aw.model.permission import CHOICE_PERMISSION_READ, CHOICE_PERMISSION_WRITE, CHOICE_PERMISSION_DELETE
-from aw.api_endpoints.base import API_PERMISSION, get_api_user, GenericResponse, BaseResponse
+from aw.api_endpoints.base import API_PERMISSION, get_api_user, GenericResponse, BaseResponse, api_docs_delete, \
+    api_docs_put, api_docs_post
 from aw.utils.permission import has_credentials_permission, has_manager_privileges
 from aw.config.hardcoded import SECRET_HIDDEN
 from aw.utils.util import is_null
@@ -139,9 +140,9 @@ class APIJobCredentials(APIView):
         credentials_global_raw = JobGlobalCredentials.objects.all()
         for credentials in credentials_global_raw:
             if has_credentials_permission(
-                    user=user,
-                    credentials=credentials,
-                    permission_needed=CHOICE_PERMISSION_READ,
+                user=user,
+                credentials=credentials,
+                permission_needed=CHOICE_PERMISSION_READ,
             ):
                 credentials_global.append(JobGlobalCredentialsReadResponse(instance=credentials).data)
 
@@ -154,11 +155,7 @@ class APIJobCredentials(APIView):
 
     @extend_schema(
         request=JobGlobalCredentialsWriteRequest,
-        responses={
-            200: OpenApiResponse(GenericResponse, description='Credentials created'),
-            400: OpenApiResponse(GenericResponse, description='Invalid credentials data provided'),
-            403: OpenApiResponse(GenericResponse, description='Not privileged to create global credentials'),
-        },
+        responses=api_docs_post('Credentials'),
         summary='Create credentials.',
         operation_id='credentials_create',
         parameters=parameters,
@@ -258,9 +255,9 @@ class APIJobCredentialsItem(APIView):
             return Response(data={'msg': base_msg}, status=404)
 
         if are_global and not has_credentials_permission(
-                user=user,
-                credentials=credentials,
-                permission_needed=CHOICE_PERMISSION_READ,
+            user=user,
+            credentials=credentials,
+            permission_needed=CHOICE_PERMISSION_READ,
         ):
             return Response(
                 data={'msg': f"{_log_global_user(are_global)} '{credentials.name}' are not viewable"},
@@ -271,11 +268,7 @@ class APIJobCredentialsItem(APIView):
 
     @extend_schema(
         request=None,
-        responses={
-            200: OpenApiResponse(GenericResponse, description='Credentials deleted'),
-            403: OpenApiResponse(GenericResponse, description='Not privileged to delete the credentials'),
-            404: OpenApiResponse(GenericResponse, description='Credentials do not exist'),
-        },
+        responses=api_docs_delete('Credentials'),
         summary='Delete credentials.',
         operation_id='credentials_delete',
         parameters=parameters,
@@ -303,9 +296,9 @@ class APIJobCredentialsItem(APIView):
             return Response(data={'msg': base_msg}, status=404)
 
         if are_global and not has_credentials_permission(
-                user=user,
-                credentials=credentials,
-                permission_needed=CHOICE_PERMISSION_DELETE,
+            user=user,
+            credentials=credentials,
+            permission_needed=CHOICE_PERMISSION_DELETE,
         ):
             return Response(
                 data={'msg': f"Not privileged to delete the {_log_global_user(are_global, lower=True)} "
@@ -324,12 +317,7 @@ class APIJobCredentialsItem(APIView):
 
     @extend_schema(
         request=JobGlobalCredentialsWriteRequest,
-        responses={
-            200: OpenApiResponse(GenericResponse, description='Credentials updated'),
-            400: OpenApiResponse(GenericResponse, description='Invalid credentials data provided'),
-            403: OpenApiResponse(GenericResponse, description='Not privileged to modify the credentials'),
-            404: OpenApiResponse(GenericResponse, description='Credentials do not exist'),
-        },
+        responses=api_docs_put('Credentials'),
         summary='Modify credentials.',
         operation_id='credentials_edit',
         parameters=parameters,
@@ -357,9 +345,9 @@ class APIJobCredentialsItem(APIView):
             return Response(data={'msg': base_msg}, status=404)
 
         if are_global and not has_credentials_permission(
-                user=user,
-                credentials=credentials,
-                permission_needed=CHOICE_PERMISSION_WRITE,
+            user=user,
+            credentials=credentials,
+            permission_needed=CHOICE_PERMISSION_WRITE,
         ):
             return Response(
                 data={'msg': f"Not privileged to modify the {_log_global_user(are_global, lower=True)} "

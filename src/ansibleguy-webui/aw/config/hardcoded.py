@@ -16,6 +16,7 @@ GRP_MANAGER = {
     'permission': 'AW Permission Managers',
     'repository': 'AW Repository Managers',
     'credentials': 'AW Credentials Managers',
+    'alert': 'AW Alert Managers',
     'system': 'AW System Managers',
 }
 REPO_CLONE_TIMEOUT = 300

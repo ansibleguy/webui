@@ -9,6 +9,9 @@ from aw.api_endpoints.credentials import APIJobCredentials, APIJobCredentialsIte
 from aw.api_endpoints.filesystem import APIFsBrowse, APIFsExists
 from aw.api_endpoints.system import APISystemConfig
 from aw.api_endpoints.repository import APIRepository, APIRepositoryItem, APIRepositoryLogFile
+from aw.api_endpoints.alert import APIAlertPlugin, APIAlertPluginItem, APIAlertUser, APIAlertUserItem, \
+    APIAlertGlobal, APIAlertGlobalItem, APIAlertGroup, APIAlertGroupItem
+# from aw.api_endpoints.base import not_implemented
 
 urlpatterns_api = [
     path('api/key/<str:token>', APIKeyItem.as_view()),
@@ -26,6 +29,14 @@ urlpatterns_api = [
     path('api/repository/log/<int:repo_id>', APIRepositoryLogFile.as_view()),
     path('api/repository/<int:repo_id>', APIRepositoryItem.as_view()),
     path('api/repository', APIRepository.as_view()),
+    path('api/alert/plugin/<int:plugin_id>', APIAlertPluginItem.as_view()),
+    path('api/alert/plugin', APIAlertPlugin.as_view()),
+    path('api/alert/global/<int:alert_id>', APIAlertGlobalItem.as_view()),
+    path('api/alert/global', APIAlertGlobal.as_view()),
+    path('api/alert/group/<int:alert_id>', APIAlertGroupItem.as_view()),
+    path('api/alert/group', APIAlertGroup.as_view()),
+    path('api/alert/user/<int:alert_id>', APIAlertUserItem.as_view()),
+    path('api/alert/user', APIAlertUser.as_view()),
     path('api/config', APISystemConfig.as_view()),
     path('api/fs/browse/<str:repository>', APIFsBrowse.as_view()),
     path('api/fs/exists', APIFsExists.as_view()),

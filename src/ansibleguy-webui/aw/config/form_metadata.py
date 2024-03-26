@@ -58,6 +58,13 @@ FORM_LABEL = {
             'credentials_all': 'All credentials',
             'repositories_all': 'All repositories',
         },
+        'alerts': {
+            'alert_type': 'Alert Type',
+            'plugin': 'Plugin',
+            'jobs_all': 'All Jobs',
+            'jobs': 'Jobs',
+            'condition': 'Condition',
+        }
     },
     'system': {
         'config': {
@@ -175,6 +182,9 @@ FORM_HELP = {
             'credentials_all': 'Match permission to all existing credentials (present and future)',
             'repositories_all': 'Match permission to all existing repositories (present and future)',
         },
+        'alerts': {
+            'jobs_all': 'Match all existing jobs (present and future)',
+        }
     },
     'system': {
         'config': {

@@ -3,13 +3,14 @@ from django.db.utils import IntegrityError
 from rest_framework.generics import GenericAPIView
 from rest_framework import serializers
 from rest_framework.response import Response
-from drf_spectacular.utils import extend_schema, OpenApiResponse
+from drf_spectacular.utils import extend_schema
 
 from aw.model.job import Job
 from aw.model.job_credential import JobGlobalCredentials
 from aw.model.permission import JobPermission, JobPermissionMapping, JobPermissionMemberUser, \
     JobPermissionMemberGroup, JobCredentialsPermissionMapping, JobRepositoryPermissionMapping
-from aw.api_endpoints.base import API_PERMISSION, GenericResponse, get_api_user
+from aw.api_endpoints.base import API_PERMISSION, GenericResponse, get_api_user, api_docs_put, api_docs_delete, \
+    api_docs_post
 from aw.utils.permission import has_manager_privileges
 from aw.utils.util import is_set
 from aw.base import USERS, GROUPS
@@ -239,11 +240,7 @@ class APIPermission(GenericAPIView):
 
     @extend_schema(
         request=PermissionWriteRequest,
-        responses={
-            200: OpenApiResponse(response=GenericResponse, description='Permission created'),
-            400: OpenApiResponse(response=GenericResponse, description='Invalid permission data provided'),
-            403: OpenApiResponse(response=GenericResponse, description='Not privileged to create a permission'),
-        },
+        responses=api_docs_post('Permission'),
         summary='Create a new Permission.',
         operation_id='permission_create',
     )
@@ -293,12 +290,7 @@ class APIPermissionItem(GenericAPIView):
 
     @extend_schema(
         request=PermissionWriteRequest,
-        responses={
-            200: OpenApiResponse(response=GenericResponse, description='Permission updated'),
-            400: OpenApiResponse(response=GenericResponse, description='Invalid permission data provided'),
-            403: OpenApiResponse(response=GenericResponse, description='Not privileged to edit the permission'),
-            404: OpenApiResponse(response=GenericResponse, description='Permission does not exist'),
-        },
+        responses=api_docs_put('Permission'),
         summary='Modify a permission.',
         operation_id='permission_edit',
     )
@@ -339,12 +331,7 @@ class APIPermissionItem(GenericAPIView):
 
     @extend_schema(
         request=None,
-        responses={
-            200: OpenApiResponse(response=GenericResponse, description='Permission deleted'),
-            400: OpenApiResponse(response=GenericResponse, description='Invalid permission data provided'),
-            403: OpenApiResponse(response=GenericResponse, description='Not privileged to delete the permission'),
-            404: OpenApiResponse(response=GenericResponse, description='Permission does not exist'),
-        },
+        responses=api_docs_delete('Permission'),
         summary='Delete a permission.',
         operation_id='permission_delete'
     )

@@ -11,7 +11,7 @@ from aw.model.permission import CHOICE_PERMISSION_READ, CHOICE_PERMISSION_EXECUT
     CHOICE_PERMISSION_WRITE, CHOICE_PERMISSION_DELETE
 from aw.model.job_credential import JobGlobalCredentials
 from aw.api_endpoints.base import API_PERMISSION, get_api_user, BaseResponse, GenericResponse, \
-    LogDownloadResponse
+    LogDownloadResponse, api_docs_put, api_docs_delete, api_docs_post
 from aw.api_endpoints.job_util import get_viewable_jobs_serialized, JobReadResponse, get_job_executions_serialized, \
     JobExecutionReadResponse, get_viewable_jobs, get_job_execution_serialized, get_log_file_content
 from aw.utils.permission import has_job_permission, has_credentials_permission, has_manager_privileges
@@ -125,11 +125,7 @@ class APIJob(APIView):
 
     @extend_schema(
         request=JobWriteRequest,
-        responses={
-            200: OpenApiResponse(GenericResponse, description='Job created'),
-            400: OpenApiResponse(GenericResponse, description='Invalid job data provided'),
-            403: OpenApiResponse(GenericResponse, description='Not privileged to create jobs'),
-        },
+        responses=api_docs_post('Job'),
         summary='Create a new job.',
         operation_id='job_create'
     )
@@ -211,11 +207,7 @@ class APIJobItem(APIView):
 
     @extend_schema(
         request=None,
-        responses={
-            200: OpenApiResponse(GenericResponse, description='Job deleted'),
-            403: OpenApiResponse(GenericResponse, description='Not privileged to delete the job'),
-            404: OpenApiResponse(GenericResponse, description='Job does not exist'),
-        },
+        responses=api_docs_delete('Job'),
         summary='Delete a job.',
         operation_id='job_delete'
     )
@@ -238,12 +230,7 @@ class APIJobItem(APIView):
 
     @extend_schema(
         request=JobWriteRequest,
-        responses={
-            200: OpenApiResponse(GenericResponse, description='Job updated'),
-            400: OpenApiResponse(GenericResponse, description='Invalid job data provided'),
-            403: OpenApiResponse(GenericResponse, description='Not privileged to modify the job'),
-            404: OpenApiResponse(GenericResponse, description='Job does not exist'),
-        },
+        responses=api_docs_put('Job'),
         summary='Modify a job.',
         operation_id='job_edit'
     )
