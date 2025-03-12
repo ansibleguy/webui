@@ -1,6 +1,10 @@
 # Basic WebUI for using Ansible
 
-<a href='https://ko-fi.com/ansible0guy' target='_blank'><img height='35' style='border:0px;height:46px;' src='https://az743702.vo.msecnd.net/cdn/kofi3.png?v=0' border='0' alt='Buy me a coffee' />
+## !!! Redirect !!!
+
+This project has been moved to [O-X-L/ansible-webui](https://github.com/O-X-L/ansible-webui)!
+
+----
 
 [![Lint](https://github.com/ansibleguy/webui/actions/workflows/lint.yml/badge.svg?branch=latest)](https://github.com/ansibleguy/webui/actions/workflows/lint.yml)
 [![Test](https://github.com/ansibleguy/webui/actions/workflows/test.yml/badge.svg?branch=latest)](https://github.com/ansibleguy/webui/actions/workflows/test.yml)
@@ -68,18 +72,6 @@ Testers are also very welcome! Please [give feedback](https://github.com/ansible
 See also: [Contributing](https://github.com/ansibleguy/webui/blob/latest/CONTRIBUTE.md)
 
 <img src="https://contrib.rocks/image?repo=ansibleguy/webui&max=5" />
-
-----
-
-## Advertisement
-
-* Need **professional support** using Ansible? Contact us:
-
-  E-Mail: [contact@oxl.at](mailto:contact@oxl.at)
-
-  Tel: [+43 3115 40 900 0](tel:+433115409000)
-
-  Web: [EN](https://www.o-x-l.com) | [DE](https://www.oxl.at)
 
 ----
 
