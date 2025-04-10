@@ -1,8 +1,10 @@
-# Basic WebUI for using Ansible
-
-## !!! Redirect !!!
+# !!! Redirect !!!
 
 This project has been moved to [O-X-L/ansible-webui](https://github.com/O-X-L/ansible-webui)!
+
+----
+
+# Basic WebUI for using Ansible
 
 ----
 
